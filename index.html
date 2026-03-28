@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MapLeads — Find Local Businesses Without Websites</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#050509;
+  --ink1:#0c0c16;
+  --ink2:#13131f;
+  --ink3:#1c1c2e;
+  --wire:#252540;
+  --wire2:#32325a;
+  --text:#eeeef8;
+  --muted:#7070a0;
+  --muted2:#404065;
+  --lime:#c8ff00;
+  --lime2:#a8d800;
+  --teal:#00e5cc;
+  --red:#ff3e5e;
+  --amber:#ffb020;
+  --r:8px;
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ── custom cursor ── */
+#cursor{
+  position:fixed;width:10px;height:10px;
+  background:var(--lime);border-radius:50%;
+  pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);
+  transition:width .15s,height .15s,background .15s;
+  mix-blend-mode:difference;
+}
+#cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1.5px solid rgba(200,255,0,0.4);border-radius:50%;
+  pointer-events:none;z-index:99998;
+  transform:translate(-50%,-50%);
+  transition:all .08s;
+}
+body:has(a:hover) #cursor,body:has(button:hover) #cursor{width:20px;height:20px;}
+
+/* ── noise texture overlay ── */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:0;opacity:.6;
+}
+
+/* ── grid bg ── */
+.grid-bg{
+  position:fixed;inset:0;z-index:0;
+  background-image:
+    linear-gradient(var(--wire) 1px,transparent 1px),
+    linear-gradient(90deg,var(--wire) 1px,transparent 1px);
+  background-size:48px 48px;
+  opacity:.18;
+  pointer-events:none;
+}
+
+/* ── scan line animation ── */
+.scan-line{
+  position:fixed;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--lime),transparent);
+  z-index:1;opacity:.15;
+  animation:scan 8s linear infinite;
+}
+@keyframes scan{0%{top:-2px}100%{top:100vh}}
+
+/* ── layout ── */
+.wrap{position:relative;z-index:2;max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:16px 0;
+  background:rgba(5,5,9,0.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--wire);
+}
+.nav-inner{
+  max-width:1180px;margin:0 auto;padding:0 24px;
+  display:flex;align-items:center;gap:32px;
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:26px;letter-spacing:2px;
+  color:var(--lime);
+  display:flex;align-items:center;gap:8px;
+}
+.nav-logo span{color:var(--text)}
+.nav-links{display:flex;gap:24px;margin-left:auto}
+.nav-links a{
+  color:var(--muted);font-size:13px;font-weight:500;
+  text-decoration:none;letter-spacing:.5px;
+  transition:color .2s;
+}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{
+  background:var(--lime);color:var(--ink);
+  padding:9px 22px;border-radius:6px;
+  font-weight:700;font-size:13px;
+  text-decoration:none;letter-spacing:.5px;
+  transition:all .2s;white-space:nowrap;
+}
+.nav-cta:hover{background:var(--lime2);color:var(--ink)!important;transform:translateY(-1px)}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;align-items:center;
+  padding:120px 0 80px;
+  position:relative;overflow:hidden;
+}
+
+.hero-radar{
+  position:absolute;right:-200px;top:50%;transform:translateY(-50%);
+  width:700px;height:700px;opacity:.12;
+  pointer-events:none;
+}
+.radar-ring{
+  position:absolute;border:1px solid var(--lime);border-radius:50%;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+}
+.radar-sweep{
+  position:absolute;top:50%;left:50%;width:50%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--lime));
+  transform-origin:left center;
+  animation:sweep 4s linear infinite;
+}
+@keyframes sweep{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(200,255,0,.06);
+  border:1px solid rgba(200,255,0,.2);
+  border-radius:999px;
+  padding:6px 14px;
+  font-family:'DM Mono',monospace;
+  font-size:11px;color:var(--lime);
+  letter-spacing:1.5px;text-transform:uppercase;
+  margin-bottom:28px;
+}
+.hero-eyebrow::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--lime);
+  animation:blink 1.4s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.hero h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(72px,10vw,130px);
+  line-height:.92;
+  letter-spacing:-1px;
+  margin-bottom:28px;
+}
+.hero h1 .accent{
+  color:transparent;
+  -webkit-text-stroke:2px var(--lime);
+}
+.hero h1 .block{display:block}
+
+.hero-desc{
+  font-size:17px;color:var(--muted);
+  max-width:520px;line-height:1.7;
+  margin-bottom:40px;
+}
+.hero-desc strong{color:var(--text)}
+
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:52px}
+
+.btn-primary{
+  background:var(--lime);color:var(--ink);
+  padding:14px 32px;border-radius:7px;
+  font-weight:700;font-size:15px;
+  text-decoration:none;letter-spacing:.3px;
+  border:none;cursor:pointer;
+  transition:all .2s;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-primary:hover{background:var(--lime2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(200,255,0,.25)}
+
+.btn-ghost{
+  background:transparent;
+  border:1px solid var(--wire2);color:var(--muted);
+  padding:14px 28px;border-radius:7px;
+  font-weight:500;font-size:15px;
+  text-decoration:none;letter-spacing:.3px;
+  cursor:pointer;
+  transition:all .2s;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-ghost:hover{border-color:var(--lime);color:var(--lime)}
+
+.hero-stats{
+  display:flex;gap:40px;flex-wrap:wrap;
+}
+.hero-stat-val{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:42px;color:var(--lime);letter-spacing:1px;
+  line-height:1;
+}
+.hero-stat-lbl{
+  font-size:12px;color:var(--muted);
+  font-family:'DM Mono',monospace;
+  letter-spacing:1px;margin-top:3px;
+}
+
+/* ── SECTION COMMONS ── */
+section{padding:100px 0}
+.section-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:'DM Mono',monospace;font-size:10px;
+  color:var(--lime);letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:16px;
+}
+.section-tag::before{content:'//'}
+h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(48px,6vw,76px);
+  line-height:.96;letter-spacing:.5px;
+  margin-bottom:16px;
+}
+h2 em{font-style:normal;color:var(--lime)}
+.section-sub{
+  font-size:16px;color:var(--muted);
+  max-width:560px;line-height:1.7;
+  margin-bottom:56px;
+}
+
+/* ── HOW IT WORKS ── */
+.steps{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:2px;
+  background:var(--wire);
+  border:1px solid var(--wire);
+  border-radius:12px;
+  overflow:hidden;
+}
+.step{
+  background:var(--ink1);
+  padding:36px 28px;
+  position:relative;
+  transition:background .2s;
+}
+.step:hover{background:var(--ink2)}
+.step-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:72px;color:var(--wire2);
+  line-height:1;margin-bottom:16px;
+  transition:color .2s;
+}
+.step:hover .step-num{color:var(--lime)}
+.step-icon{font-size:28px;margin-bottom:12px}
+.step h3{font-size:17px;font-weight:700;margin-bottom:8px}
+.step p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* ── FEATURES ── */
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:16px;
+}
+.feature-card{
+  background:var(--ink1);
+  border:1px solid var(--wire);
+  border-radius:10px;
+  padding:28px;
+  transition:all .2s;
+  position:relative;overflow:hidden;
+}
+.feature-card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--lime),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.feature-card:hover{border-color:var(--wire2);transform:translateY(-3px)}
+.feature-card:hover::before{opacity:1}
+.feat-icon{
+  width:44px;height:44px;border-radius:8px;
+  background:rgba(200,255,0,.08);
+  border:1px solid rgba(200,255,0,.15);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;margin-bottom:16px;
+}
+.feature-card h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.feature-card p{font-size:13px;color:var(--muted);line-height:1.65}
+
+/* ── TERMINAL DEMO ── */
+.terminal{
+  background:#020204;
+  border:1px solid var(--wire);
+  border-radius:12px;
+  overflow:hidden;
+  font-family:'DM Mono',monospace;
+}
+.terminal-bar{
+  background:var(--ink2);
+  padding:12px 16px;
+  display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--wire);
+}
+.t-dot{width:12px;height:12px;border-radius:50%}
+.t-title{
+  font-size:11px;color:var(--muted);
+  margin-left:8px;letter-spacing:.5px;
+}
+.terminal-body{padding:24px;font-size:13px;line-height:2}
+.t-line{display:flex;gap:12px}
+.t-prompt{color:var(--lime)}
+.t-cmd{color:var(--text)}
+.t-output{color:var(--muted);padding-left:20px}
+.t-green{color:var(--lime)}
+.t-teal{color:var(--teal)}
+.t-amber{color:var(--amber)}
+.t-red{color:var(--red)}
+.t-cursor{
+  display:inline-block;width:8px;height:14px;
+  background:var(--lime);
+  animation:blink 1s infinite;vertical-align:middle;
+}
+
+/* ── PRICING ── */
+.pricing-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:16px;
+  align-items:end;
+}
+.price-card{
+  background:var(--ink1);
+  border:1px solid var(--wire);
+  border-radius:12px;
+  padding:32px 28px;
+  position:relative;
+  transition:all .25s;
+}
+.price-card:hover{transform:translateY(-4px);border-color:var(--wire2)}
+.price-card.featured{
+  background:var(--ink2);
+  border-color:var(--lime);
+  transform:scale(1.03);
+  box-shadow:0 0 0 1px var(--lime),0 24px 60px rgba(200,255,0,.1);
+}
+.price-card.featured:hover{transform:scale(1.03) translateY(-4px)}
+.price-badge{
+  position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  background:var(--lime);color:var(--ink);
+  font-family:'DM Mono',monospace;
+  font-size:10px;font-weight:500;
+  padding:4px 14px;border-radius:999px;
+  letter-spacing:1px;text-transform:uppercase;
+  white-space:nowrap;
+}
+.price-tier{
+  font-family:'DM Mono',monospace;
+  font-size:10px;color:var(--lime);
+  letter-spacing:2px;text-transform:uppercase;
+  margin-bottom:12px;
+}
+.price-name{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:32px;letter-spacing:1px;
+  margin-bottom:6px;
+}
+.price-amount{
+  display:flex;align-items:baseline;gap:4px;
+  margin-bottom:6px;
+}
+.price-dollar{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:56px;line-height:1;color:var(--lime);
+}
+.price-free{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:48px;line-height:1;color:var(--lime);
+}
+.price-period{
+  font-size:13px;color:var(--muted);
+  font-family:'DM Mono',monospace;
+}
+.price-leads{
+  font-size:13px;color:var(--muted);
+  margin-bottom:24px;
+  font-family:'DM Mono',monospace;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--wire);
+}
+.price-leads strong{color:var(--text);font-size:15px}
+.price-features{
+  list-style:none;
+  display:flex;flex-direction:column;gap:10px;
+  margin-bottom:28px;
+}
+.price-features li{
+  font-size:13px;color:var(--muted);
+  display:flex;align-items:flex-start;gap:8px;line-height:1.5;
+}
+.price-features li::before{
+  content:'✓';color:var(--lime);
+  flex-shrink:0;font-weight:700;
+  font-family:'DM Mono',monospace;
+}
+.price-features li.no::before{content:'✗';color:var(--muted2)}
+.price-features li.no{color:var(--muted2)}
+
+.btn-plan{
+  width:100%;padding:12px;border-radius:7px;
+  font-weight:700;font-size:14px;
+  border:none;cursor:pointer;
+  transition:all .2s;letter-spacing:.3px;
+}
+.btn-plan-lime{background:var(--lime);color:var(--ink)}
+.btn-plan-lime:hover{background:var(--lime2);transform:translateY(-1px)}
+.btn-plan-ghost{
+  background:transparent;
+  border:1px solid var(--wire2);color:var(--muted);
+}
+.btn-plan-ghost:hover{border-color:var(--lime);color:var(--lime)}
+
+/* ── SOCIAL PROOF ── */
+.testimonials{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:16px;
+}
+.testi{
+  background:var(--ink1);border:1px solid var(--wire);
+  border-radius:10px;padding:24px;
+}
+.testi-stars{color:var(--amber);font-size:14px;margin-bottom:12px;letter-spacing:2px}
+.testi-text{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:16px;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:10px}
+.testi-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--ink3);border:1px solid var(--wire);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.testi-name{font-size:13px;font-weight:600}
+.testi-role{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
+
+/* ── FAQ ── */
+.faq{display:flex;flex-direction:column;gap:2px;max-width:760px}
+.faq-item{
+  background:var(--ink1);border:1px solid var(--wire);
+  border-radius:8px;overflow:hidden;
+}
+.faq-q{
+  padding:18px 22px;
+  display:flex;justify-content:space-between;align-items:center;
+  cursor:pointer;font-size:15px;font-weight:600;
+  user-select:none;
+  transition:background .15s;
+}
+.faq-q:hover{background:var(--ink2)}
+.faq-q::after{
+  content:'+';font-size:20px;color:var(--lime);
+  transition:transform .2s;flex-shrink:0;margin-left:16px;
+  font-family:'DM Mono',monospace;
+}
+.faq-item.open .faq-q::after{transform:rotate(45deg)}
+.faq-a{
+  max-height:0;overflow:hidden;
+  transition:max-height .3s ease,padding .3s;
+  font-size:14px;color:var(--muted);line-height:1.7;
+  padding:0 22px;
+}
+.faq-item.open .faq-a{max-height:200px;padding:0 22px 18px}
+
+/* ── CTA BAND ── */
+.cta-band{
+  background:var(--ink1);
+  border:1px solid var(--wire);
+  border-radius:16px;
+  padding:72px 48px;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.cta-band::before{
+  content:'';position:absolute;
+  top:-100px;left:50%;transform:translateX(-50%);
+  width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,255,0,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.cta-band h2{margin-bottom:16px}
+.cta-band p{color:var(--muted);margin-bottom:36px;font-size:16px}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--wire);
+  padding:40px 0;
+  font-family:'DM Mono',monospace;
+}
+.footer-inner{
+  display:flex;justify-content:space-between;
+  align-items:center;flex-wrap:wrap;gap:16px;
+}
+.footer-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;letter-spacing:2px;color:var(--lime);
+}
+.footer-links{display:flex;gap:20px}
+.footer-links a{
+  font-size:11px;color:var(--muted);
+  text-decoration:none;letter-spacing:.5px;
+  transition:color .2s;
+}
+.footer-links a:hover{color:var(--text)}
+.footer-copy{font-size:11px;color:var(--muted2);letter-spacing:.5px}
+
+/* ── ticker ── */
+.ticker-wrap{
+  overflow:hidden;border-top:1px solid var(--wire);border-bottom:1px solid var(--wire);
+  padding:12px 0;background:var(--ink1);margin-bottom:0;
+}
+.ticker{
+  display:flex;gap:48px;
+  animation:ticker 24s linear infinite;
+  width:max-content;
+}
+.ticker-item{
+  font-family:'DM Mono',monospace;
+  font-size:11px;color:var(--muted);
+  letter-spacing:1px;text-transform:uppercase;
+  white-space:nowrap;display:flex;align-items:center;gap:12px;
+}
+.ticker-item span{color:var(--lime)}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── animations ── */
+.fade-up{
+  opacity:0;transform:translateY(24px);
+  transition:opacity .6s ease,transform .6s ease;
+}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:768px){
+  .nav-links{display:none}
+  .hero h1{font-size:clamp(56px,14vw,90px)}
+  .hero-radar{display:none}
+  .price-card.featured{transform:none}
+  .cta-band{padding:40px 24px}
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div class="grid-bg"></div>
+<div class="scan-line"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">📍 <span>Map</span>Leads</div>
+    <div class="nav-links">
+      <a href="#how">How It Works</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <a href="#pricing" class="nav-cta">Start Free →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap" style="position:relative;z-index:2">
+    <div class="hero-eyebrow">AI-powered lead generation</div>
+    <h1>
+      <span class="block">FIND</span>
+      <span class="block accent">BUSINESSES</span>
+      <span class="block">WITHOUT</span>
+      <span class="block" style="color:var(--lime)">WEBSITES</span>
+    </h1>
+    <p class="hero-desc">
+      MapLeads scrapes Google Maps in real time, filters out franchises and chains, 
+      <strong>verifies each lead with a live Google search</strong>, and delivers only 
+      confirmed local businesses that need your services.
+    </p>
+    <div class="hero-actions">
+      <a href="#pricing" class="btn-primary">🚀 Get 100 Free Leads</a>
+      <a href="#how" class="btn-ghost">See How It Works ↓</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-val">98%</div>
+        <div class="hero-stat-lbl">Accuracy Rate</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">120+</div>
+        <div class="hero-stat-lbl">Results Per Scan</div>
+      </div>
+      <div>
+        <div class="hero-stat-val">$0</div>
+        <div class="hero-stat-lbl">To Start</div>
+      </div>
+    </div>
+  </div>
+  <!-- radar graphic -->
+  <div class="hero-radar">
+    <div class="radar-ring" style="width:100px;height:100px"></div>
+    <div class="radar-ring" style="width:200px;height:200px"></div>
+    <div class="radar-ring" style="width:320px;height:320px"></div>
+    <div class="radar-ring" style="width:460px;height:460px"></div>
+    <div class="radar-ring" style="width:620px;height:620px"></div>
+    <div class="radar-sweep"></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <div class="ticker-item">📍 Restaurant · Miami, FL · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Hair Salon · Austin, TX · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Plumbing Co · Denver, CO · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Auto Shop · Chicago, IL · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Nail Salon · Atlanta, GA · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 HVAC Service · Phoenix, AZ · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Dentist · Seattle, WA · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Landscaping · Dallas, TX · <span>No Website Found</span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-item">📍 Restaurant · Miami, FL · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Hair Salon · Austin, TX · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Plumbing Co · Denver, CO · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Auto Shop · Chicago, IL · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Nail Salon · Atlanta, GA · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 HVAC Service · Phoenix, AZ · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Dentist · Seattle, WA · <span>No Website Found</span></div>
+    <div class="ticker-item">📍 Landscaping · Dallas, TX · <span>No Website Found</span></div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="wrap">
+    <div class="fade-up">
+      <div class="section-tag">Process</div>
+      <h2>FROM MAPS TO<br><em>QUALIFIED LEADS</em></h2>
+      <p class="section-sub">Three automated steps turn a Google Maps search into a verified pipeline of businesses ready for outreach — in under 2 minutes.</p>
+    </div>
+    <div class="steps fade-up">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-icon">🗺️</div>
+        <h3>Search Google Maps</h3>
+        <p>Search any business category and city on Google Maps. MapLeads auto-scrolls the entire results list, loading every business — up to 120 per search.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-icon">🧹</div>
+        <h3>Filter Chains & Franchises</h3>
+        <p>Our 200+ chain database instantly removes TruGreen, McDonald's, Starbucks, and any national brand. Only independent local businesses make the cut.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-icon">🔍</div>
+        <h3>Google Verification</h3>
+        <p>Every "no website" flag gets verified with a live Google search. If a real business site is hiding anywhere on the web, we find it and filter it out.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-icon">📊</div>
+        <h3>Pipeline & Export</h3>
+        <p>Leads flow straight to your Google Sheet and dashboard. Track every prospect through New Lead → Contacted → Appt Set → Closed with one click.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TERMINAL DEMO -->
+<section style="padding:0 0 100px">
+  <div class="wrap fade-up">
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="t-dot" style="background:#ff5f57"></div>
+        <div class="t-dot" style="background:#febc2e"></div>
+        <div class="t-dot" style="background:#28c840"></div>
+        <div class="t-title">mapleads · live scan · restaurants fort lauderdale fl</div>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-prompt">▶</span><span class="t-cmd">Scanning Google Maps results...</span></div>
+        <div class="t-output t-teal">⏳ Loading results... 47 found · 60% scrolled</div>
+        <div class="t-output t-teal">⏳ Loading results... 89 found · 85% scrolled</div>
+        <div class="t-output t-green">✓ Loaded 112 businesses · end of results reached</div>
+        <div class="t-line" style="margin-top:8px"><span class="t-prompt">▶</span><span class="t-cmd">Applying chain filter...</span></div>
+        <div class="t-output" style="color:var(--red)">✗ Removed: McDonald's, Subway, Chili's, TruGreen (+14 more)</div>
+        <div class="t-output t-green">✓ 94 independent businesses remaining</div>
+        <div class="t-line" style="margin-top:8px"><span class="t-prompt">▶</span><span class="t-cmd">Google-verifying 61 no-website leads...</span></div>
+        <div class="t-output t-amber">🔍 Verifying 1/61: Mario's Little Italy...</div>
+        <div class="t-output t-amber">🔍 Verifying 2/61: Sunshine Diner...</div>
+        <div class="t-output" style="color:var(--red)">✗ Hidden site found: grandmakitchen.com — filtered</div>
+        <div class="t-output t-amber">🔍 Verifying 4/61: El Rincon Cubano...</div>
+        <div class="t-output t-green">✓ Confirmed no website</div>
+        <div class="t-line" style="margin-top:8px"><span class="t-prompt">▶</span><span class="t-cmd">Saving to Google Sheets...</span></div>
+        <div class="t-output t-green">☁ Done! <strong style="color:var(--lime)">47 confirmed no-website leads</strong> · 14 filtered · 38 new rows added</div>
+        <div class="t-line"><span class="t-prompt">▶</span><span class="t-cursor"></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" style="padding:0 0 100px">
+  <div class="wrap">
+    <div class="fade-up">
+      <div class="section-tag">Features</div>
+      <h2>EVERYTHING YOU NEED<br><em>NOTHING YOU DON'T</em></h2>
+      <p class="section-sub">Built specifically for sales professionals, web designers, marketers, and agencies who prospect local businesses.</p>
+    </div>
+    <div class="features-grid fade-up">
+      <div class="feature-card">
+        <div class="feat-icon">🗺️</div>
+        <h3>Auto-Scroll Scraping</h3>
+        <p>MapLeads automatically scrolls Google Maps to load every result for your search — up to 120 businesses per scan, hands-free.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🧹</div>
+        <h3>Chain & Franchise Filter</h3>
+        <p>200+ known national chains blacklisted. No more TruGreen, no more Subway. Only real independent local businesses in your pipeline.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🔍</div>
+        <h3>Live Google Verification</h3>
+        <p>Every lead gets cross-checked with a real Google search. We catch businesses with hidden websites that aren't listed on Maps.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">📋</div>
+        <h3>CRM Pipeline</h3>
+        <p>Track every lead from New → Contacted → Interested → Appt Set → Closed. Add call notes, follow-up dates, and deal details.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">📊</div>
+        <h3>Google Sheets Sync</h3>
+        <p>Every scan flows instantly to your Google Sheet. Clickable Maps and Google Search links on every row. Share with your team in seconds.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">📥</div>
+        <h3>CSV Export</h3>
+        <p>Export any filtered view to CSV with one click — name, address, phone, category, rating, Maps link, stage, and notes all included.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🕓</div>
+        <h3>Scan History</h3>
+        <p>Every session saved. Browse past scans by date and search query, drill into individual leads, and reload them into your pipeline.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🔗</div>
+        <h3>One-Click Google Search</h3>
+        <p>Each lead has a 🔍 Google button. Instantly research the business, find the owner's name, LinkedIn, or social media before calling.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🧩</div>
+        <h3>Tampermonkey Powered</h3>
+        <p>Runs as a browser extension on Google Maps — no login required, no third-party API, no monthly per-seat cost. Fully yours.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="wrap">
+    <div class="fade-up" style="text-align:center;max-width:600px;margin:0 auto 56px">
+      <div class="section-tag" style="justify-content:center">Pricing</div>
+      <h2>SIMPLE.<br><em>TRANSPARENT.</em> FAIR.</h2>
+      <p class="section-sub" style="margin:0 auto">No per-lead fees. No hidden charges. Pick a plan and own your prospecting.</p>
+    </div>
+    <div class="pricing-grid fade-up">
+
+      <!-- Free -->
+      <div class="price-card">
+        <div class="price-tier">Starter</div>
+        <div class="price-name">Free Trial</div>
+        <div class="price-amount"><div class="price-free">FREE</div></div>
+        <div class="price-leads">
+          <strong>100 leads</strong><br>once every 30 days
+        </div>
+        <ul class="price-features">
+          <li>100 verified leads / 30 days</li>
+          <li>Chain & franchise filter</li>
+          <li>Google verification</li>
+          <li>CSV export</li>
+          <li>Google Sheets sync</li>
+          <li class="no">Pipeline CRM</li>
+          <li class="no">Scan history</li>
+          <li class="no">Priority support</li>
+        </ul>
+        <button class="btn-plan btn-plan-ghost" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'})">Start Free</button>
+      </div>
+
+      <!-- Starter -->
+      <div class="price-card">
+        <div class="price-tier">Pro</div>
+        <div class="price-name">Prospector</div>
+        <div class="price-amount">
+          <div class="price-dollar">$5</div>
+          <div class="price-period">/month</div>
+        </div>
+        <div class="price-leads">
+          <strong>1,000 leads</strong><br>per month · resets monthly
+        </div>
+        <ul class="price-features">
+          <li>1,000 verified leads / mo</li>
+          <li>Chain & franchise filter</li>
+          <li>Google verification</li>
+          <li>CSV export</li>
+          <li>Google Sheets sync</li>
+          <li>Pipeline CRM</li>
+          <li>Scan history (30 days)</li>
+          <li class="no">Priority support</li>
+        </ul>
+        <button class="btn-plan btn-plan-ghost" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'})">Get Started</button>
+      </div>
+
+      <!-- Growth — FEATURED -->
+      <div class="price-card featured">
+        <div class="price-badge">Most Popular</div>
+        <div class="price-tier">Growth</div>
+        <div class="price-name">Hunter</div>
+        <div class="price-amount">
+          <div class="price-dollar">$10</div>
+          <div class="price-period">/month</div>
+        </div>
+        <div class="price-leads">
+          <strong>5,000 leads</strong><br>per month · resets monthly
+        </div>
+        <ul class="price-features">
+          <li>5,000 verified leads / mo</li>
+          <li>Chain & franchise filter</li>
+          <li>Google verification</li>
+          <li>CSV export</li>
+          <li>Google Sheets sync</li>
+          <li>Full pipeline CRM</li>
+          <li>Scan history (unlimited)</li>
+          <li>Priority email support</li>
+        </ul>
+        <button class="btn-plan btn-plan-lime" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'})">Get Hunter →</button>
+      </div>
+
+      <!-- Unlimited -->
+      <div class="price-card">
+        <div class="price-tier">Agency</div>
+        <div class="price-name">Unlimited</div>
+        <div class="price-amount">
+          <div class="price-dollar">$25</div>
+          <div class="price-period">/month</div>
+        </div>
+        <div class="price-leads">
+          <strong>Unlimited leads</strong><br>no caps · no throttling
+        </div>
+        <ul class="price-features">
+          <li>Unlimited verified leads</li>
+          <li>Chain & franchise filter</li>
+          <li>Google verification</li>
+          <li>CSV export</li>
+          <li>Google Sheets sync</li>
+          <li>Full pipeline CRM</li>
+          <li>Scan history (unlimited)</li>
+          <li>Priority support + onboarding</li>
+        </ul>
+        <button class="btn-plan btn-plan-ghost" onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'})">Go Unlimited</button>
+      </div>
+
+    </div>
+
+    <!-- comparison note -->
+    <div class="fade-up" style="text-align:center;margin-top:36px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)">
+      All plans include the Tampermonkey scraper + dashboard. Cancel anytime. No contracts.
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section style="padding:80px 0">
+  <div class="wrap">
+    <div class="fade-up">
+      <div class="section-tag">Social Proof</div>
+      <h2>WHAT PROS<br><em>ARE SAYING</em></h2>
+    </div>
+    <div class="testimonials fade-up">
+      <div class="testi">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"I was spending 3 hours manually searching Maps for leads. MapLeads does 100 verified leads in under 5 minutes. Closed 4 web design clients in the first week."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">👨</div>
+          <div>
+            <div class="testi-name">Carlos M.</div>
+            <div class="testi-role">Freelance Web Designer · Miami, FL</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The Google verification step is a game changer. I used to call businesses that already had sites. Now every number I dial is a real opportunity."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">👩</div>
+          <div>
+            <div class="testi-name">Denise R.</div>
+            <div class="testi-role">Insurance Agent · Fort Lauderdale, FL</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"We run 3 reps off the Unlimited plan. The Google Sheets sync means everyone sees the same pipeline in real time. It replaced a $200/month CRM for us."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">🧑</div>
+          <div>
+            <div class="testi-name">Josh T.</div>
+            <div class="testi-role">Digital Agency Owner · Austin, TX</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="padding:80px 0">
+  <div class="wrap">
+    <div class="fade-up">
+      <div class="section-tag">Questions</div>
+      <h2>FREQUENTLY<br><em>ASKED</em></h2>
+    </div>
+    <div class="faq fade-up">
+      <div class="faq-item">
+        <div class="faq-q">How does MapLeads actually find businesses without websites?</div>
+        <div class="faq-a">MapLeads uses a Tampermonkey browser extension that reads Google Maps results in real time. It checks whether each business has a website linked in their Maps listing, then cross-checks with a live Google search to catch any sites they didn't add to Maps.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Do I need any coding skills or API keys?</div>
+        <div class="faq-a">None. Install Tampermonkey (free browser extension), paste the MapLeads script, and you're done. No API keys, no developer account, no backend to manage. It works directly inside your browser on Google Maps.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What counts as a "lead" toward my monthly limit?</div>
+        <div class="faq-a">A lead is any business that passes both the chain filter and the Google verification check — meaning it's confirmed to have no website. Businesses with websites are not counted against your limit.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I use this for any business category or city?</div>
+        <div class="faq-a">Yes. You search Google Maps for whatever you want — restaurants in Dallas, plumbers in Chicago, nail salons in Miami — MapLeads works on any category in any location. Results depend on what Google Maps has indexed for that area.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is this against Google's Terms of Service?</div>
+        <div class="faq-a">MapLeads reads publicly visible information from Google Maps — the same data anyone can see by scrolling through search results. It does not scrape in a way that bypasses authentication, violates rate limits, or accesses private data. Use it responsibly for legitimate sales prospecting.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can multiple team members share one plan?</div>
+        <div class="faq-a">Yes. The Unlimited plan is designed for teams. Anyone you share your Google Sheet and Tampermonkey script with can scan and push leads to the same pipeline. The Unlimited plan has no seat limits.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BAND -->
+<section id="signup" style="padding:80px 0">
+  <div class="wrap">
+    <div class="cta-band fade-up">
+      <div class="section-tag" style="justify-content:center">Get Started</div>
+      <h2>STOP COLD CALLING<br><em>WRONG NUMBERS</em></h2>
+      <p>Start with 100 free verified leads. No credit card. No commitment.<br>Just real local businesses that need what you're selling.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a href="#pricing" class="btn-primary" style="font-size:16px;padding:16px 40px">🚀 Get 100 Free Leads</a>
+        <a href="#features" class="btn-ghost" style="font-size:16px;padding:16px 32px">Learn More ↓</a>
+      </div>
+      <div style="margin-top:24px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.5px">
+        No credit card required · Cancel anytime · Works in any browser
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-logo">📍 MapLeads</div>
+      <div class="footer-links">
+        <a href="#how">How It Works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a href="mailto:hello@mapleads.io">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+      <div class="footer-copy">© 2025 MapLeads · All rights reserved</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// cursor
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; });
+function animCursor() {
+  cursor.style.left = mx+'px';
+  cursor.style.top  = my+'px';
+  rx += (mx-rx)*.12;
+  ry += (my-ry)*.12;
+  ring.style.left = rx+'px';
+  ring.style.top  = ry+'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+
+// fade-up on scroll
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+// FAQ accordion
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.parentElement;
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
