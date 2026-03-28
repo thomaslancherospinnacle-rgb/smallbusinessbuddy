@@ -1135,7 +1135,7 @@ async function loadFromSheets() {
   // Use proxy URL if configured, otherwise try direct (works if hosted same-origin or via CF Worker)
   const proxyUrl = settings.proxyUrl || null;
   const getUrl = proxyUrl
-    ? `${proxyUrl}?target=${encodeURIComponent(url + '?action=getLeads')}`
+    ? `${proxyUrl}?action=getLeads`
     : url + '?action=getLeads';
 
   setSyncStatus('⏳ Loading from Sheets...', '');
@@ -1226,11 +1226,7 @@ function pushToSheets(leadOrLeads, showToast = false) {
     savedAt: b.savedAt || b.scannedAt,
   }));
 
-  const body = JSON.stringify({
-    action: 'syncLeads',
-    leads: payload,
-    ...(proxyUrl ? { target: url } : {}), // tell proxy where to forward
-  });
+  const body = JSON.stringify({ action: 'syncLeads', leads: payload });
 
   setSyncStatus('⏳ Syncing...', '');
 
