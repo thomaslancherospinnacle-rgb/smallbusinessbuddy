@@ -668,7 +668,8 @@ body {
           </div>
           <div class="detail-footer">
             <button class="btn btn-primary" onclick="saveLead()">💾 Save</button>
-            <button class="btn btn-ghost" id="d-maps-btn">🗺 Open in Maps</button>
+            <button class="btn btn-ghost" id="d-maps-btn">🗺 Maps</button>
+            <button class="btn btn-ghost" id="d-google-btn">🔍 Google</button>
             <button class="btn btn-ghost" id="d-copy-btn" onclick="copyLead()">📋 Copy</button>
             <button class="btn btn-danger" onclick="deleteLead()" style="margin-left:auto">🗑 Delete</button>
           </div>
@@ -912,6 +913,10 @@ function openDetail(id) {
   document.getElementById('d-notes').value = lead.notes || '';
 
   document.getElementById('d-maps-btn').onclick = () => window.open(lead.mapsUrl, '_blank');
+  document.getElementById('d-google-btn').onclick = () => {
+    const q = lead.googleSearchUrl || `https://www.google.com/search?q=${encodeURIComponent(lead.name+' '+(lead.city||lead.address||''))}`;
+    window.open(q, '_blank');
+  };
 
   renderList(); // re-render to highlight selected
 }
@@ -1141,24 +1146,30 @@ async function loadFromSheets() {
 
     const merged = Object.values({ ...localMap, ...sheetsMap });
     // Normalise field names (Sheets uses header strings)
-    leads = merged.map(r => ({
-      id:          r.id          || r['ID']           || uid(),
-      name:        r.name        || r['Name']         || '',
-      category:    r.category    || r['Category']     || '',
-      address:     r.address     || r['Address']      || '',
-      city:        r.city        || r['City']         || '',
-      state:       r.state       || r['State']        || '',
-      phone:       r.phone       || r['Phone']        || '',
-      rating:      r.rating      || r['Rating']       || null,
-      reviewCount: r.reviewCount || r['Reviews']      || 0,
-      hasWebsite:  r.hasWebsite  !== undefined ? r.hasWebsite : (r['Has Website'] === 'Yes'),
-      website:     r.website     || r['Website']      || null,
-      mapsUrl:     r.mapsUrl     || r['Maps URL']     || '',
-      stage:       r.stage       || r['Stage']        || 'New Lead',
-      notes:       r.notes       || r['Notes']        || '',
-      scannedAt:   r.scannedAt   || r['Scanned At']   || '',
-      savedAt:     r.savedAt     || r['Saved At']     || r.scannedAt || '',
-    }));
+    leads = merged.map(r => {
+      const name    = r.name     || r['Name']    || '';
+      const city    = r.city     || r['City']    || '';
+      const address = r.address  || r['Address'] || '';
+      return {
+        id:              r.id              || r['ID']                || uid(),
+        name,
+        category:        r.category        || r['Category']         || '',
+        address,
+        city,
+        state:           r.state           || r['State']            || '',
+        phone:           r.phone           || r['Phone']            || '',
+        rating:          r.rating          || r['Rating']           || null,
+        reviewCount:     r.reviewCount     || r['Reviews']          || 0,
+        hasWebsite:      r.hasWebsite !== undefined ? r.hasWebsite : (r['Has Website'] === 'Yes'),
+        website:         r.website         || r['Website']          || null,
+        mapsUrl:         r.mapsUrl         || r['Maps URL']         || '',
+        googleSearchUrl: r.googleSearchUrl || r['Google Search URL'] || `https://www.google.com/search?q=${encodeURIComponent(name+' '+(city||address))}`,
+        stage:           r.stage           || r['Stage']            || 'New Lead',
+        notes:           r.notes           || r['Notes']            || '',
+        scannedAt:       r.scannedAt       || r['Scanned At']       || '',
+        savedAt:         r.savedAt         || r['Saved At']         || r.scannedAt || '',
+      };
+    });
 
     saveData();
     renderAll();
@@ -1194,6 +1205,7 @@ function pushToSheets(leadOrLeads, showToast = false) {
     city: b.city, state: b.state, phone: b.phone,
     rating: b.rating, reviewCount: b.reviewCount,
     hasWebsite: b.hasWebsite, mapsUrl: b.mapsUrl,
+    googleSearchUrl: b.googleSearchUrl || `https://www.google.com/search?q=${encodeURIComponent(b.name+' '+(b.city||b.address||''))}`,
     stage: b.stage, notes: b.notes,
     savedAt: b.savedAt || b.scannedAt,
   }));
