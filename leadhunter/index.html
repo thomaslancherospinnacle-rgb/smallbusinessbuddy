@@ -703,6 +703,17 @@ body {
       5. Copy the Web App URL above
     </div>
 
+    <label>Cloudflare Worker Proxy URL <span style="color:var(--muted);font-size:10px">(fixes CORS — required for dashboard sync)</span></label>
+    <input type="text" id="cfg-proxy-url" placeholder="https://agent.nf-financial.life/leadhunter-proxy">
+    <div class="modal-hint">
+      Add this Worker to your existing Cloudflare Worker at <code>agent.nf-financial.life</code>:<br><br>
+      <code>// Route: /leadhunter-proxy</code><br>
+      <code>const target = new URL(request.url).searchParams.get('target') || SHEETS_URL;</code><br>
+      <code>const resp = await fetch(target, { method: request.method, headers: { 'Content-Type': 'application/json' }, body: request.method === 'POST' ? request.body : undefined });</code><br>
+      <code>return new Response(await resp.text(), { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }});</code><br><br>
+      Or deploy the included <code>LeadHunter-Worker.js</code> as a standalone Worker.
+    </div>
+
     <div class="modal-divider"></div>
     <label>Dashboard URL (for quick access bookmark)</label>
     <input type="text" id="cfg-dash-url" placeholder="e.g. https://agent.nf-financial.life/leadhunter" readonly style="opacity:0.5">
@@ -1121,11 +1132,18 @@ async function loadFromSheets() {
   const url = settings.sheetsUrl;
   if (!url) return;
 
+  // Use proxy URL if configured, otherwise try direct (works if hosted same-origin or via CF Worker)
+  const proxyUrl = settings.proxyUrl || null;
+  const getUrl = proxyUrl
+    ? `${proxyUrl}?target=${encodeURIComponent(url + '?action=getLeads')}`
+    : url + '?action=getLeads';
+
   setSyncStatus('⏳ Loading from Sheets...', '');
   try {
-    const res = await fetch(url + '?action=getLeads', { method: 'GET' });
+    const res = await fetch(getUrl, { method: 'GET' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
+    const text = await res.text();
+    const data = JSON.parse(text);
     if (!data.success || !Array.isArray(data.leads)) throw new Error(data.error || 'Bad response');
 
     if (data.leads.length === 0) {
@@ -1133,19 +1151,13 @@ async function loadFromSheets() {
       return;
     }
 
-    // Merge: Sheets wins for stage/notes, local wins for fields Sheets doesn't store
     const sheetsMap = {};
-    data.leads.forEach(r => {
-      const k = lkey(r);
-      sheetsMap[k] = r;
-    });
+    data.leads.forEach(r => { sheetsMap[lkey(r)] = r; });
 
-    // Start from Sheets data, overlay any local-only fields
     const localMap = {};
     leads.forEach(l => { localMap[lkey(l)] = l; });
 
     const merged = Object.values({ ...localMap, ...sheetsMap });
-    // Normalise field names (Sheets uses header strings)
     leads = merged.map(r => {
       const name    = r.name     || r['Name']    || '';
       const city    = r.city     || r['City']    || '';
@@ -1177,8 +1189,9 @@ async function loadFromSheets() {
     toast(`☁ ${leads.length} leads loaded from Sheets`, 'ok');
 
   } catch (e) {
-    setSyncStatus('⚠ Could not load Sheets', 'err');
+    setSyncStatus('⚠ CORS error — set Proxy URL in ⚙ Settings', 'err');
     console.warn('LeadHunter Sheets load error:', e.message);
+    toast('⚠ CORS blocked — add Proxy URL in ⚙ Settings', 'err');
   }
 }
 
@@ -1200,6 +1213,9 @@ function pushToSheets(leadOrLeads, showToast = false) {
   const url = settings.sheetsUrl;
   if (!url) return;
 
+  const proxyUrl = settings.proxyUrl || null;
+  const postUrl  = proxyUrl ? proxyUrl : url;
+
   const payload = (Array.isArray(leadOrLeads) ? leadOrLeads : [leadOrLeads]).map(b => ({
     name: b.name, category: b.category, address: b.address,
     city: b.city, state: b.state, phone: b.phone,
@@ -1210,15 +1226,22 @@ function pushToSheets(leadOrLeads, showToast = false) {
     savedAt: b.savedAt || b.scannedAt,
   }));
 
+  const body = JSON.stringify({
+    action: 'syncLeads',
+    leads: payload,
+    ...(proxyUrl ? { target: url } : {}), // tell proxy where to forward
+  });
+
   setSyncStatus('⏳ Syncing...', '');
 
-  fetch(url, {
+  fetch(postUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'syncLeads', leads: payload }),
+    body,
   })
-  .then(r => r.json())
-  .then(data => {
+  .then(r => r.text())
+  .then(text => {
+    const data = JSON.parse(text);
     if (data.success) {
       setSyncStatus(`☁ Synced ${fmtDate(new Date().toISOString())}`, 'ok');
       if (showToast) toast(`☁ ${payload.length} leads synced to Sheets`, 'ok');
@@ -1227,9 +1250,9 @@ function pushToSheets(leadOrLeads, showToast = false) {
     }
   })
   .catch(err => {
-    setSyncStatus('❌ Sync failed', 'err');
-    if (showToast) toast('❌ Sheets sync failed: ' + err.message, 'err');
-    console.warn('LeadHunter Sheets push error:', err.message);
+    setSyncStatus('❌ Sync failed — CORS? Set Proxy URL in ⚙', 'err');
+    if (showToast) toast('❌ Sync failed: ' + err.message, 'err');
+    console.warn('LeadHunter push error:', err.message);
   });
 }
 
@@ -1277,6 +1300,7 @@ function exportCSV() {
 // ─────────────────────────────────────────────────────────────
 function openSettings() {
   document.getElementById('cfg-sheets-url').value = settings.sheetsUrl || '';
+  document.getElementById('cfg-proxy-url').value  = settings.proxyUrl  || '';
   document.getElementById('settings-modal').classList.add('open');
 }
 function closeSettings() {
@@ -1284,6 +1308,7 @@ function closeSettings() {
 }
 function saveSettings() {
   settings.sheetsUrl = document.getElementById('cfg-sheets-url').value.trim();
+  settings.proxyUrl  = document.getElementById('cfg-proxy-url').value.trim();
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   closeSettings();
   toast('✅ Settings saved', 'ok');
