@@ -891,8 +891,7 @@ function openDetail(id) {
   `;
 
   // Contact
-  const googleSearchUrl = lead.googleSearchUrl ||
-    `https://www.google.com/search?q=${encodeURIComponent([lead.name, lead.address, lead.city, lead.state].filter(Boolean).join(' '))}`;
+  const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(lead.name + ' ' + (lead.address || ''))}`;
   const mapsUrl = (lead.mapsUrl && lead.mapsUrl !== '#')
     ? lead.mapsUrl
     : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([lead.name, lead.address, lead.city, lead.state].filter(Boolean).join(' '))}`;
