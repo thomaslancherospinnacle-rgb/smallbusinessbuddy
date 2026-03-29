@@ -891,6 +891,12 @@ function openDetail(id) {
   `;
 
   // Contact
+  const googleSearchUrl = lead.googleSearchUrl ||
+    `https://www.google.com/search?q=${encodeURIComponent([lead.name, lead.address, lead.city, lead.state].filter(Boolean).join(' '))}`;
+  const mapsUrl = (lead.mapsUrl && lead.mapsUrl !== '#')
+    ? lead.mapsUrl
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([lead.name, lead.address, lead.city, lead.state].filter(Boolean).join(' '))}`;
+
   document.getElementById('d-contact').innerHTML = `
     ${lead.phone   ? `<div class="info-row"><span class="info-icon">📞</span><span class="info-val">${esc(lead.phone)}</span></div>` : '<div class="info-row"><span class="info-icon">📞</span><span class="info-val" style="color:var(--muted)">No phone listed</span></div>'}
     ${lead.address ? `<div class="info-row"><span class="info-icon">📍</span><span class="info-val">${esc(lead.address)}</span></div>` : ''}
@@ -899,6 +905,8 @@ function openDetail(id) {
         ? `<a href="${lead.website||'#'}" target="_blank">Has website ↗</a>`
         : '<span style="color:var(--red)">❌ No website</span>'
     }</span></div>
+    <div class="info-row"><span class="info-icon">🗺</span><span class="info-val"><a href="${mapsUrl}" target="_blank">Open in Google Maps ↗</a></span></div>
+    <div class="info-row"><span class="info-icon">🔍</span><span class="info-val"><a href="${googleSearchUrl}" target="_blank">Search on Google ↗</a></span></div>
   `;
 
   // Business info
@@ -911,11 +919,8 @@ function openDetail(id) {
   document.getElementById('d-stage').value = lead.stage || 'New Lead';
   document.getElementById('d-notes').value = lead.notes || '';
 
-  document.getElementById('d-maps-btn').onclick = () => window.open(lead.mapsUrl && lead.mapsUrl !== '#' ? lead.mapsUrl : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([lead.name, lead.address, lead.city, lead.state].filter(Boolean).join(' '))}`, '_blank');
-  document.getElementById('d-google-btn').onclick = () => {
-    const q = `https://www.google.com/search?q=${encodeURIComponent([lead.name, lead.address, lead.city, lead.state].filter(Boolean).join(' '))}`;
-    window.open(q, '_blank');
-  };
+  document.getElementById('d-maps-btn').onclick = () => window.open(mapsUrl, '_blank');
+  document.getElementById('d-google-btn').onclick = () => window.open(googleSearchUrl, '_blank');
 
   renderList(); // re-render to highlight selected
 }
