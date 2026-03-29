@@ -3,411 +3,408 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlowPipe Admin — Dashboard</title>
+<title>FlowPipe Admin — Command Center</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --accent:#1a5c3a; --accent-light:#e8f5ee; --accent-hover:#14472d;
-  --text-primary:#1a1a1a; --text-secondary:#5a5a5a; --text-muted:#8a8a8a;
-  --bg-primary:#ffffff; --bg-secondary:#f8f8f6; --bg-tertiary:#f0efed;
-  --border:#e5e4e1; --border-light:#f0efed;
-  --radius:10px; --radius-lg:16px;
-  --shadow-sm:0 1px 3px rgba(0,0,0,0.04); --shadow-md:0 4px 20px rgba(0,0,0,0.06);
-  --font-body:'Outfit',sans-serif; --font-display:'Fraunces',serif;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:var(--font-body);color:var(--text-primary);background:var(--bg-secondary);-webkit-font-smoothing:antialiased;}
-button{font-family:inherit;cursor:pointer;border:none;background:none;}
-input,select,textarea{font-family:inherit;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-@keyframes slideIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
-@keyframes loadSlide{0%{transform:translateX(-100%);}100%{transform:translateX(400%);}}
-.fade-up{animation:fadeUp .4s ease both;}
+:root{--accent:#1a5c3a;--accent-light:#e8f5ee;--accent-hover:#14472d;--text-primary:#1a1a1a;--text-secondary:#5a5a5a;--text-muted:#8a8a8a;--bg-primary:#ffffff;--bg-secondary:#f8f8f6;--bg-tertiary:#f0efed;--border:#e5e4e1;--border-light:#f0efed;--radius:10px;--radius-lg:16px;--radius-xl:20px;--shadow-sm:0 1px 3px rgba(0,0,0,.04);--shadow-md:0 4px 20px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.1);--font-body:'Outfit',sans-serif;--font-display:'Fraunces',serif;--blue:#3b82f6;--blue-light:#dbeafe;--amber:#f59e0b;--amber-light:#fef3c7;--purple:#8b5cf6;--purple-light:#ede9fe;--red:#ef4444;--red-light:#fee2e2;--sidebar-w:256px}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:var(--font-body);color:var(--text-primary);background:var(--bg-secondary);-webkit-font-smoothing:antialiased}button{font-family:inherit;cursor:pointer;border:none;background:none}input,select,textarea{font-family:inherit}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes loadSlide{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}
+@keyframes popIn{0%{opacity:0;transform:scale(.92)}100%{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fade-up{animation:fadeUp .4s ease both}
 
-.admin-layout{display:flex;min-height:100vh;}
-.sidebar{width:240px;background:var(--bg-primary);border-right:1px solid var(--border-light);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;}
-.sidebar-brand{padding:20px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:10px;}
-.sidebar-brand-icon{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;}
-.sidebar-brand-name{font-family:var(--font-display);font-weight:800;font-size:18px;}
-.sidebar-brand-sub{font-size:10px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;}
-.sidebar-nav{flex:1;padding:12px 8px;}
-.sidebar-link{width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:14px;font-weight:500;color:var(--text-secondary);transition:all .2s;margin-bottom:2px;text-align:left;}
-.sidebar-link:hover{background:var(--bg-secondary);color:var(--text-primary);}
-.sidebar-link.active{background:var(--accent-light);color:var(--accent);font-weight:600;}
-.sidebar-link .badge{margin-left:auto;background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center;}
-.sidebar-footer{padding:12px 8px;border-top:1px solid var(--border-light);}
-.sidebar-footer a{display:block;padding:10px 14px;font-size:13px;color:var(--text-muted);text-decoration:none;border-radius:8px;transition:all .2s;}
-.sidebar-footer a:hover{background:var(--bg-secondary);color:var(--text-primary);}
-@media(max-width:768px){.sidebar{display:none;}}
+.admin-layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);background:var(--bg-primary);border-right:1px solid var(--border-light);display:flex;flex-direction:column;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;z-index:50;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.sidebar-brand{padding:20px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:11px}
+.sidebar-brand-icon{width:38px;height:38px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;color:#fff;box-shadow:0 2px 8px rgba(26,92,58,.25)}
+.sidebar-brand-name{font-family:var(--font-display);font-weight:800;font-size:19px}
+.sidebar-brand-sub{font-size:10px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:500}
+.sidebar-nav{flex:1;padding:14px 8px;overflow-y:auto}
+.sidebar-section{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;padding:14px 14px 6px;margin-top:2px}
+.sidebar-link{width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:14px;font-weight:500;color:var(--text-secondary);transition:all .2s;margin-bottom:2px;text-align:left}
+.sidebar-link:hover{background:var(--bg-secondary);color:var(--text-primary)}
+.sidebar-link.active{background:var(--accent-light);color:var(--accent);font-weight:600}
+.sidebar-link .sl-icon{width:20px;text-align:center;font-size:14px}
+.sidebar-link .badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:18px;text-align:center;line-height:14px}
+.sidebar-link .badge-amber{background:var(--amber)}.sidebar-link .badge-blue{background:var(--blue)}
+.sidebar-footer{padding:12px 8px;border-top:1px solid var(--border-light)}
+.sidebar-footer a{display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:13px;color:var(--text-muted);text-decoration:none;border-radius:8px;transition:all .2s}
+.sidebar-footer a:hover{background:var(--bg-secondary);color:var(--text-primary)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40}
+.sidebar-overlay.open{display:block}
+@media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}}
 
-.main{flex:1;overflow-y:auto;}
-.main-header{padding:20px 32px;background:var(--bg-primary);border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:12px;}
-.main-title{font-size:20px;font-weight:700;}
-.main-header-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.search-box{position:relative;}
-.search-box input{background:var(--bg-secondary);border:1px solid var(--border);padding:8px 12px 8px 34px;border-radius:8px;font-size:13px;color:var(--text-primary);outline:none;width:200px;}
-.search-box input:focus{border-color:var(--accent);}
-.search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);}
-.header-btn{background:var(--bg-secondary);border:1px solid var(--border);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text-secondary);display:flex;align-items:center;gap:6px;transition:all .2s;}
-.header-btn:hover{border-color:var(--accent);color:var(--accent);}
-.header-btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
-.header-btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover);color:#fff;}
-.main-body{padding:28px 32px;}
-@media(max-width:768px){.main-body{padding:16px;}}
+.main{flex:1;margin-left:var(--sidebar-w);overflow-y:auto;min-height:100vh}
+@media(max-width:768px){.main{margin-left:0}}
+.main-header{padding:14px 28px;background:var(--bg-primary);border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;gap:12px;flex-wrap:wrap}
+.main-header-left{display:flex;align-items:center;gap:12px}
+.hamburger-btn{display:none;padding:6px;border-radius:6px;transition:background .2s}
+.hamburger-btn:hover{background:var(--bg-secondary)}
+@media(max-width:768px){.hamburger-btn{display:flex;align-items:center;justify-content:center}}
+.main-title{font-size:18px;font-weight:700;white-space:nowrap}
+.main-header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.search-box{position:relative}
+.search-box input{background:var(--bg-secondary);border:1px solid var(--border);padding:8px 12px 8px 32px;border-radius:8px;font-size:13px;color:var(--text-primary);outline:none;width:190px;transition:border-color .2s,width .3s}
+.search-box input:focus{border-color:var(--accent);width:230px}
+.search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted)}
+.header-btn{background:var(--bg-secondary);border:1px solid var(--border);padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;color:var(--text-secondary);display:inline-flex;align-items:center;gap:5px;transition:all .2s;white-space:nowrap}
+.header-btn:hover{border-color:var(--accent);color:var(--accent)}
+.header-btn-primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.header-btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover);color:#fff}
+.main-body{padding:24px 28px}
+@media(max-width:768px){.main-body{padding:16px}.search-box input{width:130px}.search-box input:focus{width:170px}}
 
-.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:28px;}
-.stat-card{background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:22px;transition:all .3s;}
-.stat-card:hover{box-shadow:var(--shadow-md);}
-.stat-card-label{font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
-.stat-card-value{font-family:var(--font-display);font-size:30px;font-weight:800;}
-.stat-card-sub{font-size:12px;color:var(--text-muted);margin-top:4px;}
-.green .stat-card-value{color:var(--accent);}
-.blue .stat-card-value{color:#3b82f6;}
-.amber .stat-card-value{color:#f59e0b;}
-.purple .stat-card-value{color:#8b5cf6;}
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+.stat-card{background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:18px 20px;transition:all .3s;cursor:pointer;position:relative;overflow:hidden}
+.stat-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0}
+.stat-card.green::after{background:var(--accent)}.stat-card.blue::after{background:var(--blue)}.stat-card.amber::after{background:var(--amber)}.stat-card.purple::after{background:var(--purple)}.stat-card.red::after{background:var(--red)}
+.stat-card-label{font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.stat-card-value{font-family:var(--font-display);font-size:30px;font-weight:800;line-height:1}
+.stat-card-sub{font-size:12px;color:var(--text-muted);margin-top:5px}
+.green .stat-card-value{color:var(--accent)}.blue .stat-card-value{color:var(--blue)}.amber .stat-card-value{color:var(--amber)}.purple .stat-card-value{color:var(--purple)}.red .stat-card-value{color:var(--red)}
 
-.data-panel{background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px;}
-.data-panel-header{padding:18px 22px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;}
-.data-panel-title{font-size:16px;font-weight:700;}
-.data-panel-count{font-size:12px;color:var(--text-muted);background:var(--bg-secondary);padding:4px 10px;border-radius:10px;font-weight:600;}
+.dashboard-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-bottom:22px}
+@media(max-width:900px){.dashboard-grid{grid-template-columns:1fr}}
+.data-panel{background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:18px}
+.data-panel-header{padding:14px 18px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.data-panel-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+.data-panel-count{font-size:11px;color:var(--text-muted);background:var(--bg-secondary);padding:3px 10px;border-radius:10px;font-weight:600}
 
-.data-table{width:100%;border-collapse:collapse;}
-.data-table th{text-align:left;padding:12px 16px;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border-light);background:var(--bg-secondary);}
-.data-table td{padding:14px 16px;font-size:14px;border-bottom:1px solid var(--border-light);}
-.data-table tr:last-child td{border-bottom:none;}
-.data-table tr:hover td{background:var(--bg-secondary);}
-.name-cell{font-weight:600;}
-.meta-cell{font-size:12px;color:var(--text-muted);}
-.truncate{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chart-container{padding:18px;height:200px;display:flex;align-items:flex-end;gap:0;justify-content:space-around}
+.chart-bar-group{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:54px}
+.chart-bar{border-radius:5px 5px 0 0;transition:height .6s cubic-bezier(.4,0,.2,1);min-height:3px}
+.chart-bar-label{font-size:10px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.chart-bar-value{font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:2px}
 
-.status-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;}
-.status-new,.status-unread{background:#dbeafe;color:#1e40af;}
-.status-confirmed{background:#ede9fe;color:#5b21b6;}
-.status-inprogress,.status-pending{background:#fef3c7;color:#92400e;}
-.status-completed,.status-responded,.status-active,.status-accepted{background:#d1fae5;color:#065f46;}
-.status-cancelled,.status-declined{background:#fee2e2;color:#991b1b;}
-.status-read,.status-closed,.status-inactive{background:#f3f4f6;color:#6b7280;}
+.activity-feed{padding:0;max-height:380px;overflow-y:auto}
+.activity-item{display:flex;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border-light);transition:background .15s}
+.activity-item:last-child{border-bottom:none}
+.activity-item:hover{background:var(--bg-secondary)}
+.activity-dot{width:7px;height:7px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.activity-dot-new{background:var(--blue)}.activity-dot-pending{background:var(--amber)}.activity-dot-completed{background:var(--accent)}.activity-dot-cancelled{background:var(--red)}.activity-dot-default{background:var(--text-muted)}
+.activity-text{font-size:13px;color:var(--text-secondary);line-height:1.5}
+.activity-text strong{color:var(--text-primary);font-weight:600}
+.activity-time{font-size:11px;color:var(--text-muted);margin-top:1px}
 
-.row-actions{display:flex;gap:6px;}
-.row-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;transition:all .15s;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);}
-.row-btn:hover{border-color:var(--accent);color:var(--accent);}
-.row-btn-del{background:none;color:var(--text-muted);}
-.row-btn-del:hover{border-color:#ef4444;color:#ef4444;}
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{text-align:left;padding:10px 12px;font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border-light);background:var(--bg-secondary);white-space:nowrap}
+.data-table td{padding:11px 12px;font-size:13px;border-bottom:1px solid var(--border-light)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(26,92,58,.015)}
+.name-cell{font-weight:600}.meta-cell{font-size:11px;color:var(--text-muted)}
+.truncate{max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeUp .2s ease;}
-.modal{background:var(--bg-primary);border-radius:var(--radius-lg);padding:32px;max-width:500px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.12);max-height:90vh;overflow-y:auto;}
-.modal h3{font-size:18px;font-weight:700;margin-bottom:8px;}
-.modal p{font-size:14px;color:var(--text-secondary);margin-bottom:20px;line-height:1.5;}
-.modal-detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:14px;}
-.modal-detail-label{color:var(--text-muted);font-weight:500;}
-.modal-detail-value{color:var(--text-primary);font-weight:600;text-align:right;max-width:60%;word-break:break-word;}
-.modal-actions{display:flex;gap:10px;margin-top:24px;}
-.modal-btn{flex:1;padding:12px;border-radius:var(--radius);font-size:14px;font-weight:600;text-align:center;transition:all .2s;}
-.modal-btn-cancel{background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);}
-.modal-btn-cancel:hover{background:var(--bg-tertiary);}
-.modal-btn-primary{background:var(--accent);color:#fff;}
-.modal-btn-primary:hover{background:var(--accent-hover);}
-.modal-btn-danger{background:#ef4444;color:#fff;}
-.modal-btn-danger:hover{background:#dc2626;}
-.status-select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;color:var(--text-primary);outline:none;background:var(--bg-primary);}
-.status-select:focus{border-color:var(--accent);}
+.status-badge{display:inline-block;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600;white-space:nowrap}
+.status-new,.status-unread{background:var(--blue-light);color:#1e40af}
+.status-confirmed{background:var(--purple-light);color:#5b21b6}
+.status-inprogress,.status-pending{background:var(--amber-light);color:#92400e}
+.status-completed,.status-responded,.status-active,.status-accepted{background:#d1fae5;color:#065f46}
+.status-cancelled,.status-declined{background:var(--red-light);color:#991b1b}
+.status-read,.status-closed,.status-inactive{background:#f3f4f6;color:#6b7280}
 
-.modal .form-grid{display:grid;gap:14px;}
-.modal .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.modal .form-group label{display:block;font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;}
-.modal .form-group input,.modal .form-group textarea,.modal .form-group select{
-  width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;color:var(--text-primary);background:var(--bg-primary);outline:none;}
-.modal .form-group input:focus,.modal .form-group textarea:focus,.modal .form-group select:focus{border-color:var(--accent);}
-.modal .form-group textarea{min-height:60px;resize:vertical;}
-.modal .form-group input::placeholder,.modal .form-group textarea::placeholder{color:var(--text-muted);}
+.row-actions{display:flex;gap:3px}
+.row-btn{padding:4px 8px;border-radius:5px;font-size:10px;font-weight:600;transition:all .15s;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-secondary);white-space:nowrap}
+.row-btn:hover{border-color:var(--accent);color:var(--accent)}
+.row-btn-edit{color:var(--blue)}.row-btn-edit:hover{border-color:var(--blue)}
+.row-btn-convert{color:var(--accent);border-color:var(--accent-light);background:var(--accent-light)}.row-btn-convert:hover{background:var(--accent);color:#fff}
+.row-btn-del{background:none;color:var(--text-muted)}.row-btn-del:hover{border-color:var(--red);color:var(--red)}
 
-.empty-state{text-align:center;padding:60px 20px;}
-.empty-state-icon{font-size:40px;margin-bottom:16px;opacity:.5;}
-.empty-state-text{font-size:15px;color:var(--text-muted);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeUp .12s ease}
+.modal{background:var(--bg-primary);border-radius:var(--radius-xl);max-width:520px;width:100%;box-shadow:var(--shadow-lg);max-height:90vh;overflow:hidden;display:flex;flex-direction:column;animation:popIn .2s ease}
+.modal-head{padding:22px 24px 0;display:flex;justify-content:space-between;align-items:flex-start}
+.modal-head h3{font-size:17px;font-weight:700}.modal-head p{font-size:12px;color:var(--text-muted);margin-top:2px}
+.modal-close{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:16px;transition:all .15s;flex-shrink:0}
+.modal-close:hover{background:var(--bg-secondary);color:var(--text-primary)}
+.modal-body{padding:18px 24px;overflow-y:auto;flex:1}
+.modal-foot{padding:14px 24px;border-top:1px solid var(--border-light);display:flex;gap:8px;justify-content:flex-end}
+.modal-detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:13px;gap:10px}
+.modal-detail-label{color:var(--text-muted);font-weight:500;white-space:nowrap}
+.modal-detail-value{color:var(--text-primary);font-weight:600;text-align:right;max-width:65%;word-break:break-word}
+.modal-btn{padding:9px 18px;border-radius:var(--radius);font-size:13px;font-weight:600;text-align:center;transition:all .2s;cursor:pointer;border:none}
+.modal-btn-cancel{background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary)}.modal-btn-cancel:hover{background:var(--bg-tertiary)}
+.modal-btn-primary{background:var(--accent);color:#fff}.modal-btn-primary:hover{background:var(--accent-hover)}
+.modal-btn-danger{background:var(--red);color:#fff}.modal-btn-danger:hover{background:#dc2626}
+.status-select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;color:var(--text-primary);outline:none;background:var(--bg-primary)}.status-select:focus{border-color:var(--accent)}
 
-.loading-bar{height:3px;background:var(--bg-tertiary);overflow:hidden;}
-.loading-bar-inner{height:100%;width:30%;background:var(--accent);border-radius:3px;animation:loadSlide 1.2s ease infinite;}
+.modal .form-grid{display:grid;gap:12px}
+.modal .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal .form-group label{display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:4px}
+.modal .form-group input,.modal .form-group textarea,.modal .form-group select{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;color:var(--text-primary);background:var(--bg-primary);outline:none;transition:border-color .2s}
+.modal .form-group input:focus,.modal .form-group textarea:focus,.modal .form-group select:focus{border-color:var(--accent)}
+.modal .form-group textarea{min-height:56px;resize:vertical}
+.modal .form-group input::placeholder,.modal .form-group textarea::placeholder{color:var(--text-muted)}
 
-.toast{position:fixed;top:20px;right:20px;z-index:9999;padding:12px 20px;border-radius:var(--radius);font-size:14px;font-weight:600;color:#fff;animation:slideIn .3s ease;box-shadow:var(--shadow-md);}
-.toast-success{background:var(--accent);}
-.toast-error{background:#ef4444;}
+.filter-pills{display:flex;gap:5px;flex-wrap:wrap}
+.filter-pill{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:600;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-secondary);transition:all .2s;cursor:pointer}
+.filter-pill:hover{border-color:var(--accent);color:var(--accent)}
+.filter-pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
 
-.admin-page{display:none;}
-.admin-page.active{display:block;}
+.connection-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:5px}
+.connection-dot.online{background:#22c55e;box-shadow:0 0 5px rgba(34,197,94,.4)}
+.connection-dot.offline{background:var(--red);box-shadow:0 0 5px rgba(239,68,68,.4);animation:pulse 2s infinite}
+
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:700px){.settings-grid{grid-template-columns:1fr}}
+.settings-card{background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:22px}
+.settings-card h4{font-size:15px;font-weight:700;margin-bottom:3px}
+.settings-card p{font-size:12px;color:var(--text-muted);margin-bottom:14px}
+.settings-input{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;color:var(--text-primary);outline:none;margin-bottom:6px;background:var(--bg-primary)}.settings-input:focus{border-color:var(--accent)}
+.settings-textarea{min-height:70px;resize:vertical}
+
+.empty-state{text-align:center;padding:44px 20px}.empty-state-icon{font-size:34px;margin-bottom:10px;opacity:.4}.empty-state-text{font-size:13px;color:var(--text-muted)}
+.loading-bar{height:3px;background:var(--bg-tertiary);overflow:hidden;display:none}.loading-bar-inner{height:100%;width:30%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:3px;animation:loadSlide 1.2s ease infinite}
+.toast{position:fixed;top:18px;right:18px;z-index:9999;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:600;color:#fff;animation:slideIn .3s ease;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:6px}
+.toast-success{background:var(--accent)}.toast-error{background:var(--red)}.toast-info{background:var(--blue)}
+.admin-page{display:none}.admin-page.active{display:block}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
 </style>
 </head>
 <body>
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 <div class="admin-layout">
-  <aside class="sidebar">
-    <div class="sidebar-brand"><div class="sidebar-brand-icon">🔧</div><div><div class="sidebar-brand-name">FlowPipe</div><div class="sidebar-brand-sub">Admin</div></div></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><div class="sidebar-brand-icon">🔧</div><div><div class="sidebar-brand-name">FlowPipe</div><div class="sidebar-brand-sub">Command Center</div></div></div>
     <nav class="sidebar-nav" id="sidebarNav">
-      <button class="sidebar-link active" data-page="dashboard">📊 Dashboard</button>
-      <button class="sidebar-link" data-page="appointments">📅 Appointments <span class="badge" id="badgeAppts" style="display:none">0</span></button>
-      <button class="sidebar-link" data-page="quotes">💰 Quotes <span class="badge" id="badgeQuotes" style="display:none">0</span></button>
-      <button class="sidebar-link" data-page="contacts">✉️ Messages <span class="badge" id="badgeContacts" style="display:none">0</span></button>
-      <button class="sidebar-link" data-page="clients">👤 Clients <span class="badge" id="badgeClients" style="display:none">0</span></button>
+      <div class="sidebar-section">Overview</div>
+      <button class="sidebar-link active" data-page="dashboard"><span class="sl-icon">📊</span> Dashboard</button>
+      <div class="sidebar-section">Manage</div>
+      <button class="sidebar-link" data-page="appointments"><span class="sl-icon">📅</span> Appointments <span class="badge badge-blue" id="badgeAppts" style="display:none">0</span></button>
+      <button class="sidebar-link" data-page="quotes"><span class="sl-icon">💰</span> Quotes <span class="badge badge-amber" id="badgeQuotes" style="display:none">0</span></button>
+      <button class="sidebar-link" data-page="contacts"><span class="sl-icon">✉️</span> Messages <span class="badge" id="badgeContacts" style="display:none">0</span></button>
+      <button class="sidebar-link" data-page="clients"><span class="sl-icon">👤</span> Clients <span class="badge" id="badgeClients" style="display:none">0</span></button>
+      <div class="sidebar-section">System</div>
+      <button class="sidebar-link" data-page="settings"><span class="sl-icon">⚙️</span> Settings</button>
     </nav>
-    <div class="sidebar-footer"><a href="index.html">← Back to Website</a></div>
+    <div class="sidebar-footer">
+      <div style="padding:4px 14px 10px;display:flex;align-items:center;font-size:11px;color:var(--text-muted)"><span class="connection-dot" id="connDot"></span><span id="connLabel">Checking...</span></div>
+      <a href="index.html">← Back to Website</a>
+    </div>
   </aside>
   <div class="main">
     <header class="main-header">
-      <h1 class="main-title" id="mainTitle">Dashboard</h1>
+      <div class="main-header-left">
+        <button class="hamburger-btn" id="hamburgerBtn"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <h1 class="main-title" id="mainTitle">Dashboard</h1>
+      </div>
       <div class="main-header-actions">
-        <div class="search-box"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M16 16l-3-3"/></svg><input type="text" placeholder="Search..." id="globalSearch"></div>
-        <button class="header-btn" id="btnRefresh">🔄 Refresh</button>
-        <button class="header-btn header-btn-primary" id="btnAddClient">+ Add Client</button>
+        <div class="search-box"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="5"/><path d="M13 13l-3.5-3.5"/></svg><input type="text" placeholder="Search everything..." id="globalSearch"></div>
+        <button class="header-btn" id="btnRefresh">↻ Refresh</button>
+        <button class="header-btn" id="btnExport">⤓ Export</button>
+        <button class="header-btn header-btn-primary" id="btnAddClient">+ Client</button>
       </div>
     </header>
-    <div class="loading-bar" id="loadingBar" style="display:none"><div class="loading-bar-inner"></div></div>
+    <div class="loading-bar" id="loadingBar"><div class="loading-bar-inner"></div></div>
     <div class="main-body">
+
       <div id="admin-dashboard" class="admin-page active">
         <div class="stat-cards fade-up" id="statCards"></div>
-        <div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">Recent Appointments</span></div><div id="recentAppointments"></div></div>
-        <div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">Pending Quotes</span></div><div id="pendingQuotes"></div></div>
+        <div class="dashboard-grid">
+          <div>
+            <div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">📈 Weekly Overview</span></div><div class="chart-container" id="weeklyChart"></div></div>
+            <div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">📅 Recent Appointments</span><span class="data-panel-count" id="dashApptCount"></span></div><div style="overflow-x:auto" id="recentAppointments"></div></div>
+          </div>
+          <div>
+            <div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">⚡ Activity Feed</span></div><div class="activity-feed" id="activityFeed"></div></div>
+            <div class="data-panel fade-up" style="margin-top:18px"><div class="data-panel-header"><span class="data-panel-title">💰 Pending Quotes</span><span class="data-panel-count" id="dashQuoteCount"></span></div><div style="overflow-x:auto" id="pendingQuotes"></div></div>
+          </div>
+        </div>
       </div>
-      <div id="admin-appointments" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Appointments</span><span class="data-panel-count" id="apptCount">0</span></div><div style="overflow-x:auto" id="appointmentsTable"></div></div></div>
-      <div id="admin-quotes" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Quote Requests</span><span class="data-panel-count" id="quoteCount">0</span></div><div style="overflow-x:auto" id="quotesTable"></div></div></div>
-      <div id="admin-contacts" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Messages</span><span class="data-panel-count" id="contactCount">0</span></div><div style="overflow-x:auto" id="contactsTable"></div></div></div>
+
+      <div id="admin-appointments" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Appointments</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div class="filter-pills" id="apptFilters"></div><span class="data-panel-count" id="apptCount">0</span></div></div><div style="overflow-x:auto" id="appointmentsTable"></div></div></div>
+
+      <div id="admin-quotes" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Quote Requests</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div class="filter-pills" id="quoteFilters"></div><span class="data-panel-count" id="quoteCount">0</span></div></div><div style="overflow-x:auto" id="quotesTable"></div></div></div>
+
+      <div id="admin-contacts" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Messages</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div class="filter-pills" id="contactFilters"></div><span class="data-panel-count" id="contactCount">0</span></div></div><div style="overflow-x:auto" id="contactsTable"></div></div></div>
+
       <div id="admin-clients" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Clients</span><span class="data-panel-count" id="clientCount">0</span></div><div style="overflow-x:auto" id="clientsTable"></div></div></div>
+
+      <div id="admin-settings" class="admin-page">
+        <div class="settings-grid">
+          <div class="settings-card"><h4>🔗 Backend URL</h4><p>Your Google Apps Script Web App URL.</p><input class="settings-input" id="settingsGasUrl" placeholder="https://script.google.com/macros/s/.../exec"><button class="header-btn header-btn-primary" style="margin-top:6px" id="btnSaveGasUrl">Save & Test</button></div>
+          <div class="settings-card"><h4>🏢 Business Info</h4><p>Your business details (stored locally).</p><input class="settings-input" id="settingsBizName" placeholder="Business Name"><input class="settings-input" id="settingsBizPhone" placeholder="(555) 123-4567"><input class="settings-input" id="settingsBizEmail" placeholder="info@yourbiz.com"></div>
+          <div class="settings-card"><h4>📋 Services List</h4><p>One per line. Populates dropdowns everywhere.</p><textarea class="settings-input settings-textarea" id="settingsServices"></textarea><button class="header-btn" style="margin-top:6px" id="btnSaveServices">Update Services</button></div>
+          <div class="settings-card"><h4>📊 Data Export</h4><p>Download your data as CSV files.</p><button class="header-btn" style="margin-bottom:6px;width:100%" id="btnExportAll">⤓ Export All Data</button><button class="header-btn" style="width:100%" id="btnExportClients">⤓ Export Clients Only</button></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 <div id="modalContainer"></div>
 
 <script>
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxb92d8OoGZNyuwibBNk7t3MP1qVATx7vUp_3Sy-LV3Q7oPGpwEYYmyFflJspfC4AYp/exec';
+var GAS_URL=localStorage.getItem('flowpipe_gas_url')||'https://script.google.com/macros/s/AKfycbxOIoFOaHM-Z-SVmqM8sg-j1ruA8KCCPKe1YsLXgBkSrDbc-vPoZAbkqU0xdNXqo7my/exec';
+var appointments=[],quotes=[],contacts=[],clients=[];
+var currentPage='dashboard',searchQuery='';
+var activeFilters={appointments:'All',quotes:'All',contacts:'All'};
+var APPT_STATUSES=['New','Confirmed','In Progress','Completed','Cancelled'];
+var QUOTE_STATUSES=['Pending','Responded','Accepted','Declined','Closed'];
+var CONTACT_STATUSES=['Unread','Read','Responded','Closed'];
+var CLIENT_STATUSES=['Active','Inactive'];
+var SERVICES_LIST=['Emergency Repair','Drain Cleaning','Water Heater','Pipe Installation','Fixture Install','Inspection','Sewer Line','Gas Line'];
+var PAGE_TITLES={dashboard:'Dashboard',appointments:'Appointments',quotes:'Quote Requests',contacts:'Messages',clients:'Clients',settings:'Settings'};
 
-let appointments=[], quotes=[], contacts=[], clients=[];
-let currentPage='dashboard', searchQuery='';
+function showLoading(v){document.getElementById('loadingBar').style.display=v?'block':'none'}
+function showToast(msg,type){type=type||'success';var el=document.createElement('div');el.className='toast toast-'+type;el.innerHTML=(type==='success'?'✓ ':type==='error'?'✕ ':'ℹ ')+msg;document.body.appendChild(el);setTimeout(function(){el.style.opacity='0';el.style.transform='translateX(40px)';el.style.transition='all .3s'},2800);setTimeout(function(){el.remove()},3200)}
+function fmtDate(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}catch(e){return String(d)}}
+function timeAgo(d){if(!d)return'';try{var diff=Date.now()-new Date(d).getTime();var mins=Math.floor(diff/60000);if(mins<1)return'just now';if(mins<60)return mins+'m ago';var hrs=Math.floor(mins/60);if(hrs<24)return hrs+'h ago';var days=Math.floor(hrs/24);if(days<7)return days+'d ago';return fmtDate(d)}catch(e){return''}}
+function statusClass(s){return'status-'+(s||'new').toLowerCase().replace(/\s+/g,'')}
+function statusBadge(s){return'<span class="status-badge '+statusClass(s)+'">'+(s||'New')+'</span>'}
+function emptyState(t){return'<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">'+t+'</div></div>'}
+function filterBySearch(arr,fields){if(!searchQuery)return arr;var q=searchQuery.toLowerCase();return arr.filter(function(row){return fields.some(function(f){return String(row[f]||'').toLowerCase().indexOf(q)!==-1})})}
+function filterByStatus(arr,fv){if(!fv||fv==='All')return arr;return arr.filter(function(r){return r.Status===fv})}
+function getDataset(s){if(s==='Appointments')return appointments;if(s==='Quotes')return quotes;if(s==='Contacts')return contacts;if(s==='Clients')return clients;return[]}
+function getStatuses(s){if(s==='Appointments')return APPT_STATUSES;if(s==='Quotes')return QUOTE_STATUSES;if(s==='Contacts')return CONTACT_STATUSES;if(s==='Clients')return CLIENT_STATUSES;return[]}
+function esc(s){if(s===null||s===undefined)return'—';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-const APPT_STATUSES=['New','Confirmed','In Progress','Completed','Cancelled'];
-const QUOTE_STATUSES=['Pending','Responded','Accepted','Declined','Closed'];
-const CONTACT_STATUSES=['Unread','Read','Responded','Closed'];
-const CLIENT_STATUSES=['Active','Inactive'];
-const SERVICES=['Emergency Repair','Drain Cleaning','Water Heater','Pipe Installation','Fixture Install','Inspection','Sewer Line','Gas Line'];
-const PAGE_TITLES={dashboard:'Dashboard',appointments:'Appointments',quotes:'Quote Requests',contacts:'Messages',clients:'Clients'};
+function fetchGAS(a){return fetch(GAS_URL+'?action='+a).then(function(r){return r.json()})}
+function postGAS(p){return fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(p)}).then(function(r){return r.json()})}
 
-// NAV
-document.getElementById('sidebarNav').querySelectorAll('.sidebar-link').forEach(function(btn){
-  btn.addEventListener('click',function(){
-    currentPage=this.dataset.page;
-    document.querySelectorAll('.admin-page').forEach(function(p){p.classList.remove('active');});
-    document.getElementById('admin-'+currentPage).classList.add('active');
-    document.querySelectorAll('.sidebar-link').forEach(function(l){l.classList.remove('active');});
-    this.classList.add('active');
-    document.getElementById('mainTitle').textContent=PAGE_TITLES[currentPage]||'Dashboard';
-  });
-});
-document.getElementById('btnRefresh').addEventListener('click',loadAll);
-document.getElementById('btnAddClient').addEventListener('click',openAddClientModal);
-document.getElementById('globalSearch').addEventListener('input',function(){searchQuery=this.value;renderAll();});
+function testConnection(){var dot=document.getElementById('connDot'),lbl=document.getElementById('connLabel');dot.className='connection-dot';lbl.textContent='Checking...';if(!GAS_URL||GAS_URL.indexOf('YOUR_')===0){dot.className='connection-dot offline';lbl.textContent='Not configured';return}fetchGAS('ping').then(function(r){if(r&&r.status==='ok'){dot.className='connection-dot online';lbl.textContent='Connected'}else{dot.className='connection-dot offline';lbl.textContent='Error'}}).catch(function(){dot.className='connection-dot offline';lbl.textContent='Offline'})}
 
-// DATA
-function showLoading(v){document.getElementById('loadingBar').style.display=v?'block':'none';}
-async function fetchGAS(action){var r=await fetch(GAS_URL+'?action='+action);return await r.json();}
-async function postGAS(payload){var r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});return await r.json();}
+function loadAll(){showLoading(true);Promise.all([fetchGAS('getAppointments'),fetchGAS('getQuotes'),fetchGAS('getContacts'),fetchGAS('getClients')]).then(function(r){appointments=Array.isArray(r[0])?r[0]:[];quotes=Array.isArray(r[1])?r[1]:[];contacts=Array.isArray(r[2])?r[2]:[];clients=Array.isArray(r[3])?r[3]:[];renderAll();showToast('Data refreshed');showLoading(false)}).catch(function(e){showToast('Failed to load — check Settings.','error');console.error(e);showLoading(false)})}
 
-async function loadAll(){
-  showLoading(true);
-  try{
-    var results=await Promise.all([fetchGAS('getAppointments'),fetchGAS('getQuotes'),fetchGAS('getContacts'),fetchGAS('getClients')]);
-    appointments=Array.isArray(results[0])?results[0]:[];
-    quotes=Array.isArray(results[1])?results[1]:[];
-    contacts=Array.isArray(results[2])?results[2]:[];
-    clients=Array.isArray(results[3])?results[3]:[];
-    renderAll();
-    showToast('Data refreshed');
-  }catch(e){showToast('Failed to load. Check GAS_URL.','error');console.error(e);}
-  showLoading(false);
-}
+function showAdminPage(page){currentPage=page;var pages=document.querySelectorAll('.admin-page');for(var i=0;i<pages.length;i++)pages[i].classList.remove('active');var t=document.getElementById('admin-'+page);if(t)t.classList.add('active');var links=document.querySelectorAll('.sidebar-link');for(var j=0;j<links.length;j++)links[j].classList.remove('active');var a=document.querySelector('[data-page="'+page+'"]');if(a)a.classList.add('active');document.getElementById('mainTitle').textContent=PAGE_TITLES[page]||'Dashboard';closeSidebar()}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('open')}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('open')}
 
-// RENDER
-function renderAll(){renderDashboard();renderAppointments();renderQuotes();renderContacts();renderClients();updateBadges();}
-
-function updateBadges(){
-  setBadge('badgeAppts',appointments.filter(function(a){return a.Status==='New';}).length);
-  setBadge('badgeQuotes',quotes.filter(function(q){return q.Status==='Pending';}).length);
-  setBadge('badgeContacts',contacts.filter(function(c){return c.Status==='Unread';}).length);
-  setBadge('badgeClients',clients.length);
-}
-function setBadge(id,count){var el=document.getElementById(id);if(count>0){el.style.display='inline';el.textContent=count;}else{el.style.display='none';}}
-function fmtDate(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch(e){return d;}}
-function statusClass(s){return'status-'+(s||'new').toLowerCase().replace(/\s+/g,'');}
-function statusBadge(s){return'<span class="status-badge '+statusClass(s)+'">'+(s||'New')+'</span>';}
-function emptyState(t){return'<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">'+t+'</div></div>';}
-function filterBySearch(arr,fields){if(!searchQuery)return arr;var q=searchQuery.toLowerCase();return arr.filter(function(row){return fields.some(function(f){return String(row[f]||'').toLowerCase().indexOf(q)!==-1;});});}
+function renderAll(){renderDashboard();renderAppointments();renderQuotes();renderContacts();renderClients();updateBadges()}
+function updateBadges(){setBadge('badgeAppts',appointments.filter(function(a){return a.Status==='New'}).length);setBadge('badgeQuotes',quotes.filter(function(q){return q.Status==='Pending'}).length);setBadge('badgeContacts',contacts.filter(function(c){return c.Status==='Unread'}).length);setBadge('badgeClients',clients.length)}
+function setBadge(id,c){var el=document.getElementById(id);if(c>0){el.style.display='inline';el.textContent=c}else el.style.display='none'}
 
 function renderDashboard(){
-  document.getElementById('statCards').innerHTML=
-    '<div class="stat-card blue"><div class="stat-card-label">Appointments</div><div class="stat-card-value">'+appointments.length+'</div><div class="stat-card-sub">'+appointments.filter(function(a){return a.Status==='New';}).length+' new</div></div>'+
-    '<div class="stat-card amber"><div class="stat-card-label">Quotes</div><div class="stat-card-value">'+quotes.length+'</div><div class="stat-card-sub">'+quotes.filter(function(q){return q.Status==='Pending';}).length+' pending</div></div>'+
-    '<div class="stat-card purple"><div class="stat-card-label">Messages</div><div class="stat-card-value">'+contacts.length+'</div><div class="stat-card-sub">'+contacts.filter(function(c){return c.Status==='Unread';}).length+' unread</div></div>'+
-    '<div class="stat-card green"><div class="stat-card-label">Total Clients</div><div class="stat-card-value">'+clients.length+'</div></div>';
-
+  var nA=appointments.filter(function(a){return a.Status==='New'}).length;
+  var pQ=quotes.filter(function(q){return q.Status==='Pending'}).length;
+  var uM=contacts.filter(function(c){return c.Status==='Unread'}).length;
+  var cA=appointments.filter(function(a){return a.Status==='Completed'}).length;
+  document.getElementById('statCards').innerHTML='<div class="stat-card blue" onclick="showAdminPage(\'appointments\')"><div class="stat-card-label">Appointments</div><div class="stat-card-value">'+appointments.length+'</div><div class="stat-card-sub">'+nA+' new</div></div><div class="stat-card amber" onclick="showAdminPage(\'quotes\')"><div class="stat-card-label">Quotes</div><div class="stat-card-value">'+quotes.length+'</div><div class="stat-card-sub">'+pQ+' pending</div></div><div class="stat-card purple" onclick="showAdminPage(\'contacts\')"><div class="stat-card-label">Messages</div><div class="stat-card-value">'+contacts.length+'</div><div class="stat-card-sub">'+uM+' unread</div></div><div class="stat-card green" onclick="showAdminPage(\'clients\')"><div class="stat-card-label">Clients</div><div class="stat-card-value">'+clients.length+'</div><div class="stat-card-sub">CRM</div></div><div class="stat-card red"><div class="stat-card-label">Completed</div><div class="stat-card-value">'+cA+'</div><div class="stat-card-sub">jobs done</div></div>';
+  renderWeeklyChart();
   var recent=appointments.slice().reverse().slice(0,5);
-  document.getElementById('recentAppointments').innerHTML=recent.length===0?emptyState('No appointments yet.'):
-    '<table class="data-table"><thead><tr><th>Name</th><th>Service</th><th>Date</th><th>Time</th><th>Status</th></tr></thead><tbody>'+recent.map(function(a){return'<tr><td class="name-cell">'+a.Name+'<div class="meta-cell">'+a.Email+'</div></td><td>'+a.Service+'</td><td>'+a.Date+'</td><td>'+a.Time+'</td><td>'+statusBadge(a.Status)+'</td></tr>';}).join('')+'</tbody></table>';
-
-  var pend=quotes.filter(function(q){return q.Status==='Pending';}).slice(0,5);
-  document.getElementById('pendingQuotes').innerHTML=pend.length===0?emptyState('No pending quotes.'):
-    '<table class="data-table"><thead><tr><th>Name</th><th>Service</th><th>Contact</th><th>Status</th></tr></thead><tbody>'+pend.map(function(q){return'<tr><td class="name-cell">'+q.Name+'<div class="meta-cell">'+q.Phone+'</div></td><td>'+(q.Service||'—')+'</td><td>'+(q['Contact Method']||'phone')+'</td><td>'+statusBadge(q.Status)+'</td></tr>';}).join('')+'</tbody></table>';
+  document.getElementById('dashApptCount').textContent=recent.length+' latest';
+  if(!recent.length){document.getElementById('recentAppointments').innerHTML=emptyState('No appointments yet.')}else{var rows='';for(var i=0;i<recent.length;i++){var a=recent[i];rows+='<tr><td class="name-cell">'+esc(a.Name)+'<div class="meta-cell">'+esc(a.Phone)+'</div></td><td>'+esc(a.Service)+'</td><td>'+esc(a.Date)+'</td><td>'+statusBadge(a.Status)+'</td></tr>'}document.getElementById('recentAppointments').innerHTML='<table class="data-table"><thead><tr><th>Name</th><th>Service</th><th>Date</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table>'}
+  var pend=quotes.filter(function(q){return q.Status==='Pending'}).slice(0,5);
+  document.getElementById('dashQuoteCount').textContent=pend.length+' pending';
+  if(!pend.length){document.getElementById('pendingQuotes').innerHTML=emptyState('No pending quotes.')}else{var qr='';for(var j=0;j<pend.length;j++){var q=pend[j];qr+='<tr><td class="name-cell">'+esc(q.Name)+'<div class="meta-cell">'+esc(q.Phone)+'</div></td><td>'+esc(q.Service)+'</td><td>'+statusBadge(q.Status)+'</td></tr>'}document.getElementById('pendingQuotes').innerHTML='<table class="data-table"><thead><tr><th>Name</th><th>Service</th><th>Status</th></tr></thead><tbody>'+qr+'</tbody></table>'}
+  renderActivityFeed()
 }
 
-function buildTable(containerId,data,headers,rowFn){
-  if(!data.length){document.getElementById(containerId).innerHTML=emptyState('Nothing found.');return;}
-  document.getElementById(containerId).innerHTML='<table class="data-table"><thead><tr>'+headers.map(function(h){return'<th>'+h+'</th>';}).join('')+'</tr></thead><tbody>'+data.slice().reverse().map(rowFn).join('')+'</tbody></table>';
-  attachRowListeners(containerId);
+function renderWeeklyChart(){
+  var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],now=new Date(),ac=new Array(7).fill(0),qc=new Array(7).fill(0);
+  appointments.forEach(function(a){try{var d=new Date(a.Timestamp);if(Math.floor((now-d)/864e5)<7&&Math.floor((now-d)/864e5)>=0)ac[d.getDay()]++}catch(e){}});
+  quotes.forEach(function(q){try{var d=new Date(q.Timestamp);if(Math.floor((now-d)/864e5)<7&&Math.floor((now-d)/864e5)>=0)qc[d.getDay()]++}catch(e){}});
+  var max=Math.max.apply(null,ac.concat(qc))||1,html='';
+  for(var i=0;i<7;i++){var h1=Math.max(3,Math.round(ac[i]/max*130)),h2=Math.max(3,Math.round(qc[i]/max*130)),today=i===now.getDay();html+='<div class="chart-bar-group"><div class="chart-bar-value">'+(ac[i]+qc[i])+'</div><div style="display:flex;gap:2px;align-items:flex-end"><div class="chart-bar" style="height:'+h1+'px;background:'+(today?'var(--accent)':'var(--blue)')+';width:13px"></div><div class="chart-bar" style="height:'+h2+'px;background:'+(today?'var(--accent-light)':'var(--amber-light)')+';width:13px"></div></div><div class="chart-bar-label" style="'+(today?'color:var(--accent);font-weight:700':'')+'">'+days[i]+'</div></div>'}
+  document.getElementById('weeklyChart').innerHTML=html
 }
 
-function renderAppointments(){
-  var f=filterBySearch(appointments,['Name','Email','Phone','Service','Status']);
-  document.getElementById('apptCount').textContent=f.length+' total';
-  buildTable('appointmentsTable',f,['Name','Service','Date','Time','Phone','Status','Actions'],function(a){
-    return'<tr><td class="name-cell">'+a.Name+'<div class="meta-cell">'+a.Email+'</div></td><td>'+a.Service+'</td><td>'+a.Date+'</td><td>'+a.Time+'</td><td>'+a.Phone+'</td><td>'+statusBadge(a.Status)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Appointments" data-id="'+a.ID+'">View</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Appointments" data-id="'+a.ID+'">✕</button></div></td></tr>';
-  });
+function renderActivityFeed(){
+  var all=[];
+  appointments.forEach(function(a){all.push({type:'appointment',name:a.Name,status:a.Status,service:a.Service,time:a.Timestamp})});
+  quotes.forEach(function(q){all.push({type:'quote',name:q.Name,status:q.Status,service:q.Service,time:q.Timestamp})});
+  contacts.forEach(function(c){all.push({type:'message',name:c.Name,status:c.Status,service:'',time:c.Timestamp})});
+  all.sort(function(a,b){return new Date(b.time)-new Date(a.time)});all=all.slice(0,15);
+  if(!all.length){document.getElementById('activityFeed').innerHTML=emptyState('No activity yet.');return}
+  var html='';
+  for(var i=0;i<all.length;i++){var it=all[i];var dc='activity-dot-default';if(it.status==='New'||it.status==='Unread')dc='activity-dot-new';else if(it.status==='Pending')dc='activity-dot-pending';else if(it.status==='Completed'||it.status==='Active')dc='activity-dot-completed';else if(it.status==='Cancelled')dc='activity-dot-cancelled';
+  var verb=it.type==='appointment'?'booked an appointment':it.type==='quote'?'requested a quote':'sent a message';
+  html+='<div class="activity-item"><div class="activity-dot '+dc+'"></div><div><div class="activity-text"><strong>'+esc(it.name)+'</strong> '+verb;if(it.service)html+=' for <strong>'+esc(it.service)+'</strong>';html+='</div><div class="activity-time">'+timeAgo(it.time)+'</div></div></div>'}
+  document.getElementById('activityFeed').innerHTML=html
 }
 
-function renderQuotes(){
-  var f=filterBySearch(quotes,['Name','Email','Phone','Service','Status']);
-  document.getElementById('quoteCount').textContent=f.length+' total';
-  buildTable('quotesTable',f,['Name','Service','Phone','Description','Status','Actions'],function(q){
-    return'<tr><td class="name-cell">'+q.Name+'<div class="meta-cell">'+q.Email+'</div></td><td>'+q.Service+'</td><td>'+q.Phone+'</td><td class="truncate">'+(q.Description||'—')+'</td><td>'+statusBadge(q.Status)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Quotes" data-id="'+q.ID+'">View</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Quotes" data-id="'+q.ID+'">✕</button></div></td></tr>';
-  });
+function renderFilterPills(cid,statuses,fk){
+  var all=['All'].concat(statuses),html='';for(var i=0;i<all.length;i++)html+='<button class="filter-pill'+(activeFilters[fk]===all[i]?' active':'')+'" data-filter="'+all[i]+'" data-fk="'+fk+'">'+all[i]+'</button>';
+  var c=document.getElementById(cid);c.innerHTML=html;
+  var pills=c.querySelectorAll('.filter-pill');for(var j=0;j<pills.length;j++)(function(p){p.addEventListener('click',function(){activeFilters[p.getAttribute('data-fk')]=p.getAttribute('data-filter');renderAll()})})(pills[j])
 }
 
-function renderContacts(){
-  var f=filterBySearch(contacts,['Name','Email','Message','Status']);
-  document.getElementById('contactCount').textContent=f.length+' total';
-  buildTable('contactsTable',f,['Name','Email','Message','Date','Status','Actions'],function(c){
-    return'<tr><td class="name-cell">'+c.Name+'</td><td>'+c.Email+'</td><td class="truncate">'+(c.Message||'—')+'</td><td class="meta-cell">'+fmtDate(c.Timestamp)+'</td><td>'+statusBadge(c.Status)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Contacts" data-id="'+c.ID+'">View</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Contacts" data-id="'+c.ID+'">✕</button></div></td></tr>';
-  });
+function renderTable(cid,data,headers,rowFn){
+  var c=document.getElementById(cid);if(!data.length){c.innerHTML=emptyState('Nothing found.');return}
+  var rev=data.slice().reverse(),rows='';for(var i=0;i<rev.length;i++)rows+=rowFn(rev[i]);
+  c.innerHTML='<table class="data-table"><thead><tr>'+headers.map(function(h){return'<th>'+h+'</th>'}).join('')+'</tr></thead><tbody>'+rows+'</tbody></table>';
+  var btns=c.querySelectorAll('[data-action]');for(var j=0;j<btns.length;j++)(function(btn){btn.addEventListener('click',function(e){e.stopPropagation();var act=btn.getAttribute('data-action'),sh=btn.getAttribute('data-sheet'),id=btn.getAttribute('data-id');if(act==='view')openDetailModal(sh,id);else if(act==='edit')openEditModal(sh,id);else if(act==='delete')openDeleteModal(sh,id);else if(act==='convert')openConvertModal(sh,id)})})(btns[j])
 }
 
-function renderClients(){
-  var f=filterBySearch(clients,['Name','Email','Phone','Service','Status']);
-  document.getElementById('clientCount').textContent=f.length+' total';
-  if(!f.length){document.getElementById('clientsTable').innerHTML=emptyState('No clients yet. Click "+ Add Client" to add one.');return;}
-  buildTable('clientsTable',f,['Name','Email','Phone','Service','Address','Status','Added','Actions'],function(c){
-    return'<tr><td class="name-cell">'+c.Name+'</td><td>'+c.Email+'</td><td>'+c.Phone+'</td><td>'+(c.Service||'—')+'</td><td class="truncate">'+(c.Address||'—')+'</td><td>'+statusBadge(c.Status)+'</td><td class="meta-cell">'+fmtDate(c.Timestamp)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Clients" data-id="'+c.ID+'">View</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Clients" data-id="'+c.ID+'">✕</button></div></td></tr>';
-  });
-}
+function renderAppointments(){renderFilterPills('apptFilters',APPT_STATUSES,'appointments');var f=filterByStatus(filterBySearch(appointments,['Name','Email','Phone','Service','Status']),activeFilters.appointments);document.getElementById('apptCount').textContent=f.length;renderTable('appointmentsTable',f,['Name','Service','Date','Time','Phone','Status','Actions'],function(a){return'<tr><td class="name-cell">'+esc(a.Name)+'<div class="meta-cell">'+esc(a.Email)+'</div></td><td>'+esc(a.Service)+'</td><td>'+esc(a.Date)+'</td><td>'+esc(a.Time)+'</td><td>'+esc(a.Phone)+'</td><td>'+statusBadge(a.Status)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Appointments" data-id="'+a.ID+'">View</button><button class="row-btn row-btn-edit" data-action="edit" data-sheet="Appointments" data-id="'+a.ID+'">Edit</button><button class="row-btn row-btn-convert" data-action="convert" data-sheet="Appointments" data-id="'+a.ID+'">→Client</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Appointments" data-id="'+a.ID+'">✕</button></div></td></tr>'})}
 
-function attachRowListeners(containerId){
-  document.getElementById(containerId).querySelectorAll('[data-action]').forEach(function(btn){
-    btn.addEventListener('click',function(){
-      if(this.dataset.action==='view')openDetailModal(this.dataset.sheet,this.dataset.id);
-      if(this.dataset.action==='delete')openDeleteModal(this.dataset.sheet,this.dataset.id);
-    });
-  });
-}
+function renderQuotes(){renderFilterPills('quoteFilters',QUOTE_STATUSES,'quotes');var f=filterByStatus(filterBySearch(quotes,['Name','Email','Phone','Service','Status']),activeFilters.quotes);document.getElementById('quoteCount').textContent=f.length;renderTable('quotesTable',f,['Name','Service','Phone','Description','Status','Actions'],function(q){return'<tr><td class="name-cell">'+esc(q.Name)+'<div class="meta-cell">'+esc(q.Email)+'</div></td><td>'+esc(q.Service)+'</td><td>'+esc(q.Phone)+'</td><td class="truncate">'+esc(q.Description)+'</td><td>'+statusBadge(q.Status)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Quotes" data-id="'+q.ID+'">View</button><button class="row-btn row-btn-edit" data-action="edit" data-sheet="Quotes" data-id="'+q.ID+'">Edit</button><button class="row-btn row-btn-convert" data-action="convert" data-sheet="Quotes" data-id="'+q.ID+'">→Client</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Quotes" data-id="'+q.ID+'">✕</button></div></td></tr>'})}
 
-// MODALS
-function closeModal(){document.getElementById('modalContainer').innerHTML='';}
-function getDataset(s){if(s==='Appointments')return appointments;if(s==='Quotes')return quotes;if(s==='Contacts')return contacts;if(s==='Clients')return clients;return[];}
-function getStatuses(s){if(s==='Appointments')return APPT_STATUSES;if(s==='Quotes')return QUOTE_STATUSES;if(s==='Contacts')return CONTACT_STATUSES;if(s==='Clients')return CLIENT_STATUSES;return[];}
+function renderContacts(){renderFilterPills('contactFilters',CONTACT_STATUSES,'contacts');var f=filterByStatus(filterBySearch(contacts,['Name','Email','Message','Status']),activeFilters.contacts);document.getElementById('contactCount').textContent=f.length;renderTable('contactsTable',f,['Name','Email','Message','Date','Status','Actions'],function(c){return'<tr><td class="name-cell">'+esc(c.Name)+'</td><td>'+esc(c.Email)+'</td><td class="truncate">'+esc(c.Message)+'</td><td class="meta-cell">'+timeAgo(c.Timestamp)+'</td><td>'+statusBadge(c.Status)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Contacts" data-id="'+c.ID+'">View</button><button class="row-btn row-btn-edit" data-action="edit" data-sheet="Contacts" data-id="'+c.ID+'">Edit</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Contacts" data-id="'+c.ID+'">✕</button></div></td></tr>'})}
+
+function renderClients(){var f=filterBySearch(clients,['Name','Email','Phone','Service','Status']);document.getElementById('clientCount').textContent=f.length;if(!f.length){document.getElementById('clientsTable').innerHTML=emptyState('No clients yet. Click "+ Client" to add one.');return}renderTable('clientsTable',f,['Name','Email','Phone','Service','Address','Status','Added','Actions'],function(c){return'<tr><td class="name-cell">'+esc(c.Name)+'</td><td>'+esc(c.Email)+'</td><td>'+esc(c.Phone)+'</td><td>'+esc(c.Service)+'</td><td class="truncate">'+esc(c.Address)+'</td><td>'+statusBadge(c.Status)+'</td><td class="meta-cell">'+timeAgo(c.Timestamp)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Clients" data-id="'+c.ID+'">View</button><button class="row-btn row-btn-edit" data-action="edit" data-sheet="Clients" data-id="'+c.ID+'">Edit</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Clients" data-id="'+c.ID+'">✕</button></div></td></tr>'})}
+
+/* MODALS */
+function closeModal(){document.getElementById('modalContainer').innerHTML=''}
+function wireModal(){var o=document.getElementById('modalOverlay');if(o)o.addEventListener('click',function(e){if(e.target===o)closeModal()});var b=document.getElementById('modalBox');if(b)b.addEventListener('click',function(e){e.stopPropagation()});var c=document.getElementById('modalCancelBtn');if(c)c.addEventListener('click',closeModal);var x=document.getElementById('modalCloseBtn');if(x)x.addEventListener('click',closeModal)}
 
 function openDetailModal(sheet,id){
-  var ds=getDataset(sheet);var item=ds.find(function(r){return r.ID===id;});if(!item)return;
-  var fields=Object.entries(item).filter(function(e){return e[0]!=='ID'&&e[0]!=='Status';});
-  var statuses=getStatuses(sheet);
-  var statusOpts=statuses.map(function(s){return'<option value="'+s+'" '+(item.Status===s?'selected':'')+'>'+s+'</option>';}).join('');
-
-  document.getElementById('modalContainer').innerHTML=
-    '<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"><h3>'+(item.Name||'Detail')+'</h3><p>'+sheet+' — ID: '+id+'</p><div style="margin-bottom:16px;">'+
-    fields.map(function(e){return'<div class="modal-detail-row"><span class="modal-detail-label">'+e[0]+'</span><span class="modal-detail-value">'+(e[1]||'—')+'</span></div>';}).join('')+
-    '</div><div style="margin-bottom:8px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;display:block;">Update Status</label><select class="status-select" id="modalStatusSelect">'+statusOpts+'</select></div>'+
-    '<div class="modal-actions"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalSaveBtn">Save Status</button></div></div></div>';
-
-  document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
-  document.getElementById('modalBox').addEventListener('click',function(e){e.stopPropagation();});
-  document.getElementById('modalCancelBtn').addEventListener('click',closeModal);
-  document.getElementById('modalSaveBtn').addEventListener('click',function(){saveStatus(sheet,id);});
+  var ds=getDataset(sheet),item=null;for(var i=0;i<ds.length;i++)if(ds[i].ID===id){item=ds[i];break}if(!item)return;
+  var sts=getStatuses(sheet),so='';for(var j=0;j<sts.length;j++)so+='<option value="'+sts[j]+'"'+(item.Status===sts[j]?' selected':'')+'>'+sts[j]+'</option>';
+  var dr='',keys=Object.keys(item);for(var k=0;k<keys.length;k++)if(keys[k]!=='ID'&&keys[k]!=='Status'){var v=item[keys[k]];if(keys[k]==='Timestamp')v=fmtDate(v)+' ('+timeAgo(v)+')';dr+='<div class="modal-detail-row"><span class="modal-detail-label">'+keys[k]+'</span><span class="modal-detail-value">'+esc(v)+'</span></div>'}
+  document.getElementById('modalContainer').innerHTML='<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"><div class="modal-head"><div><h3>'+esc(item.Name||'Detail')+'</h3><p>'+sheet+' — ID: '+id+'</p></div><button class="modal-close" id="modalCloseBtn">✕</button></div><div class="modal-body"><div style="margin-bottom:14px">'+dr+'</div><div><label style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:4px;display:block">Update Status</label><select class="status-select" id="modalStatusSelect">'+so+'</select></div></div><div class="modal-foot"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Close</button><button class="modal-btn modal-btn-primary" id="modalSaveBtn">Save Status</button></div></div></div>';
+  wireModal();document.getElementById('modalSaveBtn').addEventListener('click',function(){saveStatus(sheet,id)})
 }
 
-async function saveStatus(sheet,id){
-  var newStatus=document.getElementById('modalStatusSelect').value;
-  showLoading(true);
-  try{await postGAS({action:'updateStatus',sheet:sheet,id:id,status:newStatus});
-    var item=getDataset(sheet).find(function(r){return r.ID===id;});
-    if(item)item.Status=newStatus;
-    renderAll();closeModal();showToast('Status updated');
-  }catch(e){showToast('Failed','error');}
-  showLoading(false);
-}
+function saveStatus(sheet,id){var sel=document.getElementById('modalStatusSelect');if(!sel)return;var ns=sel.value,btn=document.getElementById('modalSaveBtn');btn.textContent='Saving...';btn.disabled=true;showLoading(true);postGAS({action:'updateStatus',sheet:sheet,id:id,status:ns}).then(function(){var ds=getDataset(sheet);for(var i=0;i<ds.length;i++)if(ds[i].ID===id){ds[i].Status=ns;break}renderAll();closeModal();showToast('Status updated');showLoading(false)}).catch(function(){showToast('Failed to update','error');showLoading(false);btn.textContent='Save Status';btn.disabled=false})}
 
-function openDeleteModal(sheet,id){
-  document.getElementById('modalContainer').innerHTML=
-    '<div class="modal-overlay" id="modalOverlay"><div class="modal"><h3>Delete Record</h3><p>Are you sure? This cannot be undone.</p><div class="modal-actions"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-danger" id="modalDeleteBtn">Delete</button></div></div></div>';
-  document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
-  document.getElementById('modalCancelBtn').addEventListener('click',closeModal);
-  document.getElementById('modalDeleteBtn').addEventListener('click',function(){doDelete(sheet,id);});
+function openEditModal(sheet,id){
+  var ds=getDataset(sheet),item=null;for(var i=0;i<ds.length;i++)if(ds[i].ID===id){item=ds[i];break}if(!item)return;
+  var fields=getEditableFields(sheet),sts=getStatuses(sheet),so='';for(var s=0;s<sts.length;s++)so+='<option value="'+sts[s]+'"'+(item.Status===sts[s]?' selected':'')+'>'+sts[s]+'</option>';
+  var svo='<option value="">Select...</option>';for(var si=0;si<SERVICES_LIST.length;si++)svo+='<option value="'+SERVICES_LIST[si]+'"'+((item.Service||'')==SERVICES_LIST[si]?' selected':'')+'>'+SERVICES_LIST[si]+'</option>';
+  var fh='<div class="form-grid">';for(var f=0;f<fields.length;f++){var fd=fields[f],v=esc(item[fd.k]||'');if(fd.t==='textarea')fh+='<div class="form-group"><label>'+fd.l+'</label><textarea id="edit_'+fd.k+'">'+v+'</textarea></div>';else if(fd.t==='service')fh+='<div class="form-group"><label>'+fd.l+'</label><select id="edit_'+fd.k+'">'+svo+'</select></div>';else fh+='<div class="form-group"><label>'+fd.l+'</label><input type="'+fd.t+'" id="edit_'+fd.k+'" value="'+v+'"></div>'}
+  fh+='<div class="form-group"><label>Status</label><select class="status-select" id="edit_Status">'+so+'</select></div></div>';
+  document.getElementById('modalContainer').innerHTML='<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"><div class="modal-head"><div><h3>Edit '+sheet.slice(0,-1)+'</h3><p>'+esc(item.Name)+' — ID: '+id+'</p></div><button class="modal-close" id="modalCloseBtn">✕</button></div><div class="modal-body">'+fh+'</div><div class="modal-foot"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalSaveEditBtn">Save Changes</button></div></div></div>';
+  wireModal();document.getElementById('modalSaveEditBtn').addEventListener('click',function(){saveEdit(sheet,id,fields)})
 }
+function getEditableFields(sheet){if(sheet==='Appointments')return[{k:'Name',l:'Full Name',t:'text'},{k:'Email',l:'Email',t:'email'},{k:'Phone',l:'Phone',t:'tel'},{k:'Service',l:'Service',t:'service'},{k:'Date',l:'Date',t:'text'},{k:'Time',l:'Time',t:'text'},{k:'Address',l:'Address',t:'text'},{k:'Notes',l:'Notes',t:'textarea'}];if(sheet==='Quotes')return[{k:'Name',l:'Full Name',t:'text'},{k:'Email',l:'Email',t:'email'},{k:'Phone',l:'Phone',t:'tel'},{k:'Service',l:'Service',t:'service'},{k:'Address',l:'Address',t:'text'},{k:'Description',l:'Description',t:'textarea'},{k:'Contact Method',l:'Contact Method',t:'text'}];if(sheet==='Contacts')return[{k:'Name',l:'Full Name',t:'text'},{k:'Email',l:'Email',t:'email'},{k:'Message',l:'Message',t:'textarea'}];if(sheet==='Clients')return[{k:'Name',l:'Full Name',t:'text'},{k:'Email',l:'Email',t:'email'},{k:'Phone',l:'Phone',t:'tel'},{k:'Service',l:'Service',t:'service'},{k:'Address',l:'Address',t:'text'},{k:'Notes',l:'Notes',t:'textarea'}];return[]}
+function saveEdit(sheet,id,fields){var btn=document.getElementById('modalSaveEditBtn');btn.textContent='Saving...';btn.disabled=true;showLoading(true);var u={};for(var i=0;i<fields.length;i++){var el=document.getElementById('edit_'+fields[i].k);if(el)u[fields[i].k]=el.value}var sEl=document.getElementById('edit_Status');if(sEl)u.Status=sEl.value;var ds=getDataset(sheet);for(var j=0;j<ds.length;j++)if(ds[j].ID===id){var ks=Object.keys(u);for(var k=0;k<ks.length;k++)ds[j][ks[k]]=u[ks[k]];break}var promises=[];if(u.Status)promises.push(postGAS({action:'updateStatus',sheet:sheet,id:id,status:u.Status}));Promise.all(promises).then(function(){renderAll();closeModal();showToast('Changes saved');showLoading(false)}).catch(function(){renderAll();closeModal();showToast('Saved locally (status sync may have failed)','info');showLoading(false)})}
 
-async function doDelete(sheet,id){
-  showLoading(true);
-  try{await postGAS({action:'deleteRow',sheet:sheet,id:id});
-    if(sheet==='Appointments')appointments=appointments.filter(function(r){return r.ID!==id;});
-    if(sheet==='Quotes')quotes=quotes.filter(function(r){return r.ID!==id;});
-    if(sheet==='Contacts')contacts=contacts.filter(function(r){return r.ID!==id;});
-    if(sheet==='Clients')clients=clients.filter(function(r){return r.ID!==id;});
-    renderAll();closeModal();showToast('Deleted');
-  }catch(e){showToast('Failed','error');}
-  showLoading(false);
+function openDeleteModal(sheet,id){document.getElementById('modalContainer').innerHTML='<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"><div class="modal-head"><div><h3>Delete Record</h3><p>This cannot be undone.</p></div><button class="modal-close" id="modalCloseBtn">✕</button></div><div class="modal-body"><p style="font-size:14px;color:var(--text-secondary);line-height:1.6">Permanently delete this record from <strong>'+sheet+'</strong>?</p></div><div class="modal-foot"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-danger" id="modalDeleteBtn">Delete Forever</button></div></div></div>';wireModal();document.getElementById('modalDeleteBtn').addEventListener('click',function(){doDelete(sheet,id)})}
+function doDelete(sheet,id){var btn=document.getElementById('modalDeleteBtn');btn.textContent='Deleting...';btn.disabled=true;showLoading(true);postGAS({action:'deleteRow',sheet:sheet,id:id}).then(function(){if(sheet==='Appointments')appointments=appointments.filter(function(r){return r.ID!==id});if(sheet==='Quotes')quotes=quotes.filter(function(r){return r.ID!==id});if(sheet==='Contacts')contacts=contacts.filter(function(r){return r.ID!==id});if(sheet==='Clients')clients=clients.filter(function(r){return r.ID!==id});renderAll();closeModal();showToast('Deleted');showLoading(false)}).catch(function(){showToast('Failed to delete','error');showLoading(false);btn.textContent='Delete';btn.disabled=false})}
+
+function openConvertModal(sheet,id){
+  var ds=getDataset(sheet),item=null;for(var i=0;i<ds.length;i++)if(ds[i].ID===id){item=ds[i];break}if(!item)return;
+  var existing=clients.filter(function(c){return(c.Phone&&item.Phone&&c.Phone===item.Phone)||(c.Email&&item.Email&&c.Email===item.Email)});
+  var warn='';if(existing.length)warn='<div style="background:var(--amber-light);border:1px solid #fbbf24;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#92400e"><strong>⚠ Possible duplicate:</strong> '+esc(existing[0].Name)+' already in Clients.</div>';
+  document.getElementById('modalContainer').innerHTML='<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"><div class="modal-head"><div><h3>Convert to Client</h3><p>Add '+esc(item.Name)+' to Clients.</p></div><button class="modal-close" id="modalCloseBtn">✕</button></div><div class="modal-body">'+warn+'<div class="modal-detail-row"><span class="modal-detail-label">Name</span><span class="modal-detail-value">'+esc(item.Name)+'</span></div><div class="modal-detail-row"><span class="modal-detail-label">Email</span><span class="modal-detail-value">'+esc(item.Email)+'</span></div><div class="modal-detail-row"><span class="modal-detail-label">Phone</span><span class="modal-detail-value">'+esc(item.Phone)+'</span></div><div class="modal-detail-row"><span class="modal-detail-label">Service</span><span class="modal-detail-value">'+esc(item.Service)+'</span></div></div><div class="modal-foot"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalConvertBtn">✓ Add to Clients</button></div></div></div>';
+  wireModal();document.getElementById('modalConvertBtn').addEventListener('click',function(){doConvert(sheet,item)})
 }
+function doConvert(sheet,item){var btn=document.getElementById('modalConvertBtn');btn.textContent='Adding...';btn.disabled=true;showLoading(true);postGAS({action:'addClient',name:item.Name||'',email:item.Email||'',phone:item.Phone||'',service:item.Service||'',address:item.Address||'',notes:'Converted from '+sheet+' on '+new Date().toLocaleDateString(),timestamp:new Date().toISOString()}).then(function(r){clients.push({ID:(r&&r.id)||('tmp'+Date.now()),Timestamp:new Date().toISOString(),Name:item.Name||'',Email:item.Email||'',Phone:item.Phone||'',Service:item.Service||'',Address:item.Address||'',Notes:'Converted from '+sheet,Status:'Active'});renderAll();closeModal();showToast('Added to Clients!');showLoading(false)}).catch(function(){showToast('Failed to convert','error');showLoading(false);btn.textContent='Add to Clients';btn.disabled=false})}
 
-// ADD CLIENT
 function openAddClientModal(){
-  document.getElementById('modalContainer').innerHTML=
-    '<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"><h3>Add New Client</h3><p>Saved to the Clients sheet in your Google Sheet.</p>'+
-    '<div class="form-grid"><div class="form-group"><label>Full Name *</label><input type="text" id="acName" placeholder="John Smith"></div>'+
-    '<div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="acEmail" placeholder="john@email.com"></div><div class="form-group"><label>Phone *</label><input type="tel" id="acPhone" placeholder="(555) 123-4567"></div></div>'+
-    '<div class="form-group"><label>Service</label><select id="acService"><option value="">Select...</option></select></div>'+
-    '<div class="form-group"><label>Address</label><input type="text" id="acAddress" placeholder="123 Main St"></div>'+
-    '<div class="form-group"><label>Notes</label><textarea id="acNotes" placeholder="Notes about this client..."></textarea></div></div>'+
-    '<div class="modal-actions"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalSaveClientBtn">Add Client</button></div></div></div>';
-
-  var sel=document.getElementById('acService');
-  SERVICES.forEach(function(s){var opt=document.createElement('option');opt.value=s;opt.textContent=s;sel.appendChild(opt);});
-
-  document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
-  document.getElementById('modalBox').addEventListener('click',function(e){e.stopPropagation();});
-  document.getElementById('modalCancelBtn').addEventListener('click',closeModal);
-  document.getElementById('modalSaveClientBtn').addEventListener('click',submitNewClient);
+  var so='<option value="">Select...</option>';for(var i=0;i<SERVICES_LIST.length;i++)so+='<option value="'+SERVICES_LIST[i]+'">'+SERVICES_LIST[i]+'</option>';
+  document.getElementById('modalContainer').innerHTML='<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"><div class="modal-head"><div><h3>Add New Client</h3><p>Saved to your Clients sheet.</p></div><button class="modal-close" id="modalCloseBtn">✕</button></div><div class="modal-body"><div class="form-grid"><div class="form-group"><label>Full Name *</label><input type="text" id="acName" placeholder="John Smith"></div><div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="acEmail" placeholder="john@email.com"></div><div class="form-group"><label>Phone *</label><input type="tel" id="acPhone" placeholder="(555) 123-4567"></div></div><div class="form-group"><label>Service</label><select id="acService">'+so+'</select></div><div class="form-group"><label>Address</label><input type="text" id="acAddress" placeholder="123 Main St"></div><div class="form-group"><label>Notes</label><textarea id="acNotes" placeholder="Notes..."></textarea></div></div></div><div class="modal-foot"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalSaveClientBtn">Add Client</button></div></div></div>';
+  wireModal();document.getElementById('modalSaveClientBtn').addEventListener('click',submitNewClient)
 }
+function submitNewClient(){var n=document.getElementById('acName').value.trim(),p=document.getElementById('acPhone').value.trim();if(!n||!p){showToast('Name and Phone required.','error');return}var btn=document.getElementById('modalSaveClientBtn');btn.textContent='Saving...';btn.disabled=true;showLoading(true);var e=document.getElementById('acEmail').value.trim(),s=document.getElementById('acService').value,a=document.getElementById('acAddress').value.trim(),nt=document.getElementById('acNotes').value.trim();postGAS({action:'addClient',name:n,email:e,phone:p,service:s,address:a,notes:nt,timestamp:new Date().toISOString()}).then(function(r){clients.push({ID:(r&&r.id)||('tmp'+Date.now()),Timestamp:new Date().toISOString(),Name:n,Email:e,Phone:p,Service:s,Address:a,Notes:nt,Status:'Active'});renderAll();closeModal();showToast('Client added!');showLoading(false)}).catch(function(){showToast('Failed to add client.','error');showLoading(false);btn.textContent='Add Client';btn.disabled=false})}
 
-async function submitNewClient(){
-  var name=document.getElementById('acName').value.trim();
-  var phone=document.getElementById('acPhone').value.trim();
-  if(!name||!phone){showToast('Name and Phone required.','error');return;}
+/* CSV EXPORT */
+function exportToCSV(data,fn){if(!data||!data.length){showToast('No data to export','error');return}var h=Object.keys(data[0]),csv=[h.join(',')];for(var i=0;i<data.length;i++){var row=[];for(var j=0;j<h.length;j++){var c=String(data[i][h[j]]||'').replace(/"/g,'""');if(c.indexOf(',')!==-1||c.indexOf('"')!==-1||c.indexOf('\n')!==-1)c='"'+c+'"';row.push(c)}csv.push(row.join(','))}var blob=new Blob([csv.join('\n')],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=fn+'.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);showToast('Exported '+data.length+' rows')}
+function exportCurrentPage(){var m={appointments:{d:appointments,n:'appointments'},quotes:{d:quotes,n:'quotes'},contacts:{d:contacts,n:'contacts'},clients:{d:clients,n:'clients'},dashboard:{d:appointments.concat(quotes).concat(contacts),n:'all-data'}};var c=m[currentPage]||m.dashboard;exportToCSV(c.d,'flowpipe-'+c.n+'-'+new Date().toISOString().slice(0,10))}
 
-  var btn=document.getElementById('modalSaveClientBtn');
-  btn.textContent='Saving...';btn.disabled=true;
-  showLoading(true);
-  try{
-    var result=await postGAS({
-      action:'addClient',
-      name:name,
-      email:document.getElementById('acEmail').value.trim(),
-      phone:phone,
-      service:document.getElementById('acService').value,
-      address:document.getElementById('acAddress').value.trim(),
-      notes:document.getElementById('acNotes').value.trim(),
-      timestamp:new Date().toISOString()
-    });
-    clients.push({ID:result.id||'tmp',Timestamp:new Date().toISOString(),Name:name,Email:document.getElementById('acEmail').value.trim(),Phone:phone,Service:document.getElementById('acService').value,Address:document.getElementById('acAddress').value.trim(),Notes:document.getElementById('acNotes').value.trim(),Status:'Active'});
-    renderAll();closeModal();showToast('Client added!');
-  }catch(e){showToast('Failed to add.','error');}
-  showLoading(false);
-}
+/* SETTINGS */
+function initSettings(){var u=localStorage.getItem('flowpipe_gas_url');if(u)document.getElementById('settingsGasUrl').value=u;document.getElementById('settingsServices').value=SERVICES_LIST.join('\n')}
 
-function showToast(msg,type){
-  type=type||'success';
-  var el=document.createElement('div');el.className='toast toast-'+type;el.textContent=msg;
-  document.body.appendChild(el);setTimeout(function(){el.remove();},3000);
-}
-
-document.addEventListener('DOMContentLoaded',function(){renderAll();loadAll();});
+/* INIT */
+document.addEventListener('DOMContentLoaded',function(){
+  var sl=document.querySelectorAll('#sidebarNav .sidebar-link');for(var i=0;i<sl.length;i++)(function(l){l.addEventListener('click',function(){showAdminPage(l.getAttribute('data-page'))})})(sl[i]);
+  document.getElementById('hamburgerBtn').addEventListener('click',openSidebar);
+  document.getElementById('sidebarOverlay').addEventListener('click',closeSidebar);
+  document.getElementById('btnRefresh').addEventListener('click',loadAll);
+  document.getElementById('btnAddClient').addEventListener('click',openAddClientModal);
+  document.getElementById('btnExport').addEventListener('click',exportCurrentPage);
+  document.getElementById('globalSearch').addEventListener('input',function(){searchQuery=this.value;renderAll()});
+  document.getElementById('btnSaveGasUrl').addEventListener('click',function(){var u=document.getElementById('settingsGasUrl').value.trim();if(!u){showToast('Enter a URL','error');return}localStorage.setItem('flowpipe_gas_url',u);GAS_URL=u;showToast('Saved! Testing...','info');testConnection();setTimeout(loadAll,1500)});
+  document.getElementById('btnSaveServices').addEventListener('click',function(){var r=document.getElementById('settingsServices').value.trim();SERVICES_LIST=r.split('\n').map(function(s){return s.trim()}).filter(function(s){return s.length>0});showToast('Services updated ('+SERVICES_LIST.length+')')});
+  document.getElementById('btnExportAll').addEventListener('click',function(){var all=[];appointments.forEach(function(a){var o=Object.assign({},a);o._Sheet='Appointments';all.push(o)});quotes.forEach(function(q){var o=Object.assign({},q);o._Sheet='Quotes';all.push(o)});contacts.forEach(function(c){var o=Object.assign({},c);o._Sheet='Contacts';all.push(o)});clients.forEach(function(cl){var o=Object.assign({},cl);o._Sheet='Clients';all.push(o)});exportToCSV(all,'flowpipe-all-'+new Date().toISOString().slice(0,10))});
+  document.getElementById('btnExportClients').addEventListener('click',function(){exportToCSV(clients,'flowpipe-clients-'+new Date().toISOString().slice(0,10))});
+  initSettings();testConnection();renderAll();loadAll();
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()})
+});
 </script>
 </body>
 </html>
