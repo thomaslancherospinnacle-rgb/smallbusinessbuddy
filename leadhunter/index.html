@@ -886,7 +886,7 @@ function openDetail(id) {
   sub.innerHTML = `
     ${lead.city ? `<span>📍 ${esc(lead.city)}${lead.state ? ', '+esc(lead.state) : ''}</span>` : ''}
     ${lead.rating ? `<span>⭐ ${lead.rating} (${lead.reviewCount||0})</span>` : ''}
-    <span><a href="${lead.mapsUrl}" target="_blank">🗺 Google Maps</a></span>
+    ${(lead.mapsUrl && lead.mapsUrl !== '#') ? `<span><a href="${lead.mapsUrl}" target="_blank">🗺 Google Maps</a></span>` : `<span><a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(lead.name+' '+(lead.address||lead.city||'')+' '+(lead.state||'')).trim()}" target="_blank">🗺 Google Maps</a></span>`}
     ${lead.scannedAt ? `<span>Scanned ${fmtDate(lead.scannedAt)}</span>` : ''}
   `;
 
@@ -911,9 +911,9 @@ function openDetail(id) {
   document.getElementById('d-stage').value = lead.stage || 'New Lead';
   document.getElementById('d-notes').value = lead.notes || '';
 
-  document.getElementById('d-maps-btn').onclick = () => window.open(lead.mapsUrl, '_blank');
+  document.getElementById('d-maps-btn').onclick = () => window.open(lead.mapsUrl && lead.mapsUrl !== '#' ? lead.mapsUrl : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([lead.name, lead.address, lead.city, lead.state].filter(Boolean).join(' '))}`, '_blank');
   document.getElementById('d-google-btn').onclick = () => {
-    const q = lead.googleSearchUrl || `https://www.google.com/search?q=${encodeURIComponent(lead.name+' '+(lead.city||lead.address||''))}`;
+    const q = `https://www.google.com/search?q=${encodeURIComponent([lead.name, lead.address, lead.city, lead.state].filter(Boolean).join(' '))}`;
     window.open(q, '_blank');
   };
 
