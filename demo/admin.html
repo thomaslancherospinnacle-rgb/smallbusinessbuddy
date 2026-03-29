@@ -321,7 +321,7 @@
           <div class="settings-card"><h4>🏢 Business Info</h4><p>Your business details (stored locally).</p><input class="settings-input" id="settingsBizName" placeholder="Business Name"><input class="settings-input" id="settingsBizPhone" placeholder="(555) 123-4567"><input class="settings-input" id="settingsBizEmail" placeholder="info@yourbiz.com"></div>
           <div class="settings-card"><h4>📋 Services List</h4><p>One per line. Populates dropdowns everywhere.</p><textarea class="settings-input settings-textarea" id="settingsServices"></textarea><button class="header-btn" style="margin-top:6px" id="btnSaveServices">Update Services</button></div>
           <div class="settings-card"><h4>📊 Data Export</h4><p>Download your data as CSV files.</p><button class="header-btn" style="margin-bottom:6px;width:100%" id="btnExportAll">⤓ Export All Data</button><button class="header-btn" style="width:100%" id="btnExportClients">⤓ Export Clients Only</button></div>
-          <div class="settings-card" style="grid-column:1/-1"><h4>📧 Email Configuration</h4><p>Set up your "Send As" identities. These use GAS (GmailApp) to send. ImprovMX forwards inbound mail to this Gmail. Add one alias per line: <code>Label|email@domain.com</code></p><textarea class="settings-input settings-textarea" id="settingsEmailAliases" placeholder="Support|support@yourbiz.com&#10;Info|info@yourbiz.com&#10;Sales|sales@yourbiz.com"></textarea><button class="header-btn" style="margin-top:6px" id="btnSaveEmailAliases">Save Email Aliases</button><p style="margin-top:10px;font-size:11px;color:var(--text-muted);line-height:1.5"><strong>Setup:</strong> 1) Add domain MX records → ImprovMX (forwards to your Gmail). 2) In Gmail → Settings → Accounts → "Send mail as" → add each alias (SMTP: smtp.gmail.com, your Gmail credentials or app password). 3) GAS sends via <code>GmailApp.sendEmail</code> using the alias. That's it.</p></div>
+          <div class="settings-card" style="grid-column:1/-1"><h4>📧 Email Configuration</h4><p>Add your "Send As" email addresses below — one per line. You can use <code>Label|email@domain.com</code> or just <code>email@domain.com</code> by itself.</p><textarea class="settings-input settings-textarea" id="settingsEmailAliases" placeholder="Support|support@yourbiz.com&#10;info@yourbiz.com&#10;Sales|sales@yourbiz.com"></textarea><button class="header-btn" style="margin-top:6px" id="btnSaveEmailAliases">Save Email Aliases</button><p style="margin-top:10px;font-size:11px;color:var(--text-muted);line-height:1.5"><strong>Setup:</strong> 1) Add domain MX records → ImprovMX (forwards to your Gmail). 2) In Gmail → Settings → Accounts → "Send mail as" → add each alias (SMTP: smtp.gmail.com, your Gmail credentials or app password). 3) GAS sends via <code>GmailApp.sendEmail</code> using the alias. That's it.</p></div>
         </div>
       </div>
 
@@ -331,7 +331,7 @@
 <div id="modalContainer"></div>
 
 <script>
-var GAS_URL=localStorage.getItem('flowpipe_gas_url')||'https://script.google.com/macros/s/AKfycbyfonCxbp0jzeSSrVvrp9jaiudyavey08NqXce_AxoegkhS3rQI-cXh1m9i04O_IVnB/exec';
+var GAS_URL=localStorage.getItem('flowpipe_gas_url')||'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
 var appointments=[],quotes=[],contacts=[],clients=[];
 var currentPage='dashboard',searchQuery='';
 var activeFilters={appointments:'All',quotes:'All',contacts:'All'};
@@ -512,17 +512,41 @@ function initEmailAliases(){
 
 function saveEmailAliases(){
   var raw=document.getElementById('settingsEmailAliases').value.trim();
+  if(!raw){EMAIL_ALIASES=[];localStorage.setItem('flowpipe_email_aliases','[]');initEmailAliases();showToast('Email aliases cleared','info');return}
   var lines=raw.split('\n').filter(function(l){return l.trim().length>0});
   EMAIL_ALIASES=[];
+  var skipped=[];
   for(var i=0;i<lines.length;i++){
-    var parts=lines[i].split('|');
-    if(parts.length>=2){
-      EMAIL_ALIASES.push({label:parts[0].trim(),email:parts[1].trim()});
+    var line=lines[i].trim();
+    var label='',email='';
+    // Try pipe separator first: "Support|support@domain.com"
+    if(line.indexOf('|')!==-1){
+      var parts=line.split('|');
+      label=parts[0].trim();
+      email=parts[1].trim();
+    }
+    // Try just a bare email: "support@domain.com" → derive label from local part
+    else if(line.indexOf('@')!==-1){
+      email=line.trim();
+      label=email.split('@')[0];
+      label=label.charAt(0).toUpperCase()+label.slice(1);
+    }
+    // Validate it looks like an email
+    if(email&&email.indexOf('@')!==-1&&email.indexOf('.')!==-1){
+      EMAIL_ALIASES.push({label:label,email:email});
+    }else{
+      skipped.push(line);
     }
   }
   localStorage.setItem('flowpipe_email_aliases',JSON.stringify(EMAIL_ALIASES));
   initEmailAliases();
-  showToast('Saved '+EMAIL_ALIASES.length+' email aliases');
+  if(skipped.length>0){
+    showToast('Saved '+EMAIL_ALIASES.length+', skipped '+skipped.length+' invalid','error');
+  }else if(EMAIL_ALIASES.length>0){
+    showToast('Saved '+EMAIL_ALIASES.length+' email aliases');
+  }else{
+    showToast('No valid emails found. Use: Label|email@domain.com','error');
+  }
 }
 
 function renderEmailTemplates(){
