@@ -156,6 +156,44 @@
 .settings-input{width:100%;padding:9px 11px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;color:var(--text-primary);outline:none;margin-bottom:6px;background:var(--bg-primary)}.settings-input:focus{border-color:var(--accent)}
 .settings-textarea{min-height:70px;resize:vertical}
 
+/* ─── EMAIL ─── */
+.email-layout{display:grid;grid-template-columns:1fr;gap:0}
+.email-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--border-light);background:var(--bg-primary);border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.email-tab{padding:6px 16px;border-radius:100px;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--bg-primary);color:var(--text-secondary);cursor:pointer;transition:all .2s}
+.email-tab:hover{border-color:var(--accent);color:var(--accent)}
+.email-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.email-list{max-height:520px;overflow-y:auto}
+.email-row{display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background .15s}
+.email-row:hover{background:var(--bg-secondary)}
+.email-row.unread{background:rgba(59,130,246,.03)}
+.email-row.unread .email-row-subject{font-weight:700;color:var(--text-primary)}
+.email-row-dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:6px}
+.email-row-dot.read{background:transparent}
+.email-row-content{flex:1;min-width:0}
+.email-row-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:2px}
+.email-row-from{font-size:13px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.email-row-date{font-size:11px;color:var(--text-muted);white-space:nowrap;flex-shrink:0}
+.email-row-subject{font-size:13px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.email-row-snippet{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.email-detail{padding:24px}
+.email-detail-header{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border-light)}
+.email-detail-subject{font-size:17px;font-weight:700;margin-bottom:6px}
+.email-detail-meta{font-size:12px;color:var(--text-muted);display:flex;gap:16px;flex-wrap:wrap}
+.email-detail-body{font-size:14px;color:var(--text-secondary);line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.email-compose{background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);overflow:hidden}
+.email-compose-header{padding:14px 18px;border-bottom:1px solid var(--border-light);font-size:15px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.email-compose-body{padding:18px}
+.email-compose-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.email-compose-row label{font-size:12px;font-weight:600;color:var(--text-muted);min-width:50px}
+.email-compose-row input,.email-compose-row select{flex:1;padding:9px 11px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;color:var(--text-primary);outline:none;background:var(--bg-primary)}
+.email-compose-row input:focus,.email-compose-row select:focus{border-color:var(--accent)}
+.email-compose-textarea{width:100%;min-height:180px;padding:12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:13px;color:var(--text-primary);outline:none;resize:vertical;line-height:1.6;background:var(--bg-primary);margin-top:6px}
+.email-compose-textarea:focus{border-color:var(--accent)}
+.email-compose-footer{padding:14px 18px;border-top:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.email-template-pills{display:flex;gap:5px;flex-wrap:wrap}
+.email-template-pill{padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);cursor:pointer;transition:all .15s}
+.email-template-pill:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light)}
+
 .empty-state{text-align:center;padding:44px 20px}.empty-state-icon{font-size:34px;margin-bottom:10px;opacity:.4}.empty-state-text{font-size:13px;color:var(--text-muted)}
 .loading-bar{height:3px;background:var(--bg-tertiary);overflow:hidden;display:none}.loading-bar-inner{height:100%;width:30%;background:linear-gradient(90deg,var(--accent),var(--blue));border-radius:3px;animation:loadSlide 1.2s ease infinite}
 .toast{position:fixed;top:18px;right:18px;z-index:9999;padding:11px 18px;border-radius:var(--radius);font-size:13px;font-weight:600;color:#fff;animation:slideIn .3s ease;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:6px}
@@ -177,6 +215,7 @@
       <button class="sidebar-link" data-page="quotes"><span class="sl-icon">💰</span> Quotes <span class="badge badge-amber" id="badgeQuotes" style="display:none">0</span></button>
       <button class="sidebar-link" data-page="contacts"><span class="sl-icon">✉️</span> Messages <span class="badge" id="badgeContacts" style="display:none">0</span></button>
       <button class="sidebar-link" data-page="clients"><span class="sl-icon">👤</span> Clients <span class="badge" id="badgeClients" style="display:none">0</span></button>
+      <button class="sidebar-link" data-page="email"><span class="sl-icon">📧</span> Email <span class="badge badge-blue" id="badgeEmail" style="display:none">0</span></button>
       <div class="sidebar-section">System</div>
       <button class="sidebar-link" data-page="settings"><span class="sl-icon">⚙️</span> Settings</button>
     </nav>
@@ -223,12 +262,66 @@
 
       <div id="admin-clients" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Clients</span><span class="data-panel-count" id="clientCount">0</span></div><div style="overflow-x:auto" id="clientsTable"></div></div></div>
 
+      <!-- ═══ EMAIL ═══ -->
+      <div id="admin-email" class="admin-page">
+        <div style="display:grid;grid-template-columns:1fr;gap:18px;">
+          <!-- COMPOSE -->
+          <div class="email-compose">
+            <div class="email-compose-header">
+              <span>✏️ Compose</span>
+              <button class="header-btn" id="btnClearCompose" style="font-size:11px;padding:4px 10px">Clear</button>
+            </div>
+            <div class="email-compose-body">
+              <div class="email-compose-row">
+                <label>From</label>
+                <select id="emailFrom">
+                  <option value="">— configure in Settings —</option>
+                </select>
+              </div>
+              <div class="email-compose-row">
+                <label>To</label>
+                <input type="email" id="emailTo" placeholder="recipient@example.com">
+              </div>
+              <div class="email-compose-row">
+                <label>Subject</label>
+                <input type="text" id="emailSubject" placeholder="Subject line...">
+              </div>
+              <textarea class="email-compose-textarea" id="emailBody" placeholder="Write your message..."></textarea>
+            </div>
+            <div class="email-compose-footer">
+              <div class="email-template-pills" id="emailTemplatePills"></div>
+              <button class="header-btn header-btn-primary" id="btnSendEmail">Send →</button>
+            </div>
+          </div>
+          <!-- INBOX / SENT TABS -->
+          <div class="data-panel">
+            <div class="email-toolbar">
+              <button class="email-tab active" id="tabInbox" data-etab="inbox">📥 Inbox</button>
+              <button class="email-tab" id="tabSent" data-etab="sent">📤 Sent</button>
+              <div style="flex:1"></div>
+              <button class="header-btn" id="btnRefreshEmail" style="font-size:11px;padding:4px 10px">↻ Refresh</button>
+              <span class="data-panel-count" id="emailCount">0</span>
+            </div>
+            <div class="email-list" id="emailList"></div>
+          </div>
+          <!-- DETAIL VIEW (hidden by default) -->
+          <div class="data-panel" id="emailDetailPanel" style="display:none">
+            <div class="data-panel-header">
+              <span class="data-panel-title" id="emailDetailTitle">Message</span>
+              <button class="header-btn" id="btnBackToList" style="font-size:11px;padding:4px 10px">← Back</button>
+            </div>
+            <div class="email-detail" id="emailDetailContent"></div>
+          </div>
+        </div>
+      </div>
+
       <div id="admin-settings" class="admin-page">
         <div class="settings-grid">
           <div class="settings-card"><h4>🔗 Backend URL</h4><p>Your Google Apps Script Web App URL.</p><input class="settings-input" id="settingsGasUrl" placeholder="https://script.google.com/macros/s/.../exec"><button class="header-btn header-btn-primary" style="margin-top:6px" id="btnSaveGasUrl">Save & Test</button></div>
           <div class="settings-card"><h4>🏢 Business Info</h4><p>Your business details (stored locally).</p><input class="settings-input" id="settingsBizName" placeholder="Business Name"><input class="settings-input" id="settingsBizPhone" placeholder="(555) 123-4567"><input class="settings-input" id="settingsBizEmail" placeholder="info@yourbiz.com"></div>
           <div class="settings-card"><h4>📋 Services List</h4><p>One per line. Populates dropdowns everywhere.</p><textarea class="settings-input settings-textarea" id="settingsServices"></textarea><button class="header-btn" style="margin-top:6px" id="btnSaveServices">Update Services</button></div>
           <div class="settings-card"><h4>📊 Data Export</h4><p>Download your data as CSV files.</p><button class="header-btn" style="margin-bottom:6px;width:100%" id="btnExportAll">⤓ Export All Data</button><button class="header-btn" style="width:100%" id="btnExportClients">⤓ Export Clients Only</button></div>
+          <div class="settings-card" style="grid-column:1/-1"><h4>📧 Email Configuration</h4><p>Set up your "Send As" identities. These use GAS (GmailApp) to send. ImprovMX forwards inbound mail to this Gmail. Add one alias per line: <code>Label|email@domain.com</code></p><textarea class="settings-input settings-textarea" id="settingsEmailAliases" placeholder="Support|support@yourbiz.com&#10;Info|info@yourbiz.com&#10;Sales|sales@yourbiz.com"></textarea><button class="header-btn" style="margin-top:6px" id="btnSaveEmailAliases">Save Email Aliases</button><p style="margin-top:10px;font-size:11px;color:var(--text-muted);line-height:1.5"><strong>Setup:</strong> 1) Add domain MX records → ImprovMX (forwards to your Gmail). 2) In Gmail → Settings → Accounts → "Send mail as" → add each alias (SMTP: smtp.gmail.com, your Gmail credentials or app password). 3) GAS sends via <code>GmailApp.sendEmail</code> using the alias. That's it.</p></div>
         </div>
       </div>
 
@@ -238,7 +331,7 @@
 <div id="modalContainer"></div>
 
 <script>
-var GAS_URL=localStorage.getItem('flowpipe_gas_url')||'https://script.google.com/macros/s/AKfycbxOIoFOaHM-Z-SVmqM8sg-j1ruA8KCCPKe1YsLXgBkSrDbc-vPoZAbkqU0xdNXqo7my/exec';
+var GAS_URL=localStorage.getItem('flowpipe_gas_url')||'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
 var appointments=[],quotes=[],contacts=[],clients=[];
 var currentPage='dashboard',searchQuery='';
 var activeFilters={appointments:'All',quotes:'All',contacts:'All'};
@@ -247,7 +340,7 @@ var QUOTE_STATUSES=['Pending','Responded','Accepted','Declined','Closed'];
 var CONTACT_STATUSES=['Unread','Read','Responded','Closed'];
 var CLIENT_STATUSES=['Active','Inactive'];
 var SERVICES_LIST=['Emergency Repair','Drain Cleaning','Water Heater','Pipe Installation','Fixture Install','Inspection','Sewer Line','Gas Line'];
-var PAGE_TITLES={dashboard:'Dashboard',appointments:'Appointments',quotes:'Quote Requests',contacts:'Messages',clients:'Clients',settings:'Settings'};
+var PAGE_TITLES={dashboard:'Dashboard',appointments:'Appointments',quotes:'Quote Requests',contacts:'Messages',clients:'Clients',email:'Email',settings:'Settings'};
 
 function showLoading(v){document.getElementById('loadingBar').style.display=v?'block':'none'}
 function showToast(msg,type){type=type||'success';var el=document.createElement('div');el.className='toast toast-'+type;el.innerHTML=(type==='success'?'✓ ':type==='error'?'✕ ':'ℹ ')+msg;document.body.appendChild(el);setTimeout(function(){el.style.opacity='0';el.style.transform='translateX(40px)';el.style.transition='all .3s'},2800);setTimeout(function(){el.remove()},3200)}
@@ -386,6 +479,182 @@ function submitNewClient(){var n=document.getElementById('acName').value.trim(),
 function exportToCSV(data,fn){if(!data||!data.length){showToast('No data to export','error');return}var h=Object.keys(data[0]),csv=[h.join(',')];for(var i=0;i<data.length;i++){var row=[];for(var j=0;j<h.length;j++){var c=String(data[i][h[j]]||'').replace(/"/g,'""');if(c.indexOf(',')!==-1||c.indexOf('"')!==-1||c.indexOf('\n')!==-1)c='"'+c+'"';row.push(c)}csv.push(row.join(','))}var blob=new Blob([csv.join('\n')],{type:'text/csv'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=fn+'.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);showToast('Exported '+data.length+' rows')}
 function exportCurrentPage(){var m={appointments:{d:appointments,n:'appointments'},quotes:{d:quotes,n:'quotes'},contacts:{d:contacts,n:'contacts'},clients:{d:clients,n:'clients'},dashboard:{d:appointments.concat(quotes).concat(contacts),n:'all-data'}};var c=m[currentPage]||m.dashboard;exportToCSV(c.d,'flowpipe-'+c.n+'-'+new Date().toISOString().slice(0,10))}
 
+/* ═══════════════════════════════════════
+   EMAIL SYSTEM
+   ═══════════════════════════════════════ */
+var emailInbox=[],emailSent=[];
+var emailView='inbox'; // inbox | sent
+var EMAIL_ALIASES=JSON.parse(localStorage.getItem('flowpipe_email_aliases')||'[]'); // [{label,email}]
+
+var EMAIL_TEMPLATES=[
+  {label:'Appt Confirm',subject:'Appointment Confirmed',body:'Hi {name},\n\nThis confirms your appointment on {date}. We look forward to seeing you!\n\nIf you need to reschedule, just reply to this email or call us.\n\nThank you,\n{biz}'},
+  {label:'Quote Follow-up',subject:'Your Quote Request',body:'Hi {name},\n\nThank you for your quote request. We\'ve reviewed the details and would love to discuss your project.\n\nPlease give us a call or reply to this email with any questions.\n\nBest,\n{biz}'},
+  {label:'Job Complete',subject:'Job Complete — Thank You!',body:'Hi {name},\n\nGreat news — your job has been completed! We hope everything meets your expectations.\n\nIf you have a moment, we\'d really appreciate a Google review:\n{reviewLink}\n\nThank you for choosing us!\n\n{biz}'},
+  {label:'Payment Due',subject:'Invoice / Payment Reminder',body:'Hi {name},\n\nThis is a friendly reminder that payment is due for the recent service. Please let us know if you have any questions.\n\nThank you,\n{biz}'}
+];
+
+function initEmailAliases(){
+  var stored=localStorage.getItem('flowpipe_email_aliases');
+  if(stored){try{EMAIL_ALIASES=JSON.parse(stored)}catch(e){EMAIL_ALIASES=[]}}
+  var sel=document.getElementById('emailFrom');
+  sel.innerHTML='';
+  if(!EMAIL_ALIASES.length){
+    sel.innerHTML='<option value="">— set up in Settings →</option>';
+  }else{
+    for(var i=0;i<EMAIL_ALIASES.length;i++){
+      sel.innerHTML+='<option value="'+esc(EMAIL_ALIASES[i].email)+'">'+esc(EMAIL_ALIASES[i].label)+' ('+esc(EMAIL_ALIASES[i].email)+')</option>';
+    }
+  }
+  // Load into settings textarea
+  var ta=document.getElementById('settingsEmailAliases');
+  if(ta) ta.value=EMAIL_ALIASES.map(function(a){return a.label+'|'+a.email}).join('\n');
+}
+
+function saveEmailAliases(){
+  var raw=document.getElementById('settingsEmailAliases').value.trim();
+  var lines=raw.split('\n').filter(function(l){return l.trim().length>0});
+  EMAIL_ALIASES=[];
+  for(var i=0;i<lines.length;i++){
+    var parts=lines[i].split('|');
+    if(parts.length>=2){
+      EMAIL_ALIASES.push({label:parts[0].trim(),email:parts[1].trim()});
+    }
+  }
+  localStorage.setItem('flowpipe_email_aliases',JSON.stringify(EMAIL_ALIASES));
+  initEmailAliases();
+  showToast('Saved '+EMAIL_ALIASES.length+' email aliases');
+}
+
+function renderEmailTemplates(){
+  var html='';
+  for(var i=0;i<EMAIL_TEMPLATES.length;i++){
+    html+='<button class="email-template-pill" data-tpl="'+i+'">'+EMAIL_TEMPLATES[i].label+'</button>';
+  }
+  var c=document.getElementById('emailTemplatePills');
+  c.innerHTML=html;
+  var pills=c.querySelectorAll('.email-template-pill');
+  for(var j=0;j<pills.length;j++){
+    (function(p){p.addEventListener('click',function(){
+      var tpl=EMAIL_TEMPLATES[parseInt(p.getAttribute('data-tpl'))];
+      var bizName=document.getElementById('settingsBizName').value||'Our Team';
+      document.getElementById('emailSubject').value=tpl.subject;
+      document.getElementById('emailBody').value=tpl.body.replace(/\{biz\}/g,bizName).replace(/\{name\}/g,'').replace(/\{date\}/g,'').replace(/\{reviewLink\}/g,'[your-google-review-link]');
+      showToast('Template loaded','info');
+    })})(pills[j]);
+  }
+}
+
+function loadEmails(){
+  showLoading(true);
+  document.getElementById('emailList').innerHTML='<div class="empty-state" style="padding:24px"><div class="empty-state-text">Loading emails...</div></div>';
+  fetchGAS('getEmails&view='+emailView+'&count=30').then(function(r){
+    if(emailView==='inbox'){emailInbox=Array.isArray(r)?r:[]}
+    else{emailSent=Array.isArray(r)?r:[]}
+    renderEmailList();
+    showLoading(false);
+  }).catch(function(e){
+    console.error(e);
+    document.getElementById('emailList').innerHTML=emptyState('Could not load emails. Make sure the getEmails function is in your Code.gs.');
+    showLoading(false);
+  });
+}
+
+function renderEmailList(){
+  var data=emailView==='inbox'?emailInbox:emailSent;
+  document.getElementById('emailCount').textContent=data.length+' emails';
+  var unread=emailView==='inbox'?data.filter(function(e){return e.unread}).length:0;
+  setBadge('badgeEmail',unread);
+
+  if(!data.length){
+    document.getElementById('emailList').innerHTML=emptyState(emailView==='inbox'?'Inbox is empty.':'No sent emails.');
+    return;
+  }
+  var html='';
+  for(var i=0;i<data.length;i++){
+    var e=data[i];
+    var isUnread=e.unread?'unread':'';
+    var dotClass=e.unread?'':'read';
+    var who=emailView==='inbox'?e.from:(e.to||'');
+    html+='<div class="email-row '+isUnread+'" data-eidx="'+i+'">';
+    html+='<div class="email-row-dot '+dotClass+'"></div>';
+    html+='<div class="email-row-content">';
+    html+='<div class="email-row-top"><span class="email-row-from">'+esc(who)+'</span><span class="email-row-date">'+timeAgo(e.date)+'</span></div>';
+    html+='<div class="email-row-subject">'+esc(e.subject)+'</div>';
+    html+='<div class="email-row-snippet">'+esc((e.snippet||e.body||'').substring(0,100))+'</div>';
+    html+='</div></div>';
+  }
+  document.getElementById('emailList').innerHTML=html;
+  document.getElementById('emailDetailPanel').style.display='none';
+
+  // Wire clicks
+  var rows=document.getElementById('emailList').querySelectorAll('.email-row');
+  for(var j=0;j<rows.length;j++){
+    (function(row){row.addEventListener('click',function(){
+      var idx=parseInt(row.getAttribute('data-eidx'));
+      openEmailDetail(idx);
+    })})(rows[j]);
+  }
+}
+
+function openEmailDetail(idx){
+  var data=emailView==='inbox'?emailInbox:emailSent;
+  var e=data[idx];
+  if(!e) return;
+  document.getElementById('emailDetailPanel').style.display='block';
+  document.getElementById('emailDetailTitle').textContent=esc(e.subject||'(no subject)');
+  var who=emailView==='inbox'?'From: '+esc(e.from):'To: '+esc(e.to||'');
+  document.getElementById('emailDetailContent').innerHTML=
+    '<div class="email-detail-header"><div class="email-detail-subject">'+esc(e.subject)+'</div><div class="email-detail-meta"><span>'+who+'</span><span>'+fmtDate(e.date)+'</span></div></div>'+
+    '<div class="email-detail-body">'+esc(e.body||e.snippet||'')+'</div>'+
+    (emailView==='inbox'?'<div style="margin-top:20px"><button class="header-btn header-btn-primary" id="btnReplyEmail">↩ Reply</button></div>':'');
+  // Wire reply
+  var rb=document.getElementById('btnReplyEmail');
+  if(rb){rb.addEventListener('click',function(){
+    document.getElementById('emailTo').value=(e.from||'').replace(/.*<(.+)>$/,'$1');
+    document.getElementById('emailSubject').value='Re: '+(e.subject||'');
+    document.getElementById('emailBody').value='\n\n--- Original ---\n'+esc(e.body||'');
+    document.getElementById('emailBody').focus();
+    window.scrollTo({top:0,behavior:'smooth'});
+  })}
+}
+
+function sendEmail(){
+  var from=document.getElementById('emailFrom').value;
+  var to=document.getElementById('emailTo').value.trim();
+  var subject=document.getElementById('emailSubject').value.trim();
+  var body=document.getElementById('emailBody').value.trim();
+  if(!to){showToast('Enter a recipient','error');return}
+  if(!subject&&!body){showToast('Enter a subject or message','error');return}
+  if(!from){showToast('Select a "Send As" address (set up in Settings)','error');return}
+
+  var btn=document.getElementById('btnSendEmail');
+  btn.textContent='Sending...';btn.disabled=true;showLoading(true);
+
+  postGAS({action:'sendEmail',from:from,to:to,subject:subject,body:body}).then(function(r){
+    if(r&&r.success){
+      showToast('Email sent!');
+      document.getElementById('emailTo').value='';
+      document.getElementById('emailSubject').value='';
+      document.getElementById('emailBody').value='';
+      // Add to local sent
+      emailSent.unshift({from:from,to:to,subject:subject,body:body,date:new Date().toISOString(),snippet:body.substring(0,100)});
+    }else{
+      showToast('Failed: '+(r&&r.error||'Unknown error'),'error');
+    }
+    btn.textContent='Send →';btn.disabled=false;showLoading(false);
+  }).catch(function(e){
+    showToast('Send failed — check GAS setup','error');
+    console.error(e);
+    btn.textContent='Send →';btn.disabled=false;showLoading(false);
+  });
+}
+
+function clearCompose(){
+  document.getElementById('emailTo').value='';
+  document.getElementById('emailSubject').value='';
+  document.getElementById('emailBody').value='';
+}
+
 /* SETTINGS */
 function initSettings(){var u=localStorage.getItem('flowpipe_gas_url');if(u)document.getElementById('settingsGasUrl').value=u;document.getElementById('settingsServices').value=SERVICES_LIST.join('\n')}
 
@@ -403,6 +672,15 @@ document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('btnExportAll').addEventListener('click',function(){var all=[];appointments.forEach(function(a){var o=Object.assign({},a);o._Sheet='Appointments';all.push(o)});quotes.forEach(function(q){var o=Object.assign({},q);o._Sheet='Quotes';all.push(o)});contacts.forEach(function(c){var o=Object.assign({},c);o._Sheet='Contacts';all.push(o)});clients.forEach(function(cl){var o=Object.assign({},cl);o._Sheet='Clients';all.push(o)});exportToCSV(all,'flowpipe-all-'+new Date().toISOString().slice(0,10))});
   document.getElementById('btnExportClients').addEventListener('click',function(){exportToCSV(clients,'flowpipe-clients-'+new Date().toISOString().slice(0,10))});
   initSettings();testConnection();renderAll();loadAll();
+  // Email init
+  initEmailAliases();renderEmailTemplates();
+  document.getElementById('btnSendEmail').addEventListener('click',sendEmail);
+  document.getElementById('btnClearCompose').addEventListener('click',clearCompose);
+  document.getElementById('btnRefreshEmail').addEventListener('click',loadEmails);
+  document.getElementById('btnBackToList').addEventListener('click',function(){document.getElementById('emailDetailPanel').style.display='none'});
+  document.getElementById('btnSaveEmailAliases').addEventListener('click',saveEmailAliases);
+  // Email tabs
+  var etabs=document.querySelectorAll('.email-tab');for(var et=0;et<etabs.length;et++)(function(tab){tab.addEventListener('click',function(){emailView=tab.getAttribute('data-etab');for(var x=0;x<etabs.length;x++)etabs[x].classList.remove('active');tab.classList.add('active');loadEmails()})})(etabs[et]);
   document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()})
 });
 </script>
