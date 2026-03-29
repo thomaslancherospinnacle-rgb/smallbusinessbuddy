@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlowPipe Plumbing — Professional Plumbing Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════
+   CONFIG — Change these to customize
+   ══════════════════════════════════════ */
+:root {
+  --accent: #1a5c3a;
+  --accent-light: #e8f5ee;
+  --accent-hover: #14472d;
+  --text-primary: #1a1a1a;
+  --text-secondary: #5a5a5a;
+  --text-muted: #8a8a8a;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f8f6;
+  --bg-tertiary: #f0efed;
+  --border: #e5e4e1;
+  --border-light: #f0efed;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+  --font-body: 'Outfit', sans-serif;
+  --font-display: 'Fraunces', serif;
+  --max-width: 1140px;
+  --nav-height: 72px;
+
+  /* ─── COMPANY INFO — Edit here ─── */
+  --company-name: "FlowPipe";
+  --company-tagline: "Plumbing Co.";
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); color: var(--text-primary); background: var(--bg-primary); -webkit-font-smoothing: antialiased; }
+img { max-width: 100%; display: block; }
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; border: none; }
+input, textarea, select { font-family: inherit; }
+
+/* ─── ANIMATIONS ─── */
+@keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+@keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes checkPop { 0% { transform:scale(0); } 60% { transform:scale(1.2); } 100% { transform:scale(1); } }
+.fade-up { animation: fadeUp .6s ease both; }
+.fade-up-1 { animation-delay: .1s; }
+.fade-up-2 { animation-delay: .2s; }
+.fade-up-3 { animation-delay: .3s; }
+.fade-up-4 { animation-delay: .4s; }
+
+/* ─── NAVBAR ─── */
+.nav { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border-light); height: var(--nav-height); }
+.nav-inner { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; height: 100%; display: flex; align-items: center; justify-content: space-between; }
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-logo-icon { width: 38px; height: 38px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; }
+.nav-logo-text { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: -.5px; }
+.nav-logo-sub { font-size: 10px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; font-weight: 500; margin-top: -2px; }
+.nav-links { display: flex; gap: 4px; align-items: center; }
+.nav-link { padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--text-secondary); transition: all .2s; background: none; }
+.nav-link:hover { background: var(--bg-secondary); color: var(--text-primary); }
+.nav-link.active { background: var(--accent-light); color: var(--accent); }
+.nav-cta { padding: 10px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; color: #fff; background: var(--accent); transition: all .2s; margin-left: 8px; }
+.nav-cta:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.nav-mobile-toggle { display: none; background: none; border: none; padding: 8px; color: var(--text-primary); }
+.nav-mobile-menu { display: none; position: absolute; top: var(--nav-height); left: 0; right: 0; background: var(--bg-primary); border-bottom: 1px solid var(--border); padding: 12px; animation: slideDown .3s ease; }
+.nav-mobile-menu .nav-link { display: block; width: 100%; text-align: left; padding: 12px 16px; }
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-mobile-toggle { display: block; }
+  .nav-mobile-menu.open { display: block; }
+}
+
+/* ─── HERO ─── */
+.hero { padding: 100px 24px 80px; text-align: center; background: var(--bg-primary); position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -200px; right: -200px; width: 500px; height: 500px; background: var(--accent-light); border-radius: 50%; opacity: .4; }
+.hero::after { content: ''; position: absolute; bottom: -150px; left: -100px; width: 400px; height: 400px; background: var(--bg-tertiary); border-radius: 50%; opacity: .5; }
+.hero-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-light); color: var(--accent); padding: 6px 16px; border-radius: 100px; font-size: 13px; font-weight: 600; margin-bottom: 28px; }
+.hero-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+.hero h1 { font-family: var(--font-display); font-size: clamp(38px, 5.5vw, 64px); font-weight: 900; line-height: 1.08; letter-spacing: -1.5px; color: var(--text-primary); margin-bottom: 20px; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p { font-size: 18px; color: var(--text-secondary); line-height: 1.7; max-width: 520px; margin: 0 auto 36px; font-weight: 400; }
+.hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; background: var(--accent); color: #fff; border-radius: var(--radius); font-size: 15px; font-weight: 600; transition: all .25s; }
+.btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,92,58,.18); }
+.btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 14px 32px; background: var(--bg-primary); color: var(--text-primary); border: 1.5px solid var(--border); border-radius: var(--radius); font-size: 15px; font-weight: 500; transition: all .2s; }
+.btn-secondary:hover { border-color: var(--text-muted); background: var(--bg-secondary); }
+
+/* ─── STATS ─── */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); max-width: 700px; margin: 64px auto 0; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.stat { background: var(--bg-primary); padding: 28px 16px; text-align: center; }
+.stat-value { font-family: var(--font-display); font-size: 28px; font-weight: 800; color: var(--text-primary); }
+.stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+@media (max-width: 600px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+
+/* ─── SECTION BASE ─── */
+.section { padding: 80px 24px; }
+.section-alt { background: var(--bg-secondary); }
+.section-inner { max-width: var(--max-width); margin: 0 auto; }
+.section-header { text-align: center; margin-bottom: 48px; }
+.section-header h2 { font-family: var(--font-display); font-size: 36px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; letter-spacing: -.5px; }
+.section-header p { font-size: 16px; color: var(--text-secondary); max-width: 480px; margin: 0 auto; line-height: 1.6; }
+
+/* ─── SERVICE CARDS ─── */
+.services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.service-card { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 28px; transition: all .3s ease; position: relative; overflow: hidden; }
+.service-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.service-card-icon { width: 48px; height: 48px; background: var(--accent-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
+.service-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.service-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+.service-card-price { font-size: 14px; font-weight: 700; color: var(--accent); }
+.service-card-duration { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+/* ─── BOOKING SECTION ─── */
+.booking-container { max-width: 860px; margin: 0 auto; }
+.booking-steps { display: flex; justify-content: center; gap: 8px; margin-bottom: 40px; }
+.booking-step { display: flex; align-items: center; gap: 8px; }
+.booking-step-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; background: var(--bg-tertiary); color: var(--text-muted); transition: all .3s; }
+.booking-step-num.active { background: var(--accent); color: #fff; }
+.booking-step-num.done { background: var(--accent-light); color: var(--accent); }
+.booking-step-label { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+.booking-step-label.active { color: var(--text-primary); }
+.booking-step-line { width: 40px; height: 2px; background: var(--border); border-radius: 1px; }
+.booking-step-line.done { background: var(--accent); }
+
+/* Calendar */
+.cal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 700px) { .cal-grid { grid-template-columns: 1fr; } }
+.cal-panel { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 24px; }
+.cal-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.cal-nav button { background: var(--bg-secondary); border: 1px solid var(--border); width: 34px; height: 34px; border-radius: 8px; font-size: 16px; cursor: pointer; color: var(--text-primary); transition: all .2s; }
+.cal-nav button:hover { background: var(--bg-tertiary); }
+.cal-nav span { font-weight: 600; font-size: 16px; }
+.cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin-bottom: 8px; }
+.cal-weekdays span { font-size: 12px; color: var(--text-muted); font-weight: 600; padding: 8px 0; }
+.cal-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-day { aspect-ratio: 1; border-radius: 8px; border: none; background: none; font-size: 14px; color: var(--text-primary); cursor: pointer; transition: all .15s; font-weight: 500; }
+.cal-day:hover:not(:disabled) { background: var(--accent-light); }
+.cal-day.selected { background: var(--accent) !important; color: #fff !important; font-weight: 700; }
+.cal-day:disabled { color: var(--border); cursor: default; }
+.cal-day.today { border: 2px solid var(--accent); }
+
+.time-slots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 340px; overflow-y: auto; }
+.time-slot { padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-primary); font-size: 14px; font-weight: 500; color: var(--text-secondary); cursor: pointer; transition: all .15s; text-align: center; }
+.time-slot:hover { border-color: var(--accent); color: var(--accent); }
+.time-slot.selected { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+
+/* Form */
+.form-grid { display: grid; gap: 16px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+.form-group input, .form-group textarea, .form-group select {
+  width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius);
+  font-size: 15px; color: var(--text-primary); background: var(--bg-primary); outline: none; transition: border-color .2s;
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
+.form-group textarea { min-height: 80px; resize: vertical; }
+.form-group input::placeholder, .form-group textarea::placeholder { color: var(--text-muted); }
+
+.booking-summary { background: var(--accent-light); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 24px; display: flex; gap: 24px; flex-wrap: wrap; }
+.booking-summary-item { }
+.booking-summary-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+.booking-summary-value { font-size: 14px; font-weight: 600; color: var(--accent); margin-top: 2px; }
+
+.booking-nav { display: flex; justify-content: space-between; margin-top: 32px; }
+.btn-back { padding: 12px 24px; border-radius: var(--radius); font-size: 14px; font-weight: 500; color: var(--text-secondary); background: var(--bg-secondary); border: 1px solid var(--border); transition: all .2s; }
+.btn-back:hover { background: var(--bg-tertiary); }
+.btn-next { padding: 12px 28px; border-radius: var(--radius); font-size: 14px; font-weight: 600; color: #fff; background: var(--accent); transition: all .25s; }
+.btn-next:hover { background: var(--accent-hover); }
+.btn-next:disabled { opacity: .4; cursor: default; }
+
+/* Service select grid for step 1 */
+.service-select-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.service-select-btn { padding: 18px 14px; border-radius: var(--radius); border: 1.5px solid var(--border); background: var(--bg-primary); text-align: left; cursor: pointer; transition: all .2s; }
+.service-select-btn:hover { border-color: var(--accent); }
+.service-select-btn.selected { border-color: var(--accent); background: var(--accent-light); }
+.service-select-btn .icon { font-size: 24px; margin-bottom: 8px; }
+.service-select-btn .name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+.service-select-btn .price { font-size: 12px; color: var(--accent); font-weight: 600; margin-top: 2px; }
+
+/* ─── QUOTE FORM ─── */
+.quote-section { background: var(--bg-secondary); }
+.quote-card { max-width: 600px; margin: 0 auto; background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 40px; box-shadow: var(--shadow-md); }
+
+/* ─── REVIEWS ─── */
+.reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.review-card { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 28px; transition: all .3s; }
+.review-card:hover { box-shadow: var(--shadow-md); }
+.review-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+.review-author { display: flex; align-items: center; gap: 12px; }
+.review-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; color: var(--accent); font-weight: 700; font-size: 16px; }
+.review-name { font-size: 15px; font-weight: 600; }
+.review-meta { font-size: 12px; color: var(--text-muted); }
+.review-stars { color: #e8a838; font-size: 14px; letter-spacing: 1px; }
+.review-text { font-size: 14px; color: var(--text-secondary); line-height: 1.65; font-style: italic; }
+
+/* ─── ABOUT / TEAM ─── */
+.team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+.team-card { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 32px; text-align: center; transition: all .3s; }
+.team-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.team-avatar { width: 72px; height: 72px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 32px; }
+.team-name { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+.team-role { font-size: 14px; color: var(--accent); font-weight: 500; margin-bottom: 8px; }
+.team-detail { font-size: 12px; color: var(--text-muted); }
+
+.guarantees-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 48px; }
+.guarantee-card { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 24px; }
+.guarantee-card h4 { font-size: 15px; font-weight: 600; margin: 10px 0 6px; }
+.guarantee-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+.guarantee-icon { color: var(--accent); font-size: 20px; }
+
+/* ─── CONTACT ─── */
+.contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; }
+@media (max-width: 700px) { .contact-grid { grid-template-columns: 1fr; } }
+.contact-info-item { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 24px; }
+.contact-info-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--accent-light); display: flex; align-items: center; justify-content: center; color: var(--accent); flex-shrink: 0; }
+.contact-info-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; }
+.contact-info-value { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.contact-info-sub { font-size: 12px; color: var(--text-muted); }
+
+/* ─── CTA BANNER ─── */
+.cta-banner { max-width: 700px; margin: 0 auto; background: var(--accent); border-radius: var(--radius-lg); padding: 56px 40px; text-align: center; color: #fff; position: relative; overflow: hidden; }
+.cta-banner::before { content: ''; position: absolute; top: -80px; right: -80px; width: 200px; height: 200px; background: rgba(255,255,255,.08); border-radius: 50%; }
+.cta-banner h2 { font-family: var(--font-display); font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+.cta-banner p { font-size: 16px; opacity: .85; margin-bottom: 28px; }
+.cta-banner .btn-white { background: #fff; color: var(--accent); padding: 14px 36px; border-radius: var(--radius); font-size: 15px; font-weight: 600; transition: all .2s; display: inline-block; }
+.cta-banner .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+
+/* ─── FOOTER ─── */
+.footer { border-top: 1px solid var(--border); padding: 48px 24px 24px; }
+.footer-inner { max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: 1.5fr repeat(3, 1fr); gap: 40px; }
+@media (max-width: 700px) { .footer-inner { grid-template-columns: 1fr 1fr; } }
+.footer-brand { font-family: var(--font-display); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+.footer-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+.footer-col h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 14px; }
+.footer-col a { display: block; font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; transition: color .2s; }
+.footer-col a:hover { color: var(--accent); }
+.footer-bottom { max-width: var(--max-width); margin: 36px auto 0; padding-top: 20px; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.footer-copy { font-size: 13px; color: var(--text-muted); }
+.footer-admin { font-size: 12px; color: var(--text-muted); background: var(--bg-secondary); border: 1px solid var(--border); padding: 6px 14px; border-radius: 6px; transition: all .2s; }
+.footer-admin:hover { border-color: var(--text-muted); }
+
+/* ─── TOAST ─── */
+.toast { position: fixed; top: 24px; right: 24px; z-index: 9999; padding: 14px 24px; border-radius: var(--radius); font-size: 14px; font-weight: 600; color: #fff; animation: slideDown .35s ease; box-shadow: var(--shadow-lg); }
+.toast-success { background: var(--accent); }
+.toast-error { background: #d63031; }
+
+/* ─── CONFIRMATION ─── */
+.confirm-page { text-align: center; padding: 100px 24px; max-width: 480px; margin: 0 auto; }
+.confirm-check { width: 72px; height: 72px; border-radius: 50%; background: var(--accent-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; animation: checkPop .5s ease; }
+.confirm-check svg { color: var(--accent); }
+
+/* ─── LOADING ─── */
+.spinner { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── HIDE SECTIONS ─── */
+.page { display: none; }
+.page.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     NAVBAR
+     ══════════════════════════════════════ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo" onclick="showPage('home')">
+      <div class="nav-logo-icon">🔧</div>
+      <div>
+        <div class="nav-logo-text">FlowPipe</div>
+        <div class="nav-logo-sub">Plumbing Co.</div>
+      </div>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <button class="nav-link active" onclick="showPage('home')">Home</button>
+      <button class="nav-link" onclick="showPage('services')">Services</button>
+      <button class="nav-link" onclick="showPage('booking')">Book</button>
+      <button class="nav-link" onclick="showPage('quote')">Get Quote</button>
+      <button class="nav-link" onclick="showPage('about')">About</button>
+      <button class="nav-link" onclick="showPage('reviews')">Reviews</button>
+      <button class="nav-link" onclick="showPage('contact')">Contact</button>
+      <button class="nav-cta" onclick="showPage('booking')">📅 Book Now</button>
+    </div>
+    <button class="nav-mobile-toggle" onclick="toggleMobileMenu()">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+  <div class="nav-mobile-menu" id="mobileMenu">
+    <button class="nav-link" onclick="showPage('home')">Home</button>
+    <button class="nav-link" onclick="showPage('services')">Services</button>
+    <button class="nav-link" onclick="showPage('booking')">Book Appointment</button>
+    <button class="nav-link" onclick="showPage('quote')">Get Quote</button>
+    <button class="nav-link" onclick="showPage('about')">About</button>
+    <button class="nav-link" onclick="showPage('reviews')">Reviews</button>
+    <button class="nav-link" onclick="showPage('contact')">Contact</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HOME PAGE
+     ══════════════════════════════════════ -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge fade-up"><span class="hero-badge-dot"></span> Available 24/7 — Emergency Service</div>
+      <h1 class="fade-up fade-up-1">Plumbing Done<br><em>Right, Every Time.</em></h1>
+      <p class="fade-up fade-up-2">Licensed professionals delivering quality plumbing services across South Florida. Fast response, fair pricing, guaranteed work.</p>
+      <div class="hero-actions fade-up fade-up-3">
+        <button class="btn-primary" onclick="showPage('booking')">Schedule Service →</button>
+        <button class="btn-secondary" onclick="showPage('quote')">Get a Free Quote</button>
+      </div>
+    </div>
+    <div class="stats fade-up fade-up-4">
+      <div class="stat"><div class="stat-value">18+</div><div class="stat-label">Years Exp.</div></div>
+      <div class="stat"><div class="stat-value">4,200+</div><div class="stat-label">Jobs Done</div></div>
+      <div class="stat"><div class="stat-value">4.9★</div><div class="stat-label">Rating</div></div>
+      <div class="stat"><div class="stat-value">30min</div><div class="stat-label">Avg Response</div></div>
+    </div>
+  </section>
+
+  <!-- Services Preview -->
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div class="section-header">
+        <h2>What We Do</h2>
+        <p>Comprehensive plumbing solutions backed by our satisfaction guarantee.</p>
+      </div>
+      <div class="services-grid" id="homeServicesGrid"></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="cta-banner">
+        <h2>Ready to Fix It?</h2>
+        <p>Book online in 60 seconds. We'll confirm within the hour.</p>
+        <button class="btn-white" onclick="showPage('booking')">Book Appointment →</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     SERVICES PAGE
+     ══════════════════════════════════════ -->
+<div id="page-services" class="page">
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-header">
+        <h2>Our Services</h2>
+        <p>Full-spectrum plumbing for residential and commercial properties.</p>
+      </div>
+      <div class="services-grid" id="servicesGrid"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     BOOKING PAGE
+     ══════════════════════════════════════ -->
+<div id="page-booking" class="page">
+  <section class="section">
+    <div class="booking-container">
+      <div class="section-header">
+        <h2>Book an Appointment</h2>
+        <p>Select your service, pick a time, and we'll handle the rest.</p>
+      </div>
+
+      <!-- Steps indicator -->
+      <div class="booking-steps" id="bookingSteps"></div>
+
+      <!-- Step 1: Service -->
+      <div id="bookingStep1" class="booking-step-content">
+        <div class="service-select-grid" id="serviceSelectGrid"></div>
+        <div class="booking-nav" style="justify-content:flex-end;">
+          <button class="btn-next" id="btnStep1Next" disabled onclick="goBookingStep(2)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Date & Time -->
+      <div id="bookingStep2" class="booking-step-content" style="display:none;">
+        <div class="cal-grid">
+          <div class="cal-panel">
+            <div class="cal-nav">
+              <button onclick="calPrev()">‹</button>
+              <span id="calMonthLabel"></span>
+              <button onclick="calNext()">›</button>
+            </div>
+            <div class="cal-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+            <div class="cal-days" id="calDays"></div>
+          </div>
+          <div class="cal-panel">
+            <h3 style="font-size:16px;font-weight:600;margin-bottom:14px;" id="timeSlotsLabel">Select a date first</h3>
+            <div class="time-slots" id="timeSlots"></div>
+          </div>
+        </div>
+        <div class="booking-nav">
+          <button class="btn-back" onclick="goBookingStep(1)">← Back</button>
+          <button class="btn-next" id="btnStep2Next" disabled onclick="goBookingStep(3)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Info -->
+      <div id="bookingStep3" class="booking-step-content" style="display:none;">
+        <div class="booking-summary" id="bookingSummary"></div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="bkName" placeholder="John Smith">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" id="bkEmail" placeholder="john@email.com">
+            </div>
+            <div class="form-group">
+              <label>Phone *</label>
+              <input type="tel" id="bkPhone" placeholder="(555) 123-4567">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Service Address</label>
+            <input type="text" id="bkAddress" placeholder="123 Main St, Fort Lauderdale, FL">
+          </div>
+          <div class="form-group">
+            <label>Describe the Issue</label>
+            <textarea id="bkNotes" placeholder="Tell us about the problem..."></textarea>
+          </div>
+        </div>
+        <div class="booking-nav">
+          <button class="btn-back" onclick="goBookingStep(2)">← Back</button>
+          <button class="btn-next" id="btnSubmitBooking" onclick="submitBooking()">Confirm Booking ✓</button>
+        </div>
+      </div>
+
+      <!-- Confirmation -->
+      <div id="bookingConfirm" style="display:none;">
+        <div class="confirm-page">
+          <div class="confirm-check">
+            <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="3"><path d="M8 16l6 6 12-12"/></svg>
+          </div>
+          <h2 style="font-family:var(--font-display);font-size:32px;font-weight:800;margin-bottom:12px;">You're Booked!</h2>
+          <p style="color:var(--text-secondary);font-size:16px;line-height:1.7;margin-bottom:32px;">We've received your appointment. You'll get a confirmation call within the hour.</p>
+          <button class="btn-primary" onclick="showPage('home')">Back to Home</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     GET QUOTE PAGE
+     ══════════════════════════════════════ -->
+<div id="page-quote" class="page">
+  <section class="section quote-section">
+    <div class="section-inner">
+      <div class="section-header">
+        <h2>Get a Free Quote</h2>
+        <p>Tell us about your project and we'll get back to you within 2 hours.</p>
+      </div>
+      <div class="quote-card">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" id="qtName" placeholder="Your name">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" id="qtEmail" placeholder="you@email.com">
+            </div>
+            <div class="form-group">
+              <label>Phone *</label>
+              <input type="tel" id="qtPhone" placeholder="(555) 123-4567">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Service Needed</label>
+            <select id="qtService">
+              <option value="">Select a service...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Address</label>
+            <input type="text" id="qtAddress" placeholder="Service address">
+          </div>
+          <div class="form-group">
+            <label>Describe Your Project *</label>
+            <textarea id="qtDesc" placeholder="Give us details about the work needed, any urgency, and preferred timeline..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Preferred Contact Method</label>
+            <div style="display:flex;gap:12px;margin-top:4px;">
+              <label style="display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text-secondary);cursor:pointer;">
+                <input type="radio" name="qtContact" value="phone" checked> Phone
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text-secondary);cursor:pointer;">
+                <input type="radio" name="qtContact" value="email"> Email
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text-secondary);cursor:pointer;">
+                <input type="radio" name="qtContact" value="text"> Text
+              </label>
+            </div>
+          </div>
+          <button class="btn-primary" style="width:100%;justify-content:center;" id="btnSubmitQuote" onclick="submitQuote()">Submit Quote Request →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     ABOUT PAGE
+     ══════════════════════════════════════ -->
+<div id="page-about" class="page">
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-header">
+        <h2>About FlowPipe</h2>
+        <p>Founded in 2008, we've grown from a one-man operation to South Florida's most trusted plumbing team.</p>
+      </div>
+      <div class="team-grid" id="teamGrid"></div>
+      <div class="guarantees-grid" id="guaranteesGrid"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     REVIEWS PAGE
+     ══════════════════════════════════════ -->
+<div id="page-reviews" class="page">
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div class="section-header">
+        <h2>Customer Reviews</h2>
+        <p>Hear from the homeowners and businesses we've helped.</p>
+      </div>
+      <div class="reviews-grid" id="reviewsGrid"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     CONTACT PAGE
+     ══════════════════════════════════════ -->
+<div id="page-contact" class="page">
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-header">
+        <h2>Get in Touch</h2>
+      </div>
+      <div class="contact-grid">
+        <div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon">📞</div>
+            <div><div class="contact-info-label">Phone</div><div class="contact-info-value">(954) 555-0199</div><div class="contact-info-sub">Available 24/7 for emergencies</div></div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon">✉️</div>
+            <div><div class="contact-info-label">Email</div><div class="contact-info-value">hello@flowpipe.co</div><div class="contact-info-sub">Response within 2 hours</div></div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon">📍</div>
+            <div><div class="contact-info-label">Location</div><div class="contact-info-value">Fort Lauderdale, FL</div><div class="contact-info-sub">Serving all of Broward County</div></div>
+          </div>
+          <div class="contact-info-item">
+            <div class="contact-info-icon">🕐</div>
+            <div><div class="contact-info-label">Hours</div><div class="contact-info-value">Mon–Sat: 7am–8pm</div><div class="contact-info-sub">Sunday: Emergency only</div></div>
+          </div>
+        </div>
+        <div class="quote-card" style="box-shadow:none;">
+          <h3 style="font-size:20px;font-weight:700;margin-bottom:24px;">Send a Message</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>Name</label><input id="ctName" placeholder="Your name"></div>
+            <div class="form-group"><label>Email</label><input id="ctEmail" placeholder="you@email.com"></div>
+            <div class="form-group"><label>Message</label><textarea id="ctMessage" placeholder="How can we help?"></textarea></div>
+            <button class="btn-primary" style="width:100%;justify-content:center;" id="btnContact" onclick="submitContact()">Send Message →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══════════════════════════════════════
+     FOOTER
+     ══════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">FlowPipe</div>
+      <p class="footer-desc">Professional plumbing services for residential and commercial properties. Licensed, insured, and trusted since 2008.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <a href="#" onclick="showPage('services')">Emergency Repair</a>
+      <a href="#" onclick="showPage('services')">Drain Cleaning</a>
+      <a href="#" onclick="showPage('services')">Water Heater</a>
+      <a href="#" onclick="showPage('services')">Pipe Installation</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#" onclick="showPage('about')">About Us</a>
+      <a href="#" onclick="showPage('reviews')">Reviews</a>
+      <a href="#" onclick="showPage('contact')">Contact</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <a href="tel:+19545550199">(954) 555-0199</a>
+      <a href="mailto:hello@flowpipe.co">hello@flowpipe.co</a>
+      <a>Fort Lauderdale, FL</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 FlowPipe Plumbing Co. All rights reserved.</span>
+    <a class="footer-admin" href="admin.html">Admin Portal →</a>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+     ══════════════════════════════════════ -->
+<script>
+/* ═══════════════════════════════════════
+   CONFIG — Your Google Apps Script URL
+   ═══════════════════════════════════════ */
+const GAS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+/* ═══════════════════════════════════════
+   DATA — Edit services, reviews, team
+   ═══════════════════════════════════════ */
+const SERVICES = [
+  { id:'s1', name:'Emergency Repair', icon:'🔧', price:'From $89', desc:'24/7 emergency plumbing repairs for burst pipes, major leaks, and flooding.', duration:60 },
+  { id:'s2', name:'Drain Cleaning', icon:'🚿', price:'From $65', desc:'Professional drain unclogging for kitchens, bathrooms, and main lines.', duration:45 },
+  { id:'s3', name:'Water Heater', icon:'🔥', price:'From $120', desc:'Installation, repair, and maintenance of all water heater types.', duration:90 },
+  { id:'s4', name:'Pipe Installation', icon:'🔩', price:'From $150', desc:'New pipe installation, repiping, and pipe replacement services.', duration:120 },
+  { id:'s5', name:'Fixture Install', icon:'🚰', price:'From $75', desc:'Faucet, toilet, shower, and sink installation and replacement.', duration:60 },
+  { id:'s6', name:'Inspection', icon:'🔍', price:'From $49', desc:'Comprehensive plumbing inspection with camera and detailed report.', duration:45 },
+  { id:'s7', name:'Sewer Line', icon:'🏗️', price:'From $200', desc:'Sewer line repair, replacement, and trenchless solutions.', duration:180 },
+  { id:'s8', name:'Gas Line', icon:'⚡', price:'From $175', desc:'Gas line installation, repair, and leak detection services.', duration:90 },
+];
+
+const REVIEWS = [
+  { name:'Maria G.', rating:5, text:'Fixed our burst pipe in under an hour. Incredibly professional and fair pricing!', date:'2 weeks ago', service:'Emergency Repair' },
+  { name:'James T.', rating:5, text:'Punctual, clean, and thorough. Our new water heater works perfectly.', date:'1 month ago', service:'Water Heater' },
+  { name:'Sophia R.', rating:5, text:'Best plumber in the area. They even fixed a small leak they noticed for free.', date:'3 weeks ago', service:'Inspection' },
+  { name:'Derek M.', rating:4, text:'Great service. Drain was cleared quickly and they explained the cause.', date:'1 month ago', service:'Drain Cleaning' },
+  { name:'Linda K.', rating:5, text:'Replaced all our old fixtures beautifully. The bathroom looks brand new!', date:'2 months ago', service:'Fixture Install' },
+  { name:'Carlos P.', rating:5, text:'Emergency call at 11pm and they showed up within 30 minutes. Lifesavers!', date:'1 week ago', service:'Emergency Repair' },
+];
+
+const TEAM = [
+  { name:'Mike Henderson', role:'Master Plumber / Owner', years:18, cert:'Licensed & Insured', img:'👨‍🔧' },
+  { name:'Sarah Chen', role:'Lead Technician', years:12, cert:'Certified Pipefitter', img:'👩‍🔧' },
+  { name:'Tony Reeves', role:'Senior Plumber', years:9, cert:'Backflow Certified', img:'🧑‍🔧' },
+];
+
+const GUARANTEES = [
+  { icon:'🛡️', title:'Licensed & Bonded', desc:'Full state licensing with comprehensive bonding coverage.' },
+  { icon:'✅', title:'Satisfaction Guarantee', desc:'Not happy? We'll make it right or your money back.' },
+  { icon:'⏰', title:'24/7 Emergency', desc:'Round-the-clock emergency response, 365 days a year.' },
+  { icon:'💰', title:'Upfront Pricing', desc:'No hidden fees. You approve the price before we start.' },
+];
+
+/* ═══════════════════════════════════════
+   PAGE NAVIGATION
+   ═══════════════════════════════════════ */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('#navLinks .nav-link').forEach(l => l.classList.remove('active'));
+  const links = document.querySelectorAll('#navLinks .nav-link');
+  const map = { home:0, services:1, booking:2, quote:3, about:4, reviews:5, contact:6 };
+  if (map[id] !== undefined && links[map[id]]) links[map[id]].classList.add('active');
+  document.getElementById('mobileMenu').classList.remove('open');
+  window.scrollTo(0, 0);
+}
+
+function toggleMobileMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+/* ═══════════════════════════════════════
+   RENDER DATA
+   ═══════════════════════════════════════ */
+function renderServiceCards(containerId, clickAction) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = SERVICES.map(s => `
+    <div class="service-card" ${clickAction ? `onclick="${clickAction}"` : ''}>
+      <div class="service-card-icon">${s.icon}</div>
+      <h3>${s.name}</h3>
+      <p>${s.desc}</p>
+      <div class="service-card-price">${s.price}</div>
+      <div class="service-card-duration">~${s.duration} min</div>
+    </div>
+  `).join('');
+}
+
+function renderServiceSelectGrid() {
+  const el = document.getElementById('serviceSelectGrid');
+  el.innerHTML = SERVICES.map(s => `
+    <button class="service-select-btn" data-id="${s.id}" onclick="selectService('${s.id}')">
+      <div class="icon">${s.icon}</div>
+      <div class="name">${s.name}</div>
+      <div class="price">${s.price}</div>
+    </button>
+  `).join('');
+}
+
+function renderQuoteServiceOptions() {
+  const el = document.getElementById('qtService');
+  SERVICES.forEach(s => { const opt = document.createElement('option'); opt.value = s.name; opt.textContent = s.name; el.appendChild(opt); });
+}
+
+function renderReviews() {
+  document.getElementById('reviewsGrid').innerHTML = REVIEWS.map(r => `
+    <div class="review-card">
+      <div class="review-header">
+        <div class="review-author">
+          <div class="review-avatar">${r.name[0]}</div>
+          <div><div class="review-name">${r.name}</div><div class="review-meta">${r.date} · ${r.service}</div></div>
+        </div>
+        <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+      </div>
+      <p class="review-text">"${r.text}"</p>
+    </div>
+  `).join('');
+}
+
+function renderTeam() {
+  document.getElementById('teamGrid').innerHTML = TEAM.map(t => `
+    <div class="team-card">
+      <div class="team-avatar">${t.img}</div>
+      <div class="team-name">${t.name}</div>
+      <div class="team-role">${t.role}</div>
+      <div class="team-detail">${t.years} yrs experience · ${t.cert}</div>
+    </div>
+  `).join('');
+  document.getElementById('guaranteesGrid').innerHTML = GUARANTEES.map(g => `
+    <div class="guarantee-card">
+      <div class="guarantee-icon">${g.icon}</div>
+      <h4>${g.title}</h4>
+      <p>${g.desc}</p>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════
+   BOOKING FLOW
+   ═══════════════════════════════════════ */
+let bkService = null, bkDate = null, bkTime = null;
+let calMonth, calYear;
+
+function initBooking() {
+  const now = new Date();
+  calMonth = now.getMonth();
+  calYear = now.getFullYear();
+  renderCalendar();
+  renderBookingSteps(1);
+}
+
+function renderBookingSteps(step) {
+  const labels = ['Service', 'Date & Time', 'Your Info'];
+  document.getElementById('bookingSteps').innerHTML = labels.map((l, i) => {
+    const num = i + 1;
+    const numClass = step > num ? 'done' : step === num ? 'active' : '';
+    const lblClass = step === num ? 'active' : '';
+    const lineClass = step > num ? 'done' : '';
+    return `
+      <div class="booking-step">
+        <div class="booking-step-num ${numClass}">${step > num ? '✓' : num}</div>
+        <span class="booking-step-label ${lblClass}">${l}</span>
+      </div>
+      ${i < 2 ? `<div class="booking-step-line ${lineClass}"></div>` : ''}
+    `;
+  }).join('');
+}
+
+function goBookingStep(step) {
+  document.querySelectorAll('.booking-step-content').forEach(el => el.style.display = 'none');
+  document.getElementById('bookingStep' + step).style.display = 'block';
+  renderBookingSteps(step);
+  if (step === 3) renderBookingSummary();
+}
+
+function selectService(id) {
+  bkService = SERVICES.find(s => s.id === id);
+  document.querySelectorAll('.service-select-btn').forEach(b => b.classList.toggle('selected', b.dataset.id === id));
+  document.getElementById('btnStep1Next').disabled = false;
+}
+
+// Calendar
+function renderCalendar() {
+  const d = new Date(calYear, calMonth, 1);
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const firstDay = d.getDay();
+  const today = new Date();
+  document.getElementById('calMonthLabel').textContent = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  let html = '';
+  for (let i = 0; i < firstDay; i++) html += '<div></div>';
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dt = new Date(calYear, calMonth, day);
+    const isPast = dt < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const isSun = dt.getDay() === 0;
+    const disabled = isPast || isSun;
+    const isToday = dt.toDateString() === today.toDateString();
+    const isSelected = bkDate && new Date(bkDate).toDateString() === dt.toDateString();
+    html += `<button class="cal-day${isToday ? ' today' : ''}${isSelected ? ' selected' : ''}" ${disabled ? 'disabled' : ''} onclick="selectDate('${dt.toISOString()}')">${day}</button>`;
+  }
+  document.getElementById('calDays').innerHTML = html;
+}
+
+function calPrev() { if (calMonth === 0) { calMonth = 11; calYear--; } else calMonth--; renderCalendar(); }
+function calNext() { if (calMonth === 11) { calMonth = 0; calYear++; } else calMonth++; renderCalendar(); }
+
+function selectDate(iso) {
+  bkDate = iso;
+  bkTime = null;
+  renderCalendar();
+  renderTimeSlots();
+  document.getElementById('btnStep2Next').disabled = true;
+}
+
+function renderTimeSlots() {
+  if (!bkDate) return;
+  const d = new Date(bkDate);
+  document.getElementById('timeSlotsLabel').textContent = 'Available — ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  let html = '';
+  for (let h = 8; h <= 17; h++) {
+    for (let m of [0, 30]) {
+      if (h === 17 && m === 30) continue;
+      const label = fmtTime(h, m);
+      const sel = bkTime && bkTime.h === h && bkTime.m === m;
+      html += `<button class="time-slot${sel ? ' selected' : ''}" onclick="selectTime(${h},${m})">${label}</button>`;
+    }
+  }
+  document.getElementById('timeSlots').innerHTML = html;
+}
+
+function selectTime(h, m) {
+  bkTime = { h, m };
+  renderTimeSlots();
+  document.getElementById('btnStep2Next').disabled = false;
+}
+
+function fmtTime(h, m) { const ampm = h >= 12 ? 'PM' : 'AM'; return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${ampm}`; }
+function fmtDate(iso) { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+
+function renderBookingSummary() {
+  document.getElementById('bookingSummary').innerHTML = `
+    <div class="booking-summary-item"><div class="booking-summary-label">Service</div><div class="booking-summary-value">${bkService?.name || '—'}</div></div>
+    <div class="booking-summary-item"><div class="booking-summary-label">Date</div><div class="booking-summary-value">${bkDate ? fmtDate(bkDate) : '—'}</div></div>
+    <div class="booking-summary-item"><div class="booking-summary-label">Time</div><div class="booking-summary-value">${bkTime ? fmtTime(bkTime.h, bkTime.m) : '—'}</div></div>
+  `;
+}
+
+/* ═══════════════════════════════════════
+   FORM SUBMISSIONS → Google Apps Script
+   ═══════════════════════════════════════ */
+function showToast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+function setLoading(btn, loading) {
+  if (loading) {
+    btn.dataset.originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Sending...';
+    btn.disabled = true;
+  } else {
+    btn.innerHTML = btn.dataset.originalText;
+    btn.disabled = false;
+  }
+}
+
+async function postToGAS(payload) {
+  const res = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  });
+  return await res.json();
+}
+
+async function submitBooking() {
+  const name = document.getElementById('bkName').value.trim();
+  const email = document.getElementById('bkEmail').value.trim();
+  const phone = document.getElementById('bkPhone').value.trim();
+  if (!name || !email || !phone) { showToast('Please fill all required fields.', 'error'); return; }
+
+  const btn = document.getElementById('btnSubmitBooking');
+  setLoading(btn, true);
+  try {
+    await postToGAS({
+      action: 'appointment',
+      name, email, phone,
+      address: document.getElementById('bkAddress').value.trim(),
+      notes: document.getElementById('bkNotes').value.trim(),
+      service: bkService?.name || '',
+      date: bkDate ? fmtDate(bkDate) : '',
+      time: bkTime ? fmtTime(bkTime.h, bkTime.m) : '',
+      timestamp: new Date().toISOString()
+    });
+    document.querySelectorAll('.booking-step-content').forEach(el => el.style.display = 'none');
+    document.getElementById('bookingSteps').style.display = 'none';
+    document.getElementById('bookingConfirm').style.display = 'block';
+    showToast('Appointment booked successfully!');
+  } catch (e) {
+    showToast('Something went wrong. Please try again.', 'error');
+  }
+  setLoading(btn, false);
+}
+
+async function submitQuote() {
+  const name = document.getElementById('qtName').value.trim();
+  const email = document.getElementById('qtEmail').value.trim();
+  const phone = document.getElementById('qtPhone').value.trim();
+  const desc = document.getElementById('qtDesc').value.trim();
+  if (!name || !email || !phone || !desc) { showToast('Please fill all required fields.', 'error'); return; }
+
+  const btn = document.getElementById('btnSubmitQuote');
+  setLoading(btn, true);
+  try {
+    await postToGAS({
+      action: 'quote',
+      name, email, phone, desc,
+      service: document.getElementById('qtService').value,
+      address: document.getElementById('qtAddress').value.trim(),
+      contactMethod: document.querySelector('input[name="qtContact"]:checked')?.value || 'phone',
+      timestamp: new Date().toISOString()
+    });
+    showToast('Quote request submitted! We'll be in touch soon.');
+    ['qtName','qtEmail','qtPhone','qtDesc','qtAddress'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('qtService').selectedIndex = 0;
+  } catch (e) {
+    showToast('Something went wrong. Please try again.', 'error');
+  }
+  setLoading(btn, false);
+}
+
+async function submitContact() {
+  const name = document.getElementById('ctName').value.trim();
+  const email = document.getElementById('ctEmail').value.trim();
+  const message = document.getElementById('ctMessage').value.trim();
+  if (!name || !email || !message) { showToast('Please fill all fields.', 'error'); return; }
+
+  const btn = document.getElementById('btnContact');
+  setLoading(btn, true);
+  try {
+    await postToGAS({ action: 'contact', name, email, message, timestamp: new Date().toISOString() });
+    showToast('Message sent!');
+    ['ctName','ctEmail','ctMessage'].forEach(id => document.getElementById(id).value = '');
+  } catch (e) {
+    showToast('Something went wrong.', 'error');
+  }
+  setLoading(btn, false);
+}
+
+/* ═══════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  renderServiceCards('homeServicesGrid');
+  renderServiceCards('servicesGrid');
+  renderServiceSelectGrid();
+  renderQuoteServiceOptions();
+  renderReviews();
+  renderTeam();
+  initBooking();
+});
+</script>
+</body>
+</html>
