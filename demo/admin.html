@@ -8,647 +8,406 @@
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --accent: #1a5c3a;
-  --accent-light: #e8f5ee;
-  --accent-hover: #14472d;
-  --text-primary: #1a1a1a;
-  --text-secondary: #5a5a5a;
-  --text-muted: #8a8a8a;
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8f8f6;
-  --bg-tertiary: #f0efed;
-  --border: #e5e4e1;
-  --border-light: #f0efed;
-  --radius: 10px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
-  --font-body: 'Outfit', sans-serif;
-  --font-display: 'Fraunces', serif;
-
-  --status-new: #3b82f6;
-  --status-confirmed: #8b5cf6;
-  --status-progress: #f59e0b;
-  --status-completed: #22c55e;
-  --status-cancelled: #ef4444;
-  --status-pending: #f59e0b;
-  --status-responded: #22c55e;
-  --status-unread: #3b82f6;
-  --status-read: #8a8a8a;
+  --accent:#1a5c3a; --accent-light:#e8f5ee; --accent-hover:#14472d;
+  --text-primary:#1a1a1a; --text-secondary:#5a5a5a; --text-muted:#8a8a8a;
+  --bg-primary:#ffffff; --bg-secondary:#f8f8f6; --bg-tertiary:#f0efed;
+  --border:#e5e4e1; --border-light:#f0efed;
+  --radius:10px; --radius-lg:16px;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.04); --shadow-md:0 4px 20px rgba(0,0,0,0.06);
+  --font-body:'Outfit',sans-serif; --font-display:'Fraunces',serif;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: var(--font-body); color: var(--text-primary); background: var(--bg-secondary); -webkit-font-smoothing:antialiased; }
-button { font-family:inherit; cursor:pointer; border:none; }
-input, select { font-family:inherit; }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-body);color:var(--text-primary);background:var(--bg-secondary);-webkit-font-smoothing:antialiased;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+input,select,textarea{font-family:inherit;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+@keyframes loadSlide{0%{transform:translateX(-100%);}100%{transform:translateX(400%);}}
+.fade-up{animation:fadeUp .4s ease both;}
 
-@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-@keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
-.fade-up { animation: fadeUp .4s ease both; }
+.admin-layout{display:flex;min-height:100vh;}
+.sidebar{width:240px;background:var(--bg-primary);border-right:1px solid var(--border-light);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;}
+.sidebar-brand{padding:20px;border-bottom:1px solid var(--border-light);display:flex;align-items:center;gap:10px;}
+.sidebar-brand-icon{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;}
+.sidebar-brand-name{font-family:var(--font-display);font-weight:800;font-size:18px;}
+.sidebar-brand-sub{font-size:10px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;}
+.sidebar-nav{flex:1;padding:12px 8px;}
+.sidebar-link{width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;font-size:14px;font-weight:500;color:var(--text-secondary);transition:all .2s;margin-bottom:2px;text-align:left;}
+.sidebar-link:hover{background:var(--bg-secondary);color:var(--text-primary);}
+.sidebar-link.active{background:var(--accent-light);color:var(--accent);font-weight:600;}
+.sidebar-link .badge{margin-left:auto;background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;min-width:20px;text-align:center;}
+.sidebar-footer{padding:12px 8px;border-top:1px solid var(--border-light);}
+.sidebar-footer a{display:block;padding:10px 14px;font-size:13px;color:var(--text-muted);text-decoration:none;border-radius:8px;transition:all .2s;}
+.sidebar-footer a:hover{background:var(--bg-secondary);color:var(--text-primary);}
+@media(max-width:768px){.sidebar{display:none;}}
 
-/* ─── LAYOUT ─── */
-.admin-layout { display: flex; min-height: 100vh; }
+.main{flex:1;overflow-y:auto;}
+.main-header{padding:20px 32px;background:var(--bg-primary);border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;flex-wrap:wrap;gap:12px;}
+.main-title{font-size:20px;font-weight:700;}
+.main-header-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.search-box{position:relative;}
+.search-box input{background:var(--bg-secondary);border:1px solid var(--border);padding:8px 12px 8px 34px;border-radius:8px;font-size:13px;color:var(--text-primary);outline:none;width:200px;}
+.search-box input:focus{border-color:var(--accent);}
+.search-box svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);}
+.header-btn{background:var(--bg-secondary);border:1px solid var(--border);padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;color:var(--text-secondary);display:flex;align-items:center;gap:6px;transition:all .2s;}
+.header-btn:hover{border-color:var(--accent);color:var(--accent);}
+.header-btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.header-btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover);color:#fff;}
+.main-body{padding:28px 32px;}
+@media(max-width:768px){.main-body{padding:16px;}}
 
-/* Sidebar */
-.sidebar { width: 240px; background: var(--bg-primary); border-right: 1px solid var(--border-light); display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh; }
-.sidebar-brand { padding: 20px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 10px; }
-.sidebar-brand-icon { width: 36px; height: 36px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; }
-.sidebar-brand-name { font-family: var(--font-display); font-weight: 800; font-size: 18px; }
-.sidebar-brand-sub { font-size: 10px; color: var(--text-muted); letter-spacing: 1.5px; text-transform: uppercase; }
-.sidebar-nav { flex: 1; padding: 12px 8px; }
-.sidebar-link { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; font-size: 14px; font-weight: 500; color: var(--text-secondary); background: none; transition: all .2s; margin-bottom: 2px; text-align: left; }
-.sidebar-link:hover { background: var(--bg-secondary); color: var(--text-primary); }
-.sidebar-link.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
-.sidebar-link .badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px; min-width: 20px; text-align: center; }
-.sidebar-footer { padding: 12px 8px; border-top: 1px solid var(--border-light); }
-.sidebar-footer a { display: block; padding: 10px 14px; font-size: 13px; color: var(--text-muted); text-decoration: none; border-radius: 8px; transition: all .2s; }
-.sidebar-footer a:hover { background: var(--bg-secondary); color: var(--text-primary); }
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:28px;}
+.stat-card{background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:22px;transition:all .3s;}
+.stat-card:hover{box-shadow:var(--shadow-md);}
+.stat-card-label{font-size:12px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.stat-card-value{font-family:var(--font-display);font-size:30px;font-weight:800;}
+.stat-card-sub{font-size:12px;color:var(--text-muted);margin-top:4px;}
+.green .stat-card-value{color:var(--accent);}
+.blue .stat-card-value{color:#3b82f6;}
+.amber .stat-card-value{color:#f59e0b;}
+.purple .stat-card-value{color:#8b5cf6;}
 
-/* Main */
-.main { flex: 1; overflow-y: auto; }
-.main-header { padding: 20px 32px; background: var(--bg-primary); border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
-.main-title { font-size: 20px; font-weight: 700; }
-.main-header-actions { display: flex; align-items: center; gap: 12px; }
-.search-box { position: relative; }
-.search-box input { background: var(--bg-secondary); border: 1px solid var(--border); padding: 8px 12px 8px 34px; border-radius: 8px; font-size: 13px; color: var(--text-primary); outline: none; width: 220px; transition: border-color .2s; }
-.search-box input:focus { border-color: var(--accent); }
-.search-box svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-.refresh-btn { background: var(--bg-secondary); border: 1px solid var(--border); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; transition: all .2s; }
-.refresh-btn:hover { border-color: var(--accent); color: var(--accent); }
+.data-panel{background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:24px;}
+.data-panel-header{padding:18px 22px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center;}
+.data-panel-title{font-size:16px;font-weight:700;}
+.data-panel-count{font-size:12px;color:var(--text-muted);background:var(--bg-secondary);padding:4px 10px;border-radius:10px;font-weight:600;}
 
-.main-body { padding: 28px 32px; }
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{text-align:left;padding:12px 16px;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border-light);background:var(--bg-secondary);}
+.data-table td{padding:14px 16px;font-size:14px;border-bottom:1px solid var(--border-light);}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--bg-secondary);}
+.name-cell{font-weight:600;}
+.meta-cell{font-size:12px;color:var(--text-muted);}
+.truncate{max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
-/* ─── DASHBOARD CARDS ─── */
-.stat-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 28px; }
-.stat-card { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 22px; transition: all .3s; }
-.stat-card:hover { box-shadow: var(--shadow-md); }
-.stat-card-label { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
-.stat-card-value { font-family: var(--font-display); font-size: 30px; font-weight: 800; }
-.stat-card-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-.stat-card.green .stat-card-value { color: var(--accent); }
-.stat-card.blue .stat-card-value { color: var(--status-new); }
-.stat-card.amber .stat-card-value { color: var(--status-pending); }
-.stat-card.purple .stat-card-value { color: var(--status-confirmed); }
+.status-badge{display:inline-block;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;}
+.status-new,.status-unread{background:#dbeafe;color:#1e40af;}
+.status-confirmed{background:#ede9fe;color:#5b21b6;}
+.status-inprogress,.status-pending{background:#fef3c7;color:#92400e;}
+.status-completed,.status-responded,.status-active,.status-accepted{background:#d1fae5;color:#065f46;}
+.status-cancelled,.status-declined{background:#fee2e2;color:#991b1b;}
+.status-read,.status-closed,.status-inactive{background:#f3f4f6;color:#6b7280;}
 
-/* ─── TABLE ─── */
-.data-panel { background: var(--bg-primary); border: 1px solid var(--border-light); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 24px; }
-.data-panel-header { padding: 18px 22px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
-.data-panel-title { font-size: 16px; font-weight: 700; }
-.data-panel-count { font-size: 12px; color: var(--text-muted); background: var(--bg-secondary); padding: 4px 10px; border-radius: 10px; font-weight: 600; }
-.data-table { width: 100%; border-collapse: collapse; }
-.data-table th { text-align: left; padding: 12px 16px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--border-light); background: var(--bg-secondary); }
-.data-table td { padding: 14px 16px; font-size: 14px; border-bottom: 1px solid var(--border-light); }
-.data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover td { background: var(--bg-secondary); }
-.data-table .name-cell { font-weight: 600; color: var(--text-primary); }
-.data-table .meta-cell { font-size: 12px; color: var(--text-muted); }
+.row-actions{display:flex;gap:6px;}
+.row-btn{padding:5px 10px;border-radius:6px;font-size:11px;font-weight:600;transition:all .15s;border:1px solid var(--border);background:var(--bg-secondary);color:var(--text-secondary);}
+.row-btn:hover{border-color:var(--accent);color:var(--accent);}
+.row-btn-del{background:none;color:var(--text-muted);}
+.row-btn-del:hover{border-color:#ef4444;color:#ef4444;}
 
-/* Status badges */
-.status-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
-.status-new       { background: #dbeafe; color: #1e40af; }
-.status-confirmed { background: #ede9fe; color: #5b21b6; }
-.status-progress  { background: #fef3c7; color: #92400e; }
-.status-completed { background: #d1fae5; color: #065f46; }
-.status-cancelled { background: #fee2e2; color: #991b1b; }
-.status-pending   { background: #fef3c7; color: #92400e; }
-.status-responded { background: #d1fae5; color: #065f46; }
-.status-unread    { background: #dbeafe; color: #1e40af; }
-.status-read      { background: #f3f4f6; color: #6b7280; }
-.status-closed    { background: #f3f4f6; color: #6b7280; }
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:1000;display:flex;align-items:center;justify-content:center;padding:24px;animation:fadeUp .2s ease;}
+.modal{background:var(--bg-primary);border-radius:var(--radius-lg);padding:32px;max-width:500px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.12);max-height:90vh;overflow-y:auto;}
+.modal h3{font-size:18px;font-weight:700;margin-bottom:8px;}
+.modal p{font-size:14px;color:var(--text-secondary);margin-bottom:20px;line-height:1.5;}
+.modal-detail-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:14px;}
+.modal-detail-label{color:var(--text-muted);font-weight:500;}
+.modal-detail-value{color:var(--text-primary);font-weight:600;text-align:right;max-width:60%;word-break:break-word;}
+.modal-actions{display:flex;gap:10px;margin-top:24px;}
+.modal-btn{flex:1;padding:12px;border-radius:var(--radius);font-size:14px;font-weight:600;text-align:center;transition:all .2s;}
+.modal-btn-cancel{background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);}
+.modal-btn-cancel:hover{background:var(--bg-tertiary);}
+.modal-btn-primary{background:var(--accent);color:#fff;}
+.modal-btn-primary:hover{background:var(--accent-hover);}
+.modal-btn-danger{background:#ef4444;color:#fff;}
+.modal-btn-danger:hover{background:#dc2626;}
+.status-select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;color:var(--text-primary);outline:none;background:var(--bg-primary);}
+.status-select:focus{border-color:var(--accent);}
 
-/* Action buttons in table */
-.row-actions { display: flex; gap: 6px; }
-.row-btn { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; transition: all .15s; }
-.row-btn-status { background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-secondary); }
-.row-btn-status:hover { border-color: var(--accent); color: var(--accent); }
-.row-btn-delete { background: none; border: 1px solid var(--border); color: var(--text-muted); }
-.row-btn-delete:hover { border-color: #ef4444; color: #ef4444; }
+.modal .form-grid{display:grid;gap:14px;}
+.modal .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.modal .form-group label{display:block;font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;}
+.modal .form-group input,.modal .form-group textarea,.modal .form-group select{
+  width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;color:var(--text-primary);background:var(--bg-primary);outline:none;}
+.modal .form-group input:focus,.modal .form-group textarea:focus,.modal .form-group select:focus{border-color:var(--accent);}
+.modal .form-group textarea{min-height:60px;resize:vertical;}
+.modal .form-group input::placeholder,.modal .form-group textarea::placeholder{color:var(--text-muted);}
 
-/* ─── MODAL ─── */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.3); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; animation: fadeUp .2s ease; }
-.modal { background: var(--bg-primary); border-radius: var(--radius-lg); padding: 32px; max-width: 440px; width: 100%; box-shadow: 0 24px 60px rgba(0,0,0,.12); }
-.modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-.modal p { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.5; }
-.modal-detail { margin-bottom: 16px; }
-.modal-detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-light); font-size: 14px; }
-.modal-detail-label { color: var(--text-muted); font-weight: 500; }
-.modal-detail-value { color: var(--text-primary); font-weight: 600; text-align: right; max-width: 60%; }
-.modal-actions { display: flex; gap: 10px; margin-top: 24px; }
-.modal-btn { flex: 1; padding: 12px; border-radius: var(--radius); font-size: 14px; font-weight: 600; text-align: center; transition: all .2s; }
-.modal-btn-cancel { background: var(--bg-secondary); border: 1px solid var(--border); color: var(--text-secondary); }
-.modal-btn-cancel:hover { background: var(--bg-tertiary); }
-.modal-btn-primary { background: var(--accent); color: #fff; }
-.modal-btn-primary:hover { background: var(--accent-hover); }
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-state-icon{font-size:40px;margin-bottom:16px;opacity:.5;}
+.empty-state-text{font-size:15px;color:var(--text-muted);}
 
-/* Status select in modal */
-.status-select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius); font-size: 14px; color: var(--text-primary); outline: none; background: var(--bg-primary); }
-.status-select:focus { border-color: var(--accent); }
+.loading-bar{height:3px;background:var(--bg-tertiary);overflow:hidden;}
+.loading-bar-inner{height:100%;width:30%;background:var(--accent);border-radius:3px;animation:loadSlide 1.2s ease infinite;}
 
-/* ─── EMPTY STATE ─── */
-.empty-state { text-align: center; padding: 60px 20px; }
-.empty-state-icon { font-size: 40px; margin-bottom: 16px; opacity: .5; }
-.empty-state-text { font-size: 15px; color: var(--text-muted); }
+.toast{position:fixed;top:20px;right:20px;z-index:9999;padding:12px 20px;border-radius:var(--radius);font-size:14px;font-weight:600;color:#fff;animation:slideIn .3s ease;box-shadow:var(--shadow-md);}
+.toast-success{background:var(--accent);}
+.toast-error{background:#ef4444;}
 
-/* ─── LOADING ─── */
-.loading-bar { height: 3px; background: var(--bg-tertiary); overflow: hidden; }
-.loading-bar-inner { height: 100%; width: 30%; background: var(--accent); border-radius: 3px; animation: loadSlide 1.2s ease infinite; }
-@keyframes loadSlide { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }
-
-/* ─── TOAST ─── */
-.toast { position: fixed; top: 20px; right: 20px; z-index: 9999; padding: 12px 20px; border-radius: var(--radius); font-size: 14px; font-weight: 600; color: #fff; animation: slideIn .3s ease; box-shadow: var(--shadow-md); }
-.toast-success { background: var(--accent); }
-.toast-error { background: #ef4444; }
-
-/* ─── RESPONSIVE ─── */
-@media (max-width: 768px) {
-  .sidebar { display: none; }
-  .main-body { padding: 16px; }
-  .stat-cards { grid-template-columns: repeat(2, 1fr); }
-}
-
-/* Hide sections */
-.admin-page { display: none; }
-.admin-page.active { display: block; }
+.admin-page{display:none;}
+.admin-page.active{display:block;}
 </style>
 </head>
 <body>
-
 <div class="admin-layout">
-  <!-- ═══ SIDEBAR ═══ -->
   <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="sidebar-brand-icon">🔧</div>
-      <div>
-        <div class="sidebar-brand-name">FlowPipe</div>
-        <div class="sidebar-brand-sub">Admin</div>
-      </div>
-    </div>
-    <nav class="sidebar-nav">
-      <button class="sidebar-link active" onclick="showAdmin('dashboard')" data-page="dashboard">
-        📊 Dashboard
-      </button>
-      <button class="sidebar-link" onclick="showAdmin('appointments')" data-page="appointments">
-        📅 Appointments <span class="badge" id="badgeAppts" style="display:none">0</span>
-      </button>
-      <button class="sidebar-link" onclick="showAdmin('quotes')" data-page="quotes">
-        💰 Quote Requests <span class="badge" id="badgeQuotes" style="display:none">0</span>
-      </button>
-      <button class="sidebar-link" onclick="showAdmin('contacts')" data-page="contacts">
-        ✉️ Messages <span class="badge" id="badgeContacts" style="display:none">0</span>
-      </button>
+    <div class="sidebar-brand"><div class="sidebar-brand-icon">🔧</div><div><div class="sidebar-brand-name">FlowPipe</div><div class="sidebar-brand-sub">Admin</div></div></div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <button class="sidebar-link active" data-page="dashboard">📊 Dashboard</button>
+      <button class="sidebar-link" data-page="appointments">📅 Appointments <span class="badge" id="badgeAppts" style="display:none">0</span></button>
+      <button class="sidebar-link" data-page="quotes">💰 Quotes <span class="badge" id="badgeQuotes" style="display:none">0</span></button>
+      <button class="sidebar-link" data-page="contacts">✉️ Messages <span class="badge" id="badgeContacts" style="display:none">0</span></button>
+      <button class="sidebar-link" data-page="clients">👤 Clients <span class="badge" id="badgeClients" style="display:none">0</span></button>
     </nav>
-    <div class="sidebar-footer">
-      <a href="index.html">← Back to Website</a>
-    </div>
+    <div class="sidebar-footer"><a href="index.html">← Back to Website</a></div>
   </aside>
-
-  <!-- ═══ MAIN ═══ -->
   <div class="main">
     <header class="main-header">
       <h1 class="main-title" id="mainTitle">Dashboard</h1>
       <div class="main-header-actions">
-        <div class="search-box">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M16 16l-3-3"/></svg>
-          <input type="text" placeholder="Search..." id="globalSearch" oninput="handleSearch()">
-        </div>
-        <button class="refresh-btn" onclick="loadAll()">🔄 Refresh</button>
+        <div class="search-box"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="M16 16l-3-3"/></svg><input type="text" placeholder="Search..." id="globalSearch"></div>
+        <button class="header-btn" id="btnRefresh">🔄 Refresh</button>
+        <button class="header-btn header-btn-primary" id="btnAddClient">+ Add Client</button>
       </div>
     </header>
-
-    <!-- Loading bar -->
     <div class="loading-bar" id="loadingBar" style="display:none"><div class="loading-bar-inner"></div></div>
-
     <div class="main-body">
-
-      <!-- ═══ DASHBOARD ═══ -->
       <div id="admin-dashboard" class="admin-page active">
         <div class="stat-cards fade-up" id="statCards"></div>
-        <div class="data-panel fade-up" style="animation-delay:.1s">
-          <div class="data-panel-header">
-            <span class="data-panel-title">Recent Appointments</span>
-          </div>
-          <div id="recentAppointments"></div>
-        </div>
-        <div class="data-panel fade-up" style="animation-delay:.2s">
-          <div class="data-panel-header">
-            <span class="data-panel-title">Pending Quotes</span>
-          </div>
-          <div id="pendingQuotes"></div>
-        </div>
+        <div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">Recent Appointments</span></div><div id="recentAppointments"></div></div>
+        <div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">Pending Quotes</span></div><div id="pendingQuotes"></div></div>
       </div>
-
-      <!-- ═══ APPOINTMENTS ═══ -->
-      <div id="admin-appointments" class="admin-page">
-        <div class="data-panel fade-up">
-          <div class="data-panel-header">
-            <span class="data-panel-title">All Appointments</span>
-            <span class="data-panel-count" id="apptCount">0</span>
-          </div>
-          <div style="overflow-x:auto" id="appointmentsTable"></div>
-        </div>
-      </div>
-
-      <!-- ═══ QUOTES ═══ -->
-      <div id="admin-quotes" class="admin-page">
-        <div class="data-panel fade-up">
-          <div class="data-panel-header">
-            <span class="data-panel-title">All Quote Requests</span>
-            <span class="data-panel-count" id="quoteCount">0</span>
-          </div>
-          <div style="overflow-x:auto" id="quotesTable"></div>
-        </div>
-      </div>
-
-      <!-- ═══ CONTACTS ═══ -->
-      <div id="admin-contacts" class="admin-page">
-        <div class="data-panel fade-up">
-          <div class="data-panel-header">
-            <span class="data-panel-title">All Messages</span>
-            <span class="data-panel-count" id="contactCount">0</span>
-          </div>
-          <div style="overflow-x:auto" id="contactsTable"></div>
-        </div>
-      </div>
-
+      <div id="admin-appointments" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Appointments</span><span class="data-panel-count" id="apptCount">0</span></div><div style="overflow-x:auto" id="appointmentsTable"></div></div></div>
+      <div id="admin-quotes" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Quote Requests</span><span class="data-panel-count" id="quoteCount">0</span></div><div style="overflow-x:auto" id="quotesTable"></div></div></div>
+      <div id="admin-contacts" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Messages</span><span class="data-panel-count" id="contactCount">0</span></div><div style="overflow-x:auto" id="contactsTable"></div></div></div>
+      <div id="admin-clients" class="admin-page"><div class="data-panel fade-up"><div class="data-panel-header"><span class="data-panel-title">All Clients</span><span class="data-panel-count" id="clientCount">0</span></div><div style="overflow-x:auto" id="clientsTable"></div></div></div>
     </div>
   </div>
 </div>
-
-<!-- ═══ MODAL CONTAINER ═══ -->
 <div id="modalContainer"></div>
 
 <script>
-/* ═══════════════════════════════════════
-   CONFIG — Your Google Apps Script URL
-   ═══════════════════════════════════════ */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbyaW7HsQUhAtIXzvVkiJIVa3iHAQ59bKciyARo0e8zvg0Vecg1RnV3j-PXcrXayKoED/exec';
+const GAS_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
 
-/* ═══════════════════════════════════════
-   STATE
-   ═══════════════════════════════════════ */
-let appointments = [];
-let quotes = [];
-let contacts = [];
-let currentPage = 'dashboard';
-let searchQuery = '';
+let appointments=[], quotes=[], contacts=[], clients=[];
+let currentPage='dashboard', searchQuery='';
 
-const APPT_STATUSES   = ['New', 'Confirmed', 'In Progress', 'Completed', 'Cancelled'];
-const QUOTE_STATUSES  = ['Pending', 'Responded', 'Accepted', 'Declined', 'Closed'];
-const CONTACT_STATUSES = ['Unread', 'Read', 'Responded', 'Closed'];
+const APPT_STATUSES=['New','Confirmed','In Progress','Completed','Cancelled'];
+const QUOTE_STATUSES=['Pending','Responded','Accepted','Declined','Closed'];
+const CONTACT_STATUSES=['Unread','Read','Responded','Closed'];
+const CLIENT_STATUSES=['Active','Inactive'];
+const SERVICES=['Emergency Repair','Drain Cleaning','Water Heater','Pipe Installation','Fixture Install','Inspection','Sewer Line','Gas Line'];
+const PAGE_TITLES={dashboard:'Dashboard',appointments:'Appointments',quotes:'Quote Requests',contacts:'Messages',clients:'Clients'};
 
-/* ═══════════════════════════════════════
-   NAVIGATION
-   ═══════════════════════════════════════ */
-function showAdmin(page) {
-  currentPage = page;
-  document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
-  document.getElementById('admin-' + page).classList.add('active');
-  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
-  document.querySelector(`[data-page="${page}"]`).classList.add('active');
-  const titles = { dashboard:'Dashboard', appointments:'Appointments', quotes:'Quote Requests', contacts:'Messages' };
-  document.getElementById('mainTitle').textContent = titles[page] || 'Dashboard';
-}
-
-/* ═══════════════════════════════════════
-   DATA LOADING
-   ═══════════════════════════════════════ */
-function showLoading(v) { document.getElementById('loadingBar').style.display = v ? 'block' : 'none'; }
-
-async function fetchGAS(action) {
-  const res = await fetch(GAS_URL + '?action=' + action);
-  return await res.json();
-}
-
-async function postGAS(payload) {
-  const res = await fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify(payload)
+// NAV
+document.getElementById('sidebarNav').querySelectorAll('.sidebar-link').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    currentPage=this.dataset.page;
+    document.querySelectorAll('.admin-page').forEach(function(p){p.classList.remove('active');});
+    document.getElementById('admin-'+currentPage).classList.add('active');
+    document.querySelectorAll('.sidebar-link').forEach(function(l){l.classList.remove('active');});
+    this.classList.add('active');
+    document.getElementById('mainTitle').textContent=PAGE_TITLES[currentPage]||'Dashboard';
   });
-  return await res.json();
-}
+});
+document.getElementById('btnRefresh').addEventListener('click',loadAll);
+document.getElementById('btnAddClient').addEventListener('click',openAddClientModal);
+document.getElementById('globalSearch').addEventListener('input',function(){searchQuery=this.value;renderAll();});
 
-async function loadAll() {
+// DATA
+function showLoading(v){document.getElementById('loadingBar').style.display=v?'block':'none';}
+async function fetchGAS(action){var r=await fetch(GAS_URL+'?action='+action);return await r.json();}
+async function postGAS(payload){var r=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});return await r.json();}
+
+async function loadAll(){
   showLoading(true);
-  try {
-    const [a, q, c] = await Promise.all([
-      fetchGAS('getAppointments'),
-      fetchGAS('getQuotes'),
-      fetchGAS('getContacts')
-    ]);
-    appointments = Array.isArray(a) ? a : [];
-    quotes = Array.isArray(q) ? q : [];
-    contacts = Array.isArray(c) ? c : [];
+  try{
+    var results=await Promise.all([fetchGAS('getAppointments'),fetchGAS('getQuotes'),fetchGAS('getContacts'),fetchGAS('getClients')]);
+    appointments=Array.isArray(results[0])?results[0]:[];
+    quotes=Array.isArray(results[1])?results[1]:[];
+    contacts=Array.isArray(results[2])?results[2]:[];
+    clients=Array.isArray(results[3])?results[3]:[];
     renderAll();
     showToast('Data refreshed');
-  } catch (e) {
-    showToast('Failed to load data. Check your GAS_URL.', 'error');
-    console.error(e);
-  }
+  }catch(e){showToast('Failed to load. Check GAS_URL.','error');console.error(e);}
   showLoading(false);
 }
 
-/* ═══════════════════════════════════════
-   RENDERING
-   ═══════════════════════════════════════ */
-function renderAll() {
-  renderDashboard();
-  renderAppointments();
-  renderQuotes();
-  renderContacts();
-  updateBadges();
+// RENDER
+function renderAll(){renderDashboard();renderAppointments();renderQuotes();renderContacts();renderClients();updateBadges();}
+
+function updateBadges(){
+  setBadge('badgeAppts',appointments.filter(function(a){return a.Status==='New';}).length);
+  setBadge('badgeQuotes',quotes.filter(function(q){return q.Status==='Pending';}).length);
+  setBadge('badgeContacts',contacts.filter(function(c){return c.Status==='Unread';}).length);
+  setBadge('badgeClients',clients.length);
+}
+function setBadge(id,count){var el=document.getElementById(id);if(count>0){el.style.display='inline';el.textContent=count;}else{el.style.display='none';}}
+function fmtDate(d){if(!d)return'—';try{return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}catch(e){return d;}}
+function statusClass(s){return'status-'+(s||'new').toLowerCase().replace(/\s+/g,'');}
+function statusBadge(s){return'<span class="status-badge '+statusClass(s)+'">'+(s||'New')+'</span>';}
+function emptyState(t){return'<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">'+t+'</div></div>';}
+function filterBySearch(arr,fields){if(!searchQuery)return arr;var q=searchQuery.toLowerCase();return arr.filter(function(row){return fields.some(function(f){return String(row[f]||'').toLowerCase().indexOf(q)!==-1;});});}
+
+function renderDashboard(){
+  document.getElementById('statCards').innerHTML=
+    '<div class="stat-card blue"><div class="stat-card-label">Appointments</div><div class="stat-card-value">'+appointments.length+'</div><div class="stat-card-sub">'+appointments.filter(function(a){return a.Status==='New';}).length+' new</div></div>'+
+    '<div class="stat-card amber"><div class="stat-card-label">Quotes</div><div class="stat-card-value">'+quotes.length+'</div><div class="stat-card-sub">'+quotes.filter(function(q){return q.Status==='Pending';}).length+' pending</div></div>'+
+    '<div class="stat-card purple"><div class="stat-card-label">Messages</div><div class="stat-card-value">'+contacts.length+'</div><div class="stat-card-sub">'+contacts.filter(function(c){return c.Status==='Unread';}).length+' unread</div></div>'+
+    '<div class="stat-card green"><div class="stat-card-label">Total Clients</div><div class="stat-card-value">'+clients.length+'</div></div>';
+
+  var recent=appointments.slice().reverse().slice(0,5);
+  document.getElementById('recentAppointments').innerHTML=recent.length===0?emptyState('No appointments yet.'):
+    '<table class="data-table"><thead><tr><th>Name</th><th>Service</th><th>Date</th><th>Time</th><th>Status</th></tr></thead><tbody>'+recent.map(function(a){return'<tr><td class="name-cell">'+a.Name+'<div class="meta-cell">'+a.Email+'</div></td><td>'+a.Service+'</td><td>'+a.Date+'</td><td>'+a.Time+'</td><td>'+statusBadge(a.Status)+'</td></tr>';}).join('')+'</tbody></table>';
+
+  var pend=quotes.filter(function(q){return q.Status==='Pending';}).slice(0,5);
+  document.getElementById('pendingQuotes').innerHTML=pend.length===0?emptyState('No pending quotes.'):
+    '<table class="data-table"><thead><tr><th>Name</th><th>Service</th><th>Contact</th><th>Status</th></tr></thead><tbody>'+pend.map(function(q){return'<tr><td class="name-cell">'+q.Name+'<div class="meta-cell">'+q.Phone+'</div></td><td>'+(q.Service||'—')+'</td><td>'+(q['Contact Method']||'phone')+'</td><td>'+statusBadge(q.Status)+'</td></tr>';}).join('')+'</tbody></table>';
 }
 
-function updateBadges() {
-  const newAppts = appointments.filter(a => a.Status === 'New').length;
-  const pendQuotes = quotes.filter(q => q.Status === 'Pending').length;
-  const unreadMsgs = contacts.filter(c => c.Status === 'Unread').length;
-  setBadge('badgeAppts', newAppts);
-  setBadge('badgeQuotes', pendQuotes);
-  setBadge('badgeContacts', unreadMsgs);
+function buildTable(containerId,data,headers,rowFn){
+  if(!data.length){document.getElementById(containerId).innerHTML=emptyState('Nothing found.');return;}
+  document.getElementById(containerId).innerHTML='<table class="data-table"><thead><tr>'+headers.map(function(h){return'<th>'+h+'</th>';}).join('')+'</tr></thead><tbody>'+data.slice().reverse().map(rowFn).join('')+'</tbody></table>';
+  attachRowListeners(containerId);
 }
 
-function setBadge(id, count) {
-  const el = document.getElementById(id);
-  if (count > 0) { el.style.display = 'inline'; el.textContent = count; }
-  else { el.style.display = 'none'; }
+function renderAppointments(){
+  var f=filterBySearch(appointments,['Name','Email','Phone','Service','Status']);
+  document.getElementById('apptCount').textContent=f.length+' total';
+  buildTable('appointmentsTable',f,['Name','Service','Date','Time','Phone','Status','Actions'],function(a){
+    return'<tr><td class="name-cell">'+a.Name+'<div class="meta-cell">'+a.Email+'</div></td><td>'+a.Service+'</td><td>'+a.Date+'</td><td>'+a.Time+'</td><td>'+a.Phone+'</td><td>'+statusBadge(a.Status)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Appointments" data-id="'+a.ID+'">View</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Appointments" data-id="'+a.ID+'">✕</button></div></td></tr>';
+  });
 }
 
-function fmtDate(d) {
-  if (!d) return '—';
-  try { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
-  catch { return d; }
+function renderQuotes(){
+  var f=filterBySearch(quotes,['Name','Email','Phone','Service','Status']);
+  document.getElementById('quoteCount').textContent=f.length+' total';
+  buildTable('quotesTable',f,['Name','Service','Phone','Description','Status','Actions'],function(q){
+    return'<tr><td class="name-cell">'+q.Name+'<div class="meta-cell">'+q.Email+'</div></td><td>'+q.Service+'</td><td>'+q.Phone+'</td><td class="truncate">'+(q.Description||'—')+'</td><td>'+statusBadge(q.Status)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Quotes" data-id="'+q.ID+'">View</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Quotes" data-id="'+q.ID+'">✕</button></div></td></tr>';
+  });
 }
 
-function statusClass(s) { return 'status-' + (s || 'new').toLowerCase().replace(/\s+/g, ''); }
-function statusBadge(s) { return `<span class="status-badge ${statusClass(s)}">${s || 'New'}</span>`; }
-
-function emptyState(text) {
-  return `<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">${text}</div></div>`;
+function renderContacts(){
+  var f=filterBySearch(contacts,['Name','Email','Message','Status']);
+  document.getElementById('contactCount').textContent=f.length+' total';
+  buildTable('contactsTable',f,['Name','Email','Message','Date','Status','Actions'],function(c){
+    return'<tr><td class="name-cell">'+c.Name+'</td><td>'+c.Email+'</td><td class="truncate">'+(c.Message||'—')+'</td><td class="meta-cell">'+fmtDate(c.Timestamp)+'</td><td>'+statusBadge(c.Status)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Contacts" data-id="'+c.ID+'">View</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Contacts" data-id="'+c.ID+'">✕</button></div></td></tr>';
+  });
 }
 
-function filterBySearch(arr, fields) {
-  if (!searchQuery) return arr;
-  const q = searchQuery.toLowerCase();
-  return arr.filter(row => fields.some(f => String(row[f] || '').toLowerCase().includes(q)));
+function renderClients(){
+  var f=filterBySearch(clients,['Name','Email','Phone','Service','Status']);
+  document.getElementById('clientCount').textContent=f.length+' total';
+  if(!f.length){document.getElementById('clientsTable').innerHTML=emptyState('No clients yet. Click "+ Add Client" to add one.');return;}
+  buildTable('clientsTable',f,['Name','Email','Phone','Service','Address','Status','Added','Actions'],function(c){
+    return'<tr><td class="name-cell">'+c.Name+'</td><td>'+c.Email+'</td><td>'+c.Phone+'</td><td>'+(c.Service||'—')+'</td><td class="truncate">'+(c.Address||'—')+'</td><td>'+statusBadge(c.Status)+'</td><td class="meta-cell">'+fmtDate(c.Timestamp)+'</td><td><div class="row-actions"><button class="row-btn" data-action="view" data-sheet="Clients" data-id="'+c.ID+'">View</button><button class="row-btn row-btn-del" data-action="delete" data-sheet="Clients" data-id="'+c.ID+'">✕</button></div></td></tr>';
+  });
 }
 
-// ─── Dashboard ───
-function renderDashboard() {
-  const newAppts = appointments.filter(a => a.Status === 'New').length;
-  const pendQuotes = quotes.filter(q => q.Status === 'Pending').length;
-  const unreadMsgs = contacts.filter(c => c.Status === 'Unread').length;
-  const completed = appointments.filter(a => a.Status === 'Completed').length;
-
-  document.getElementById('statCards').innerHTML = `
-    <div class="stat-card blue"><div class="stat-card-label">Total Appointments</div><div class="stat-card-value">${appointments.length}</div><div class="stat-card-sub">${newAppts} new</div></div>
-    <div class="stat-card amber"><div class="stat-card-label">Quote Requests</div><div class="stat-card-value">${quotes.length}</div><div class="stat-card-sub">${pendQuotes} pending</div></div>
-    <div class="stat-card purple"><div class="stat-card-label">Messages</div><div class="stat-card-value">${contacts.length}</div><div class="stat-card-sub">${unreadMsgs} unread</div></div>
-    <div class="stat-card green"><div class="stat-card-label">Completed Jobs</div><div class="stat-card-value">${completed}</div></div>
-  `;
-
-  // Recent appointments (last 5)
-  const recent = [...appointments].reverse().slice(0, 5);
-  if (recent.length === 0) {
-    document.getElementById('recentAppointments').innerHTML = emptyState('No appointments yet. They will appear here when customers book.');
-  } else {
-    document.getElementById('recentAppointments').innerHTML = `<table class="data-table"><thead><tr><th>Name</th><th>Service</th><th>Date</th><th>Time</th><th>Status</th></tr></thead><tbody>${recent.map(a => `
-      <tr>
-        <td class="name-cell">${a.Name || '—'}<div class="meta-cell">${a.Email || ''}</div></td>
-        <td>${a.Service || '—'}</td>
-        <td>${a.Date || '—'}</td>
-        <td>${a.Time || '—'}</td>
-        <td>${statusBadge(a.Status)}</td>
-      </tr>
-    `).join('')}</tbody></table>`;
-  }
-
-  // Pending quotes
-  const pending = quotes.filter(q => q.Status === 'Pending');
-  if (pending.length === 0) {
-    document.getElementById('pendingQuotes').innerHTML = emptyState('No pending quotes.');
-  } else {
-    document.getElementById('pendingQuotes').innerHTML = `<table class="data-table"><thead><tr><th>Name</th><th>Service</th><th>Contact</th><th>Status</th></tr></thead><tbody>${pending.slice(0, 5).map(q => `
-      <tr>
-        <td class="name-cell">${q.Name || '—'}<div class="meta-cell">${q.Phone || ''}</div></td>
-        <td>${q.Service || '—'}</td>
-        <td>${q['Contact Method'] || 'phone'}</td>
-        <td>${statusBadge(q.Status)}</td>
-      </tr>
-    `).join('')}</tbody></table>`;
-  }
+function attachRowListeners(containerId){
+  document.getElementById(containerId).querySelectorAll('[data-action]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      if(this.dataset.action==='view')openDetailModal(this.dataset.sheet,this.dataset.id);
+      if(this.dataset.action==='delete')openDeleteModal(this.dataset.sheet,this.dataset.id);
+    });
+  });
 }
 
-// ─── Appointments Table ───
-function renderAppointments() {
-  const filtered = filterBySearch(appointments, ['Name', 'Email', 'Phone', 'Service', 'Status']);
-  document.getElementById('apptCount').textContent = filtered.length + ' total';
+// MODALS
+function closeModal(){document.getElementById('modalContainer').innerHTML='';}
+function getDataset(s){if(s==='Appointments')return appointments;if(s==='Quotes')return quotes;if(s==='Contacts')return contacts;if(s==='Clients')return clients;return[];}
+function getStatuses(s){if(s==='Appointments')return APPT_STATUSES;if(s==='Quotes')return QUOTE_STATUSES;if(s==='Contacts')return CONTACT_STATUSES;if(s==='Clients')return CLIENT_STATUSES;return[];}
 
-  if (filtered.length === 0) {
-    document.getElementById('appointmentsTable').innerHTML = emptyState('No appointments found.');
-    return;
-  }
+function openDetailModal(sheet,id){
+  var ds=getDataset(sheet);var item=ds.find(function(r){return r.ID===id;});if(!item)return;
+  var fields=Object.entries(item).filter(function(e){return e[0]!=='ID'&&e[0]!=='Status';});
+  var statuses=getStatuses(sheet);
+  var statusOpts=statuses.map(function(s){return'<option value="'+s+'" '+(item.Status===s?'selected':'')+'>'+s+'</option>';}).join('');
 
-  document.getElementById('appointmentsTable').innerHTML = `
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Service</th><th>Date</th><th>Time</th><th>Phone</th><th>Address</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody>${[...filtered].reverse().map(a => `
-        <tr>
-          <td class="name-cell">${a.Name || '—'}<div class="meta-cell">${a.Email || ''}</div></td>
-          <td>${a.Service || '—'}</td>
-          <td>${a.Date || '—'}</td>
-          <td>${a.Time || '—'}</td>
-          <td>${a.Phone || '—'}</td>
-          <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.Address || '—'}</td>
-          <td>${statusBadge(a.Status)}</td>
-          <td>
-            <div class="row-actions">
-              <button class="row-btn row-btn-status" onclick="openDetailModal('Appointments', '${a.ID}')">View</button>
-              <button class="row-btn row-btn-delete" onclick="confirmDelete('Appointments', '${a.ID}')">✕</button>
-            </div>
-          </td>
-        </tr>
-      `).join('')}</tbody>
-    </table>`;
+  document.getElementById('modalContainer').innerHTML=
+    '<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"><h3>'+(item.Name||'Detail')+'</h3><p>'+sheet+' — ID: '+id+'</p><div style="margin-bottom:16px;">'+
+    fields.map(function(e){return'<div class="modal-detail-row"><span class="modal-detail-label">'+e[0]+'</span><span class="modal-detail-value">'+(e[1]||'—')+'</span></div>';}).join('')+
+    '</div><div style="margin-bottom:8px;"><label style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;display:block;">Update Status</label><select class="status-select" id="modalStatusSelect">'+statusOpts+'</select></div>'+
+    '<div class="modal-actions"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalSaveBtn">Save Status</button></div></div></div>';
+
+  document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+  document.getElementById('modalBox').addEventListener('click',function(e){e.stopPropagation();});
+  document.getElementById('modalCancelBtn').addEventListener('click',closeModal);
+  document.getElementById('modalSaveBtn').addEventListener('click',function(){saveStatus(sheet,id);});
 }
 
-// ─── Quotes Table ───
-function renderQuotes() {
-  const filtered = filterBySearch(quotes, ['Name', 'Email', 'Phone', 'Service', 'Status']);
-  document.getElementById('quoteCount').textContent = filtered.length + ' total';
-
-  if (filtered.length === 0) {
-    document.getElementById('quotesTable').innerHTML = emptyState('No quote requests found.');
-    return;
-  }
-
-  document.getElementById('quotesTable').innerHTML = `
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Service</th><th>Phone</th><th>Description</th><th>Preferred</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody>${[...filtered].reverse().map(q => `
-        <tr>
-          <td class="name-cell">${q.Name || '—'}<div class="meta-cell">${q.Email || ''}</div></td>
-          <td>${q.Service || '—'}</td>
-          <td>${q.Phone || '—'}</td>
-          <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${q.Description || '—'}</td>
-          <td>${q['Contact Method'] || '—'}</td>
-          <td>${statusBadge(q.Status)}</td>
-          <td>
-            <div class="row-actions">
-              <button class="row-btn row-btn-status" onclick="openDetailModal('Quotes', '${q.ID}')">View</button>
-              <button class="row-btn row-btn-delete" onclick="confirmDelete('Quotes', '${q.ID}')">✕</button>
-            </div>
-          </td>
-        </tr>
-      `).join('')}</tbody>
-    </table>`;
-}
-
-// ─── Contacts Table ───
-function renderContacts() {
-  const filtered = filterBySearch(contacts, ['Name', 'Email', 'Message', 'Status']);
-  document.getElementById('contactCount').textContent = filtered.length + ' total';
-
-  if (filtered.length === 0) {
-    document.getElementById('contactsTable').innerHTML = emptyState('No messages found.');
-    return;
-  }
-
-  document.getElementById('contactsTable').innerHTML = `
-    <table class="data-table">
-      <thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
-      <tbody>${[...filtered].reverse().map(c => `
-        <tr>
-          <td class="name-cell">${c.Name || '—'}</td>
-          <td>${c.Email || '—'}</td>
-          <td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.Message || '—'}</td>
-          <td class="meta-cell">${fmtDate(c.Timestamp)}</td>
-          <td>${statusBadge(c.Status)}</td>
-          <td>
-            <div class="row-actions">
-              <button class="row-btn row-btn-status" onclick="openDetailModal('Contacts', '${c.ID}')">View</button>
-              <button class="row-btn row-btn-delete" onclick="confirmDelete('Contacts', '${c.ID}')">✕</button>
-            </div>
-          </td>
-        </tr>
-      `).join('')}</tbody>
-    </table>`;
-}
-
-/* ═══════════════════════════════════════
-   SEARCH
-   ═══════════════════════════════════════ */
-function handleSearch() {
-  searchQuery = document.getElementById('globalSearch').value;
-  renderAll();
-}
-
-/* ═══════════════════════════════════════
-   MODALS
-   ═══════════════════════════════════════ */
-function closeModal() { document.getElementById('modalContainer').innerHTML = ''; }
-
-function openDetailModal(sheet, id) {
-  const datasets = { Appointments: appointments, Quotes: quotes, Contacts: contacts };
-  const statuses = { Appointments: APPT_STATUSES, Quotes: QUOTE_STATUSES, Contacts: CONTACT_STATUSES };
-  const item = datasets[sheet].find(r => r.ID === id);
-  if (!item) return;
-
-  const fields = Object.entries(item).filter(([k]) => k !== 'ID');
-  const statusOpts = statuses[sheet].map(s => `<option value="${s}" ${item.Status === s ? 'selected' : ''}>${s}</option>`).join('');
-
-  document.getElementById('modalContainer').innerHTML = `
-    <div class="modal-overlay" onclick="closeModal()">
-      <div class="modal" onclick="event.stopPropagation()">
-        <h3>${item.Name || 'Detail'}</h3>
-        <p>${sheet.slice(0,-1)} — ID: ${id}</p>
-        <div class="modal-detail">
-          ${fields.map(([k, v]) => k !== 'Status' ? `
-            <div class="modal-detail-row">
-              <span class="modal-detail-label">${k}</span>
-              <span class="modal-detail-value">${v || '—'}</span>
-            </div>
-          ` : '').join('')}
-        </div>
-        <div style="margin-bottom:8px;">
-          <label style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;display:block;">Update Status</label>
-          <select class="status-select" id="modalStatusSelect">${statusOpts}</select>
-        </div>
-        <div class="modal-actions">
-          <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancel</button>
-          <button class="modal-btn modal-btn-primary" onclick="saveStatus('${sheet}', '${id}')">Save Status</button>
-        </div>
-      </div>
-    </div>`;
-}
-
-async function saveStatus(sheet, id) {
-  const newStatus = document.getElementById('modalStatusSelect').value;
+async function saveStatus(sheet,id){
+  var newStatus=document.getElementById('modalStatusSelect').value;
   showLoading(true);
-  try {
-    await postGAS({ action: 'updateStatus', sheet, id, status: newStatus });
-    // Update local state
-    const datasets = { Appointments: appointments, Quotes: quotes, Contacts: contacts };
-    const item = datasets[sheet].find(r => r.ID === id);
-    if (item) item.Status = newStatus;
-    renderAll();
-    closeModal();
-    showToast('Status updated');
-  } catch (e) {
-    showToast('Failed to update', 'error');
-  }
+  try{await postGAS({action:'updateStatus',sheet:sheet,id:id,status:newStatus});
+    var item=getDataset(sheet).find(function(r){return r.ID===id;});
+    if(item)item.Status=newStatus;
+    renderAll();closeModal();showToast('Status updated');
+  }catch(e){showToast('Failed','error');}
   showLoading(false);
 }
 
-function confirmDelete(sheet, id) {
-  document.getElementById('modalContainer').innerHTML = `
-    <div class="modal-overlay" onclick="closeModal()">
-      <div class="modal" onclick="event.stopPropagation()">
-        <h3>Delete Record</h3>
-        <p>Are you sure you want to permanently delete this record? This cannot be undone.</p>
-        <div class="modal-actions">
-          <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancel</button>
-          <button class="modal-btn" style="background:#ef4444;color:#fff;" onclick="doDelete('${sheet}', '${id}')">Delete</button>
-        </div>
-      </div>
-    </div>`;
+function openDeleteModal(sheet,id){
+  document.getElementById('modalContainer').innerHTML=
+    '<div class="modal-overlay" id="modalOverlay"><div class="modal"><h3>Delete Record</h3><p>Are you sure? This cannot be undone.</p><div class="modal-actions"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-danger" id="modalDeleteBtn">Delete</button></div></div></div>';
+  document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+  document.getElementById('modalCancelBtn').addEventListener('click',closeModal);
+  document.getElementById('modalDeleteBtn').addEventListener('click',function(){doDelete(sheet,id);});
 }
 
-async function doDelete(sheet, id) {
+async function doDelete(sheet,id){
   showLoading(true);
-  try {
-    await postGAS({ action: 'deleteRow', sheet, id });
-    // Remove from local state
-    if (sheet === 'Appointments') appointments = appointments.filter(r => r.ID !== id);
-    if (sheet === 'Quotes') quotes = quotes.filter(r => r.ID !== id);
-    if (sheet === 'Contacts') contacts = contacts.filter(r => r.ID !== id);
-    renderAll();
-    closeModal();
-    showToast('Record deleted');
-  } catch (e) {
-    showToast('Failed to delete', 'error');
-  }
+  try{await postGAS({action:'deleteRow',sheet:sheet,id:id});
+    if(sheet==='Appointments')appointments=appointments.filter(function(r){return r.ID!==id;});
+    if(sheet==='Quotes')quotes=quotes.filter(function(r){return r.ID!==id;});
+    if(sheet==='Contacts')contacts=contacts.filter(function(r){return r.ID!==id;});
+    if(sheet==='Clients')clients=clients.filter(function(r){return r.ID!==id;});
+    renderAll();closeModal();showToast('Deleted');
+  }catch(e){showToast('Failed','error');}
   showLoading(false);
 }
 
-/* ═══════════════════════════════════════
-   TOAST
-   ═══════════════════════════════════════ */
-function showToast(msg, type = 'success') {
-  const el = document.createElement('div');
-  el.className = 'toast toast-' + type;
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 3000);
+// ADD CLIENT
+function openAddClientModal(){
+  document.getElementById('modalContainer').innerHTML=
+    '<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox"><h3>Add New Client</h3><p>Saved to the Clients sheet in your Google Sheet.</p>'+
+    '<div class="form-grid"><div class="form-group"><label>Full Name *</label><input type="text" id="acName" placeholder="John Smith"></div>'+
+    '<div class="form-row"><div class="form-group"><label>Email</label><input type="email" id="acEmail" placeholder="john@email.com"></div><div class="form-group"><label>Phone *</label><input type="tel" id="acPhone" placeholder="(555) 123-4567"></div></div>'+
+    '<div class="form-group"><label>Service</label><select id="acService"><option value="">Select...</option></select></div>'+
+    '<div class="form-group"><label>Address</label><input type="text" id="acAddress" placeholder="123 Main St"></div>'+
+    '<div class="form-group"><label>Notes</label><textarea id="acNotes" placeholder="Notes about this client..."></textarea></div></div>'+
+    '<div class="modal-actions"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalSaveClientBtn">Add Client</button></div></div></div>';
+
+  var sel=document.getElementById('acService');
+  SERVICES.forEach(function(s){var opt=document.createElement('option');opt.value=s;opt.textContent=s;sel.appendChild(opt);});
+
+  document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+  document.getElementById('modalBox').addEventListener('click',function(e){e.stopPropagation();});
+  document.getElementById('modalCancelBtn').addEventListener('click',closeModal);
+  document.getElementById('modalSaveClientBtn').addEventListener('click',submitNewClient);
 }
 
-/* ═══════════════════════════════════════
-   INIT
-   ═══════════════════════════════════════ */
-document.addEventListener('DOMContentLoaded', () => {
-  // Render empty state first, then load
-  renderAll();
-  loadAll();
-});
+async function submitNewClient(){
+  var name=document.getElementById('acName').value.trim();
+  var phone=document.getElementById('acPhone').value.trim();
+  if(!name||!phone){showToast('Name and Phone required.','error');return;}
+
+  var btn=document.getElementById('modalSaveClientBtn');
+  btn.textContent='Saving...';btn.disabled=true;
+  showLoading(true);
+  try{
+    var result=await postGAS({
+      action:'addClient',
+      name:name,
+      email:document.getElementById('acEmail').value.trim(),
+      phone:phone,
+      service:document.getElementById('acService').value,
+      address:document.getElementById('acAddress').value.trim(),
+      notes:document.getElementById('acNotes').value.trim(),
+      timestamp:new Date().toISOString()
+    });
+    clients.push({ID:result.id||'tmp',Timestamp:new Date().toISOString(),Name:name,Email:document.getElementById('acEmail').value.trim(),Phone:phone,Service:document.getElementById('acService').value,Address:document.getElementById('acAddress').value.trim(),Notes:document.getElementById('acNotes').value.trim(),Status:'Active'});
+    renderAll();closeModal();showToast('Client added!');
+  }catch(e){showToast('Failed to add.','error');}
+  showLoading(false);
+}
+
+function showToast(msg,type){
+  type=type||'success';
+  var el=document.createElement('div');el.className='toast toast-'+type;el.textContent=msg;
+  document.body.appendChild(el);setTimeout(function(){el.remove();},3000);
+}
+
+document.addEventListener('DOMContentLoaded',function(){renderAll();loadAll();});
 </script>
 </body>
 </html>
