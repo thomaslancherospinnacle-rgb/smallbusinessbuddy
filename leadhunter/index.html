@@ -703,15 +703,8 @@ body {
       5. Copy the Web App URL above
     </div>
 
-    <label>Cloudflare Worker Proxy URL <span style="color:var(--muted);font-size:10px">(fixes CORS — required for dashboard sync)</span></label>
-    <input type="text" id="cfg-proxy-url" placeholder="https://agent.nf-financial.life/leadhunter-proxy">
-    <div class="modal-hint">
-      Add this Worker to your existing Cloudflare Worker at <code>agent.nf-financial.life</code>:<br><br>
-      <code>// Route: /leadhunter-proxy</code><br>
-      <code>const target = new URL(request.url).searchParams.get('target') || SHEETS_URL;</code><br>
-      <code>const resp = await fetch(target, { method: request.method, headers: { 'Content-Type': 'application/json' }, body: request.method === 'POST' ? request.body : undefined });</code><br>
-      <code>return new Response(await resp.text(), { headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }});</code><br><br>
-      Or deploy the included <code>LeadHunter-Worker.js</code> as a standalone Worker.
+    <div class="modal-hint" style="color:var(--green);border-color:rgba(0,255,136,0.2)">
+      ✅ No proxy needed — this version uses CORS-free GET requests directly to Apps Script.
     </div>
 
     <div class="modal-divider"></div>
@@ -1132,18 +1125,12 @@ async function loadFromSheets() {
   const url = settings.sheetsUrl;
   if (!url) return;
 
-  // Use proxy URL if configured, otherwise try direct (works if hosted same-origin or via CF Worker)
-  const proxyUrl = settings.proxyUrl || null;
-  const getUrl = proxyUrl
-    ? `${proxyUrl}?action=getLeads`
-    : url + '?action=getLeads';
-
+  // Pure GET — no preflight, no CORS issue
   setSyncStatus('⏳ Loading from Sheets...', '');
   try {
-    const res = await fetch(getUrl, { method: 'GET' });
+    const res = await fetch(url + '?action=getLeads');
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    const text = await res.text();
-    const data = JSON.parse(text);
+    const data = await res.json();
     if (!data.success || !Array.isArray(data.leads)) throw new Error(data.error || 'Bad response');
 
     if (data.leads.length === 0) {
@@ -1189,9 +1176,9 @@ async function loadFromSheets() {
     toast(`☁ ${leads.length} leads loaded from Sheets`, 'ok');
 
   } catch (e) {
-    setSyncStatus('⚠ CORS error — set Proxy URL in ⚙ Settings', 'err');
+    setSyncStatus('❌ Load failed: ' + e.message, 'err');
     console.warn('LeadHunter Sheets load error:', e.message);
-    toast('⚠ CORS blocked — add Proxy URL in ⚙ Settings', 'err');
+    toast('❌ Sheets load failed: ' + e.message, 'err');
   }
 }
 
@@ -1204,17 +1191,25 @@ function syncSheets() {
     openSettings();
     return;
   }
-  const toSync = leads;
-  if (!toSync.length) { toast('⚠ No leads to sync', 'warn'); return; }
-  pushToSheets(toSync, true);
+  if (!leads.length) { toast('⚠ No leads to sync', 'warn'); return; }
+  pushToSheets(leads, true);
+}
+
+// Encode payload as base64 and send as a GET param — zero CORS issues
+function gsGet(url, action, payloadObj) {
+  let fullUrl = url + '?action=' + encodeURIComponent(action);
+  if (payloadObj) {
+    // btoa needs a plain string — use encodeURIComponent to handle unicode
+    const json  = JSON.stringify(payloadObj);
+    const b64   = btoa(unescape(encodeURIComponent(json)));
+    fullUrl += '&payload=' + encodeURIComponent(b64);
+  }
+  return fetch(fullUrl).then(r => r.json());
 }
 
 function pushToSheets(leadOrLeads, showToast = false) {
   const url = settings.sheetsUrl;
   if (!url) return;
-
-  const proxyUrl = settings.proxyUrl || null;
-  const postUrl  = proxyUrl ? proxyUrl : url;
 
   const payload = (Array.isArray(leadOrLeads) ? leadOrLeads : [leadOrLeads]).map(b => ({
     name: b.name, category: b.category, address: b.address,
@@ -1226,30 +1221,22 @@ function pushToSheets(leadOrLeads, showToast = false) {
     savedAt: b.savedAt || b.scannedAt,
   }));
 
-  const body = JSON.stringify({ action: 'syncLeads', leads: payload });
-
   setSyncStatus('⏳ Syncing...', '');
 
-  fetch(postUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body,
-  })
-  .then(r => r.text())
-  .then(text => {
-    const data = JSON.parse(text);
-    if (data.success) {
-      setSyncStatus(`☁ Synced ${fmtDate(new Date().toISOString())}`, 'ok');
-      if (showToast) toast(`☁ ${payload.length} leads synced to Sheets`, 'ok');
-    } else {
-      throw new Error(data.error || 'Unknown error');
-    }
-  })
-  .catch(err => {
-    setSyncStatus('❌ Sync failed — CORS? Set Proxy URL in ⚙', 'err');
-    if (showToast) toast('❌ Sync failed: ' + err.message, 'err');
-    console.warn('LeadHunter push error:', err.message);
-  });
+  gsGet(url, 'syncLeads', { leads: payload })
+    .then(data => {
+      if (data.success) {
+        setSyncStatus(`☁ Synced ${fmtDate(new Date().toISOString())}`, 'ok');
+        if (showToast) toast(`☁ ${payload.length} leads synced to Sheets`, 'ok');
+      } else {
+        throw new Error(data.error || 'Unknown error');
+      }
+    })
+    .catch(e => {
+      setSyncStatus('❌ Sync failed: ' + e.message, 'err');
+      if (showToast) toast('❌ Sync failed: ' + e.message, 'err');
+      console.warn('LeadHunter push error:', e.message);
+    });
 }
 
 function setSyncStatus(msg, type) {
@@ -1296,7 +1283,6 @@ function exportCSV() {
 // ─────────────────────────────────────────────────────────────
 function openSettings() {
   document.getElementById('cfg-sheets-url').value = settings.sheetsUrl || '';
-  document.getElementById('cfg-proxy-url').value  = settings.proxyUrl  || '';
   document.getElementById('settings-modal').classList.add('open');
 }
 function closeSettings() {
@@ -1304,7 +1290,6 @@ function closeSettings() {
 }
 function saveSettings() {
   settings.sheetsUrl = document.getElementById('cfg-sheets-url').value.trim();
-  settings.proxyUrl  = document.getElementById('cfg-proxy-url').value.trim();
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   closeSettings();
   toast('✅ Settings saved', 'ok');
