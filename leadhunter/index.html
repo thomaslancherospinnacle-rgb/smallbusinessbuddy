@@ -702,12 +702,7 @@ body {
       4. Execute as: <code>Me</code> · Access: <code>Anyone</code><br>
       5. Copy the Web App URL above
     </div>
-
-    <div class="modal-hint" style="color:var(--green);border-color:rgba(0,255,136,0.2)">
-      ✅ No proxy needed — this version uses CORS-free GET requests directly to Apps Script.
-    </div>
-
-    <div class="modal-divider"></div>
+<div class="modal-divider"></div>
     <label>Dashboard URL (for quick access bookmark)</label>
     <input type="text" id="cfg-dash-url" placeholder="e.g. https://agent.nf-financial.life/leadhunter" readonly style="opacity:0.5">
 
@@ -1119,36 +1114,51 @@ function bindFilters() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// GOOGLE SHEETS — LOAD (source of truth on startup)
+// GOOGLE SHEETS SYNC
+// All communication is plain GET — no CORS preflight ever.
+// Tampermonkey uses POST via GM_xmlhttpRequest (also no CORS).
 // ─────────────────────────────────────────────────────────────
-async function loadFromSheets() {
+
+// Encode a JS object as base64 JSON for ?payload= GET param
+function encodePayload(obj) {
+  const json = JSON.stringify(obj);
+  return btoa(unescape(encodeURIComponent(json)));
+}
+
+// Single fetch helper — always GET
+function gsCall(action, payloadObj) {
   const url = settings.sheetsUrl;
-  if (!url) return;
+  if (!url) return Promise.reject(new Error('No Sheets URL configured'));
+  let endpoint = url + '?action=' + encodeURIComponent(action);
+  if (payloadObj) endpoint += '&payload=' + encodeURIComponent(encodePayload(payloadObj));
+  return fetch(endpoint).then(r => {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  });
+}
 
-  // Pure GET — no preflight, no CORS issue
-  setSyncStatus('⏳ Loading from Sheets...', '');
+async function loadFromSheets() {
+  if (!settings.sheetsUrl) return;
+  setSyncStatus('⏳ Loading...', '');
   try {
-    const res = await fetch(url + '?action=getLeads');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (!data.success || !Array.isArray(data.leads)) throw new Error(data.error || 'Bad response');
-
-    if (data.leads.length === 0) {
+    const data = await gsCall('getLeads');
+    if (!data.success) throw new Error(data.error || 'Bad response');
+    if (!Array.isArray(data.leads) || data.leads.length === 0) {
       setSyncStatus('☁ Sheets empty', 'ok');
       return;
     }
 
+    // Merge: Sheets wins over local for existing keys
     const sheetsMap = {};
     data.leads.forEach(r => { sheetsMap[lkey(r)] = r; });
-
     const localMap = {};
     leads.forEach(l => { localMap[lkey(l)] = l; });
-
     const merged = Object.values({ ...localMap, ...sheetsMap });
+
     leads = merged.map(r => {
-      const name    = r.name     || r['Name']    || '';
-      const city    = r.city     || r['City']    || '';
-      const address = r.address  || r['Address'] || '';
+      const name    = r.name    || r['Name']    || '';
+      const city    = r.city    || r['City']    || '';
+      const address = r.address || r['Address'] || '';
       return {
         id:              r.id              || r['ID']                || uid(),
         name,
@@ -1160,82 +1170,70 @@ async function loadFromSheets() {
         rating:          r.rating          || r['Rating']           || null,
         reviewCount:     r.reviewCount     || r['Reviews']          || 0,
         hasWebsite:      r.hasWebsite !== undefined ? r.hasWebsite : (r['Has Website'] === 'Yes'),
-        website:         r.website         || r['Website']          || null,
         mapsUrl:         r.mapsUrl         || r['Maps URL']         || '',
         googleSearchUrl: r.googleSearchUrl || r['Google Search URL'] || `https://www.google.com/search?q=${encodeURIComponent(name+' '+(city||address))}`,
         stage:           r.stage           || r['Stage']            || 'New Lead',
         notes:           r.notes           || r['Notes']            || '',
         scannedAt:       r.scannedAt       || r['Scanned At']       || '',
-        savedAt:         r.savedAt         || r['Saved At']         || r.scannedAt || '',
+        savedAt:         r.savedAt         || r['Saved At']         || '',
       };
     });
 
     saveData();
     renderAll();
-    setSyncStatus(`☁ Loaded ${leads.length} from Sheets`, 'ok');
+    setSyncStatus(`☁ ${leads.length} leads loaded`, 'ok');
     toast(`☁ ${leads.length} leads loaded from Sheets`, 'ok');
 
-  } catch (e) {
-    setSyncStatus('❌ Load failed: ' + e.message, 'err');
-    console.warn('LeadHunter Sheets load error:', e.message);
-    toast('❌ Sheets load failed: ' + e.message, 'err');
+  } catch (err) {
+    setSyncStatus('❌ Load failed: ' + err.message, 'err');
+    toast('❌ Sheets load failed: ' + err.message, 'err');
+    console.warn('[LeadHunter] load error:', err.message);
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-// GOOGLE SHEETS — PUSH
-// ─────────────────────────────────────────────────────────────
 function syncSheets() {
-  if (!settings.sheetsUrl) {
-    toast('⚠ No Sheets URL set — open ⚙ Settings', 'warn');
-    openSettings();
-    return;
-  }
+  if (!settings.sheetsUrl) { toast('⚠ No Sheets URL — open ⚙ Settings', 'warn'); openSettings(); return; }
   if (!leads.length) { toast('⚠ No leads to sync', 'warn'); return; }
   pushToSheets(leads, true);
 }
 
-// Encode payload as base64 and send as a GET param — zero CORS issues
-function gsGet(url, action, payloadObj) {
-  let fullUrl = url + '?action=' + encodeURIComponent(action);
-  if (payloadObj) {
-    // btoa needs a plain string — use encodeURIComponent to handle unicode
-    const json  = JSON.stringify(payloadObj);
-    const b64   = btoa(unescape(encodeURIComponent(json)));
-    fullUrl += '&payload=' + encodeURIComponent(b64);
-  }
-  return fetch(fullUrl).then(r => r.json());
-}
-
 function pushToSheets(leadOrLeads, showToast = false) {
-  const url = settings.sheetsUrl;
-  if (!url) return;
+  if (!settings.sheetsUrl) return;
 
-  const payload = (Array.isArray(leadOrLeads) ? leadOrLeads : [leadOrLeads]).map(b => ({
-    name: b.name, category: b.category, address: b.address,
-    city: b.city, state: b.state, phone: b.phone,
-    rating: b.rating, reviewCount: b.reviewCount,
-    hasWebsite: b.hasWebsite, mapsUrl: b.mapsUrl,
-    googleSearchUrl: b.googleSearchUrl || `https://www.google.com/search?q=${encodeURIComponent(b.name+' '+(b.city||b.address||''))}`,
-    stage: b.stage, notes: b.notes,
-    savedAt: b.savedAt || b.scannedAt,
-  }));
+  const payload = (Array.isArray(leadOrLeads) ? leadOrLeads : [leadOrLeads])
+    .filter(b => b && b.name)
+    .map(b => ({
+      name:           b.name,
+      category:       b.category       || '',
+      address:        b.address        || '',
+      city:           b.city           || '',
+      state:          b.state          || '',
+      phone:          b.phone          || '',
+      rating:         b.rating         || '',
+      reviewCount:    b.reviewCount    || 0,
+      hasWebsite:     !!b.hasWebsite,
+      mapsUrl:        b.mapsUrl        || '',
+      googleSearchUrl:b.googleSearchUrl|| `https://www.google.com/search?q=${encodeURIComponent(b.name+' '+(b.city||b.address||''))}`,
+      stage:          b.stage          || 'New Lead',
+      notes:          b.notes          || '',
+      savedAt:        b.savedAt        || b.scannedAt || '',
+      scannedAt:      b.scannedAt      || '',
+    }));
+
+  if (!payload.length) return;
 
   setSyncStatus('⏳ Syncing...', '');
 
-  gsGet(url, 'syncLeads', { leads: payload })
+  gsCall('syncLeads', { leads: payload })
     .then(data => {
-      if (data.success) {
-        setSyncStatus(`☁ Synced ${fmtDate(new Date().toISOString())}`, 'ok');
-        if (showToast) toast(`☁ ${payload.length} leads synced to Sheets`, 'ok');
-      } else {
-        throw new Error(data.error || 'Unknown error');
-      }
+      if (!data.success) throw new Error(data.error || 'Unknown error');
+      setSyncStatus(`☁ Synced ${fmtDate(new Date().toISOString())}`, 'ok');
+      if (showToast) toast(`☁ ${payload.length} leads synced`, 'ok');
     })
-    .catch(e => {
-      setSyncStatus('❌ Sync failed: ' + e.message, 'err');
-      if (showToast) toast('❌ Sync failed: ' + e.message, 'err');
-      console.warn('LeadHunter push error:', e.message);
+    .catch(err => {
+      setSyncStatus('❌ Sync failed: ' + err.message, 'err');
+      if (showToast) toast('❌ Sync failed: ' + err.message, 'err');
+      console.warn('[LeadHunter] sync error:', err.message);
     });
 }
 
@@ -1246,13 +1244,12 @@ function setSyncStatus(msg, type) {
 }
 
 function lkey(l) {
-  return ((l.name||'') + (l.address||'')).toLowerCase().replace(/\s/g,'');
+  return ((l.name||l['Name']||'') + (l.address||l['Address']||'')).toLowerCase().replace(/\s/g,'');
 }
 
 function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 }
-
 // ─────────────────────────────────────────────────────────────
 // CSV EXPORT
 // ─────────────────────────────────────────────────────────────
