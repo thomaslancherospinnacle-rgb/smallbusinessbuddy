@@ -441,6 +441,16 @@ input, textarea, select { font-family: inherit; }
       <!-- Step 3 (book) / Step 2 (quote): Your Info -->
       <div id="bookingStep3" style="display:none;">
         <div class="booking-summary" id="bookingSummary"></div>
+
+        <!-- Deposit notice — shown only in "book" mode -->
+        <div id="depositNotice" style="display:none;background:#e8f5ee;border:1px solid #a7d7bc;border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;">
+          <span style="font-size:22px;flex-shrink:0;">🔒</span>
+          <div>
+            <div style="font-weight:700;font-size:14px;color:#1a5c3a;margin-bottom:3px;">$100 Deposit Required at Booking</div>
+            <div style="font-size:13px;color:#2d7a52;line-height:1.5;">This covers our travel &amp; inspection time. It is <strong>not</strong> deducted from the job total — the final invoice is billed separately after we complete the work. Secure payment via Stripe.</div>
+          </div>
+        </div>
+
         <div class="form-grid">
           <div class="form-group"><label>Full Name *</label><input type="text" id="bkName" placeholder="John Smith"></div>
           <div class="form-row">
@@ -501,7 +511,7 @@ input, textarea, select { font-family: inherit; }
       <div class="contact-grid">
         <div>
           <div class="contact-info-item"><div class="contact-info-icon">📞</div><div><div class="contact-info-label">Phone</div><div class="contact-info-value">(954) 555-0199</div><div class="contact-info-sub">Available 24/7 for emergencies</div></div></div>
-          <div class="contact-info-item"><div class="contact-info-icon">✉️</div><div><div class="contact-info-label">Email</div><div class="contact-info-value">info@flowpipe.com</div><div class="contact-info-sub">Response within 2 hours</div></div></div>
+          <div class="contact-info-item"><div class="contact-info-icon">✉️</div><div><div class="contact-info-label">Email</div><div class="contact-info-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bbd2d5ddd4fbddd7d4cccbd2cbde95d8d4d6">[email&#160;protected]</a></div><div class="contact-info-sub">Response within 2 hours</div></div></div>
           <div class="contact-info-item"><div class="contact-info-icon">📍</div><div><div class="contact-info-label">Location</div><div class="contact-info-value">Fort Lauderdale, FL</div><div class="contact-info-sub">Serving all of Broward County</div></div></div>
           <div class="contact-info-item"><div class="contact-info-icon">🕐</div><div><div class="contact-info-label">Hours</div><div class="contact-info-value">Mon–Sat: 7am–8pm</div><div class="contact-info-sub">Sunday: Emergency only</div></div></div>
         </div>
@@ -542,7 +552,7 @@ input, textarea, select { font-family: inherit; }
     <div class="footer-col">
       <h4>Contact</h4>
       <span class="footer-link">(954) 555-0199</span>
-      <span class="footer-link">info@flowpipe.com</span>
+      <span class="footer-link"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e0898e868fa0868c8f9790899085ce838f8d">[email&#160;protected]</a></span>
       <span class="footer-link">Fort Lauderdale, FL</span>
     </div>
   </div>
@@ -552,11 +562,14 @@ input, textarea, select { font-family: inherit; }
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 /* ═══════════════════════════════════════
    CONFIG
    ═══════════════════════════════════════ */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwdc0kUUjwkFqOpCud_W55MP-DVTzd8m0g8b5wiFJEzbnSVR-GyuFdhtPRPNTCiDbwMlw/exec';
+
+// ── Stripe Worker URL ── set after deploying stripe-worker.js to Cloudflare
+const STRIPE_WORKER_URL = localStorage.getItem('flowpipe_stripe_worker') || 'YOUR_STRIPE_WORKER_URL';
 
 const SERVICES = [
   { id:'s1', name:'Emergency Repair', icon:'🔧', price:'From $89', desc:'24/7 emergency plumbing repairs for burst pipes, major leaks, and flooding.', duration:60 },
@@ -824,10 +837,13 @@ function updateBookingMode() {
   document.getElementById('bookingPageTitle').textContent = isQuote ? 'Request a Quote' : 'Book an Appointment';
   document.getElementById('bookingPageDesc').textContent = isQuote
     ? 'Select the service and tell us about your project. No commitment.'
-    : 'Select your service, pick a time, and we\'ll handle the rest.';
-  document.getElementById('btnSubmitBooking').textContent = isQuote ? 'Submit Quote Request →' : 'Confirm Booking ✓';
+    : 'Select your service, pick a time, and confirm with a $100 deposit.';
+  document.getElementById('btnSubmitBooking').textContent = isQuote ? 'Submit Quote Request →' : 'Pay $100 Deposit & Book →';
   document.getElementById('bkNotesLabel').textContent = isQuote ? 'Describe Your Project *' : 'Describe the Issue';
   document.getElementById('bkNotes').placeholder = isQuote ? 'Details about the work needed...' : 'Tell us about the problem...';
+  // Show deposit notice only in book mode
+  const notice = document.getElementById('depositNotice');
+  if (notice) notice.style.display = isQuote ? 'none' : 'flex';
 }
 
 function resetBookingSteps() {
@@ -1119,9 +1135,9 @@ async function submitBooking() {
   setLoading(btn, true);
 
   try {
-    let result;
     if (isQuote) {
-      result = await postToGAS({
+      // ── QUOTE: log directly to GAS, no payment ──
+      const result = await postToGAS({
         action: 'quote',
         name, email, phone,
         desc: document.getElementById('bkNotes').value.trim(),
@@ -1132,8 +1148,23 @@ async function submitBooking() {
       });
       document.getElementById('confirmTitle').textContent = 'Quote Request Sent!';
       document.getElementById('confirmDesc').textContent = 'We\'ve received your request and will get back to you within 2 hours with a free estimate.';
+      if (result && result.email && result.email.sent) {
+        document.getElementById('confirmEmail').textContent = 'A confirmation email has been sent to ' + email;
+      } else {
+        document.getElementById('confirmEmail').textContent = '';
+      }
+      ['bookingStep1','bookingStep2','bookingStep3'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+      document.getElementById('bookingSteps').style.display = 'none';
+      document.querySelector('.booking-mode-toggle').style.display = 'none';
+      document.getElementById('bookingConfirm').style.display = 'block';
+      showToast('Quote request submitted!');
+
     } else {
-      result = await postToGAS({
+      // ── BOOK: first log to GAS, then redirect to Stripe Checkout ──
+      const appointmentId = 'APPT-' + Date.now();
+
+      // Log to Google Sheet (even before payment — status will be "Pending Payment")
+      await postToGAS({
         action: 'appointment',
         name, email, phone,
         address: document.getElementById('bkAddress').value.trim(),
@@ -1142,40 +1173,55 @@ async function submitBooking() {
         date: bkDate ? fmtDate(bkDate) : '',
         time: bkTime ? fmtTime(bkTime.h, bkTime.m) : '',
         duration: bkService ? bkService.duration : 60,
+        appointmentId,
+        status: 'Pending Payment',
         timestamp: new Date().toISOString()
       });
-      document.getElementById('confirmTitle').textContent = 'You\'re Booked!';
-      document.getElementById('confirmDesc').textContent = 'We\'ve received your appointment. You\'ll get a confirmation call within the hour.';
-      // Clear availability cache for this date
-      if (bkDate) {
-        const dateKey = new Date(bkDate).toISOString().slice(0, 10);
-        Object.keys(availabilityCache).forEach(k => { if (k.startsWith(dateKey)) delete availabilityCache[k]; });
-      }
-    }
 
-    // Log email status for debugging
-    console.log('GAS response:', result);
-    if (result && result.email) {
-      console.log('Auto-reply email status:', result.email);
-      if (result.email.sent) {
-        document.getElementById('confirmEmail').textContent = 'A confirmation email has been sent to ' + email;
+      // Check if worker is configured
+      if (!STRIPE_WORKER_URL || STRIPE_WORKER_URL.startsWith('YOUR_')) {
+        // Fallback: no Stripe configured — just confirm
+        showToast('Booked! (Stripe not configured — no deposit collected)', 'info');
+        document.getElementById('confirmTitle').textContent = 'You\'re Booked!';
+        document.getElementById('confirmDesc').textContent = 'We\'ve received your appointment. You\'ll get a confirmation call within the hour.';
+        document.getElementById('confirmEmail').textContent = '';
+        ['bookingStep1','bookingStep2','bookingStep3'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+        document.getElementById('bookingSteps').style.display = 'none';
+        document.querySelector('.booking-mode-toggle').style.display = 'none';
+        document.getElementById('bookingConfirm').style.display = 'block';
+        setLoading(btn, false);
+        return;
+      }
+
+      // Create Stripe Checkout session
+      const res = await fetch(STRIPE_WORKER_URL + '/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName: name,
+          customerEmail: email,
+          service: bkService ? bkService.name : 'Plumbing Service',
+          appointmentDate: bkDate ? fmtDate(bkDate) : '',
+          appointmentTime: bkTime ? fmtTime(bkTime.h, bkTime.m) : '',
+          appointmentId,
+        })
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
       } else {
-        document.getElementById('confirmEmail').textContent = 'We were unable to send a confirmation email. (Reason: ' + (result.email.reason || 'unknown') + ')';
-        console.warn('Email not sent:', result.email);
+        showToast('Payment setup failed: ' + (data.error || 'Unknown error'), 'error');
+        setLoading(btn, false);
       }
-    } else {
-      document.getElementById('confirmEmail').textContent = '';
     }
-
-    ['bookingStep1','bookingStep2','bookingStep3'].forEach(id => { document.getElementById(id).style.display = 'none'; });
-    document.getElementById('bookingSteps').style.display = 'none';
-    document.querySelector('.booking-mode-toggle').style.display = 'none';
-    document.getElementById('bookingConfirm').style.display = 'block';
-    showToast(isQuote ? 'Quote request submitted!' : 'Appointment booked successfully!');
   } catch (e) {
     showToast('Something went wrong. Please try again.', 'error');
+    setLoading(btn, false);
   }
-  setLoading(btn, false);
+
+  if (bookingMode === 'quote') setLoading(btn, false);
 }
 
 async function submitContact() {
@@ -1198,17 +1244,4 @@ async function submitContact() {
 
 /* ═══════════════════════════════════════
    INIT
-   ═══════════════════════════════════════ */
-buildNav();
-renderServiceCards('homeServicesGrid');
-renderServiceCards('servicesGrid');
-renderServiceSelectGrid();
-renderInquiryServiceOptions();
-renderReviews();
-renderTeam();
-initBooking();
-initInquiry();
-showPage('home');
-</script>
-</body>
-</html>
+   ════════
