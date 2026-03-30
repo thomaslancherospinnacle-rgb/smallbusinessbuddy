@@ -528,7 +528,7 @@ input, textarea, select { font-family: inherit; }
       <div class="contact-grid">
         <div>
           <div class="contact-info-item"><div class="contact-info-icon">📞</div><div><div class="contact-info-label">Phone</div><div class="contact-info-value">(954) 555-0199</div><div class="contact-info-sub">Available 24/7 for emergencies</div></div></div>
-          <div class="contact-info-item"><div class="contact-info-icon">✉️</div><div><div class="contact-info-label">Email</div><div class="contact-info-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d3babdb5bc93b5bfbca4a3baa3b6fdb5baa7">[email&#160;protected]</a></div><div class="contact-info-sub">Response within 2 hours</div></div></div>
+          <div class="contact-info-item"><div class="contact-info-icon">✉️</div><div><div class="contact-info-label">Email</div><div class="contact-info-value">info@flowpipe.fit</div><div class="contact-info-sub">Response within 2 hours</div></div></div>
           <div class="contact-info-item"><div class="contact-info-icon">📍</div><div><div class="contact-info-label">Location</div><div class="contact-info-value">Fort Lauderdale, FL</div><div class="contact-info-sub">Serving all of Broward County</div></div></div>
           <div class="contact-info-item"><div class="contact-info-icon">🕐</div><div><div class="contact-info-label">Hours</div><div class="contact-info-value">Mon–Sat: 7am–8pm</div><div class="contact-info-sub">Sunday: Emergency only</div></div></div>
         </div>
@@ -569,7 +569,7 @@ input, textarea, select { font-family: inherit; }
     <div class="footer-col">
       <h4>Contact</h4>
       <span class="footer-link">(954) 555-0199</span>
-      <span class="footer-link"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c0a9aea6af80a6acafb7b0a9b0a5eea6a9b4">[email&#160;protected]</a></span>
+      <span class="footer-link">info@flowpipe.fit</span>
       <span class="footer-link">Fort Lauderdale, FL</span>
     </div>
   </div>
@@ -579,7 +579,7 @@ input, textarea, select { font-family: inherit; }
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 /* ═══════════════════════════════════════
    CONFIG
    ═══════════════════════════════════════ */
@@ -1266,7 +1266,11 @@ async function submitContact() {
    ═══════════════════════════════════════ */
 (function init() {
   buildNav();
-  renderStaticContent();
+  renderServiceCards('homeServicesGrid');
+  renderServiceCards('servicesGrid');
+  renderInquiryServiceOptions();
+  renderReviews();
+  renderTeam();
   initInquiry();
   initBooking();
   renderServiceSelectGrid();
