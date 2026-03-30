@@ -6,6 +6,23 @@
 <title>FlowPipe Plumbing — Professional Plumbing Services</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800;900&display=swap" rel="stylesheet">
+<script>
+// Early stub — ensures onclick="showPage(...)" never throws before the main
+// script block at the bottom of <body> has executed.
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  var t = document.getElementById('page-' + id);
+  if (t) t.classList.add('active');
+  document.querySelectorAll('.nav-desktop .nav-link').forEach(function(l){
+    l.classList.toggle('active', l.dataset.nav === id);
+  });
+  var mob = document.getElementById('navMobile');
+  if (mob) mob.classList.remove('open');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Let the main script update its own currentPage tracker if it's loaded
+  if (typeof _showPageFull === 'function') _showPageFull(id);
+}
+</script>
 <style>
 :root {
   --accent: #1a5c3a;
@@ -511,7 +528,7 @@ input, textarea, select { font-family: inherit; }
       <div class="contact-grid">
         <div>
           <div class="contact-info-item"><div class="contact-info-icon">📞</div><div><div class="contact-info-label">Phone</div><div class="contact-info-value">(954) 555-0199</div><div class="contact-info-sub">Available 24/7 for emergencies</div></div></div>
-          <div class="contact-info-item"><div class="contact-info-icon">✉️</div><div><div class="contact-info-label">Email</div><div class="contact-info-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bbd2d5ddd4fbddd7d4cccbd2cbde95d8d4d6">[email&#160;protected]</a></div><div class="contact-info-sub">Response within 2 hours</div></div></div>
+          <div class="contact-info-item"><div class="contact-info-icon">✉️</div><div><div class="contact-info-label">Email</div><div class="contact-info-value">info@flowpipe.fit</div><div class="contact-info-sub">Response within 2 hours</div></div></div>
           <div class="contact-info-item"><div class="contact-info-icon">📍</div><div><div class="contact-info-label">Location</div><div class="contact-info-value">Fort Lauderdale, FL</div><div class="contact-info-sub">Serving all of Broward County</div></div></div>
           <div class="contact-info-item"><div class="contact-info-icon">🕐</div><div><div class="contact-info-label">Hours</div><div class="contact-info-value">Mon–Sat: 7am–8pm</div><div class="contact-info-sub">Sunday: Emergency only</div></div></div>
         </div>
@@ -552,7 +569,7 @@ input, textarea, select { font-family: inherit; }
     <div class="footer-col">
       <h4>Contact</h4>
       <span class="footer-link">(954) 555-0199</span>
-      <span class="footer-link"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e0898e868fa0868c8f9790899085ce838f8d">[email&#160;protected]</a></span>
+      <span class="footer-link">info@flowpipe.fit</span>
       <span class="footer-link">Fort Lauderdale, FL</span>
     </div>
   </div>
@@ -562,14 +579,14 @@ input, textarea, select { font-family: inherit; }
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 /* ═══════════════════════════════════════
    CONFIG
    ═══════════════════════════════════════ */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwdc0kUUjwkFqOpCud_W55MP-DVTzd8m0g8b5wiFJEzbnSVR-GyuFdhtPRPNTCiDbwMlw/exec';
 
 // ── Stripe Worker URL ── set after deploying stripe-worker.js to Cloudflare
-const STRIPE_WORKER_URL = localStorage.getItem('flowpipe_stripe_worker') || 'https://morning-forest-5c80.thomaslancheros06.workers.dev';
+const STRIPE_WORKER_URL = localStorage.getItem('flowpipe_stripe_worker') || 'https://morning-forest-5c80.thomaslancheros06.workers.dev/';
 
 const SERVICES = [
   { id:'s1', name:'Emergency Repair', icon:'🔧', price:'From $89', desc:'24/7 emergency plumbing repairs for burst pipes, major leaks, and flooding.', duration:60 },
@@ -638,6 +655,7 @@ function buildNav() {
   });
 }
 
+// Full showPage — replaces the early head stub once the main script loads
 function showPage(id) {
   currentPage = id;
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -649,6 +667,7 @@ function showPage(id) {
   document.getElementById('navMobile').classList.remove('open');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+window._showPageFull = showPage; // expose for early stub
 
 document.getElementById('logoBtn').addEventListener('click', () => showPage('home'));
 document.getElementById('hamburgerBtn').addEventListener('click', () => {
