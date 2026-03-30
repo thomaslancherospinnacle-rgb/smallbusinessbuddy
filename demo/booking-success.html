@@ -5,519 +5,250 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Booking Confirmed — FlowPipe Plumbing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,700;0,800;0,900;1,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --accent:       #1a5c3a;
-  --accent-light: #e8f5ee;
-  --accent-mid:   #2d7a52;
-  --accent-hover: #14472d;
-  --text-primary: #1a1a1a;
-  --text-secondary: #5a5a5a;
-  --text-muted:   #8a8a8a;
-  --bg:           #f8f8f6;
-  --white:        #ffffff;
-  --border:       #e5e4e1;
-  --font-body:    'Outfit', sans-serif;
-  --font-display: 'Fraunces', serif;
-  --radius:       12px;
-  --radius-lg:    20px;
-  --shadow-md:    0 4px 24px rgba(0,0,0,.07);
-  --shadow-lg:    0 12px 48px rgba(0,0,0,.10);
-}
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --accent:#1a5c3a;--accent-light:#e8f5ee;--accent-hover:#14472d;
+    --text-primary:#1a1a1a;--text-secondary:#5a5a5a;--text-muted:#8a8a8a;
+    --bg:#f8f8f6;--bg-card:#ffffff;--border:#e5e4e1;--border-light:#f0efed;
+    --radius:10px;--radius-lg:16px;--radius-xl:24px;
+    --shadow-md:0 4px 20px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.1);
+    --font-body:'Outfit',sans-serif;--font-display:'Fraunces',serif;
+    --red:#ef4444;--amber:#f59e0b;
+  }
+  body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
 
-* { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body {
-  font-family: var(--font-body);
-  background: var(--bg);
-  color: var(--text-primary);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-}
+  /* ── Nav strip ── */
+  .nav{position:fixed;top:0;left:0;right:0;background:#fff;border-bottom:1px solid var(--border-light);padding:14px 28px;display:flex;align-items:center;gap:10px;z-index:50}
+  .nav-logo-icon{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0}
+  .nav-logo-name{font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--text-primary)}
+  .nav-back{margin-left:auto;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--border);color:var(--text-secondary);background:var(--bg);text-decoration:none;transition:all .2s}
+  .nav-back:hover{border-color:var(--accent);color:var(--accent)}
 
-/* ── Background orbs ── */
-body::before {
-  content: '';
-  position: fixed;
-  top: -160px; right: -160px;
-  width: 520px; height: 520px;
-  background: radial-gradient(circle, rgba(26,92,58,.12) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-}
-body::after {
-  content: '';
-  position: fixed;
-  bottom: -120px; left: -120px;
-  width: 420px; height: 420px;
-  background: radial-gradient(circle, rgba(26,92,58,.08) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-}
+  /* ── Card ── */
+  .card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);max-width:520px;width:100%;padding:48px 40px 40px;text-align:center;margin-top:72px}
+  @media(max-width:560px){.card{padding:36px 24px 28px}}
 
-/* ── Animations ── */
-@keyframes popIn {
-  0%   { opacity:0; transform: scale(.7); }
-  65%  { transform: scale(1.08); }
-  100% { opacity:1; transform: scale(1); }
-}
-@keyframes fadeUp {
-  from { opacity:0; transform: translateY(22px); }
-  to   { opacity:1; transform: translateY(0); }
-}
-@keyframes checkDraw {
-  from { stroke-dashoffset: 60; }
-  to   { stroke-dashoffset: 0; }
-}
-@keyframes ringPulse {
-  0%   { transform: scale(1);   opacity:.6; }
-  100% { transform: scale(1.55); opacity:0; }
-}
-@keyframes confettiFall {
-  0%   { transform: translateY(-20px) rotate(0deg);   opacity:1; }
-  100% { transform: translateY(120px) rotate(720deg); opacity:0; }
-}
-@keyframes shimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position:  200% 0; }
-}
+  /* ── States ── */
+  .state{display:none}.state.active{display:block}
 
-/* ── Card ── */
-.card {
-  position: relative;
-  z-index: 1;
-  background: var(--white);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 52px 44px 44px;
-  max-width: 520px;
-  width: 100%;
-  text-align: center;
-  animation: fadeUp .5s .1s ease both;
-  border: 1px solid var(--border);
-}
-@media (max-width: 540px) { .card { padding: 40px 24px 32px; } }
+  /* ── Success checkmark ── */
+  .checkmark{width:80px;height:80px;margin:0 auto 28px;background:var(--accent-light);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275) both}
+  .checkmark svg{width:38px;height:38px;stroke:var(--accent);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .checkmark svg path{stroke-dasharray:50;stroke-dashoffset:50;animation:drawCheck .5s .3s ease forwards}
+  @keyframes drawCheck{to{stroke-dashoffset:0}}
+  @keyframes popIn{0%{opacity:0;transform:scale(.7)}100%{opacity:1;transform:scale(1)}}
 
-/* ── Check circle ── */
-.check-wrap {
-  position: relative;
-  width: 96px; height: 96px;
-  margin: 0 auto 28px;
-  animation: popIn .55s ease both;
-}
-.check-ring-pulse {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 3px solid var(--accent);
-  animation: ringPulse 1.1s .55s ease-out forwards;
-}
-.check-circle {
-  width: 96px; height: 96px;
-  border-radius: 50%;
-  background: var(--accent);
-  display: flex; align-items: center; justify-content: center;
-  position: relative; z-index: 1;
-  box-shadow: 0 6px 24px rgba(26,92,58,.35);
-}
-.check-circle svg {
-  width: 44px; height: 44px;
-  overflow: visible;
-}
-.check-circle svg path {
-  stroke: #fff;
-  stroke-width: 3.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  fill: none;
-  stroke-dasharray: 60;
-  stroke-dashoffset: 60;
-  animation: checkDraw .45s .5s cubic-bezier(.4,0,.2,1) forwards;
-}
+  /* ── Spinner (loading state) ── */
+  .spinner-wrap{width:80px;height:80px;margin:0 auto 28px;display:flex;align-items:center;justify-content:center}
+  .spinner{width:44px;height:44px;border:3px solid var(--border-light);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── Confetti dots ── */
-.confetti-wrap {
-  position: absolute;
-  top: 0; left: 50%;
-  transform: translateX(-50%);
-  width: 300px; height: 1px;
-  pointer-events: none;
-  overflow: visible;
-}
-.confetti-dot {
-  position: absolute;
-  width: 8px; height: 8px;
-  border-radius: 2px;
-  animation: confettiFall .9s ease-out both;
-}
+  /* ── Error icon ── */
+  .error-icon{width:80px;height:80px;margin:0 auto 28px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px}
 
-/* ── Heading ── */
-.success-eyebrow {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2.5px;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 10px;
-  animation: fadeUp .4s .35s ease both;
-  opacity: 0;
-}
-.success-title {
-  font-family: var(--font-display);
-  font-size: clamp(28px, 6vw, 38px);
-  font-weight: 900;
-  line-height: 1.1;
-  color: var(--text-primary);
-  margin-bottom: 14px;
-  animation: fadeUp .4s .45s ease both;
-  opacity: 0;
-}
-.success-title em {
-  font-style: italic;
-  color: var(--accent);
-}
-.success-desc {
-  font-size: 15px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin-bottom: 28px;
-  animation: fadeUp .4s .55s ease both;
-  opacity: 0;
-}
+  /* ── Typography ── */
+  h1{font-family:var(--font-display);font-weight:800;font-size:30px;line-height:1.15;margin-bottom:10px}
+  .subtitle{font-size:15px;color:var(--text-secondary);line-height:1.6;margin-bottom:32px}
 
-/* ── Info pills ── */
-.info-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin-bottom: 30px;
-  animation: fadeUp .4s .65s ease both;
-  opacity: 0;
-}
-.info-pill {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: var(--accent-light);
-  border: 1px solid rgba(26,92,58,.15);
-  border-radius: 100px;
-  padding: 7px 14px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent);
-}
-.info-pill .pill-icon { font-size: 14px; }
+  /* ── Detail block ── */
+  .detail-block{background:var(--bg);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:20px 22px;text-align:left;margin-bottom:28px}
+  .detail-block-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+  .detail-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border-light);font-size:13px}
+  .detail-row:last-child{border-bottom:none;padding-bottom:0}
+  .detail-row-label{color:var(--text-muted);font-weight:500;white-space:nowrap;flex-shrink:0}
+  .detail-row-value{color:var(--text-primary);font-weight:600;text-align:right;word-break:break-word}
 
-/* ── Reference box ── */
-.ref-box {
-  background: var(--bg);
-  border: 1.5px dashed var(--border);
-  border-radius: var(--radius);
-  padding: 14px 18px;
-  margin-bottom: 28px;
-  animation: fadeUp .4s .72s ease both;
-  opacity: 0;
-}
-.ref-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-.ref-value {
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: .5px;
-  word-break: break-all;
-}
+  /* ── Amount badge ── */
+  .amount-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-light);color:var(--accent);font-weight:700;font-size:15px;padding:10px 20px;border-radius:100px;margin-bottom:28px}
+  .amount-badge span{font-size:11px;font-weight:600;opacity:.75}
 
-/* ── What's next steps ── */
-.next-steps {
-  text-align: left;
-  background: var(--bg);
-  border-radius: var(--radius);
-  padding: 20px 22px;
-  margin-bottom: 28px;
-  animation: fadeUp .4s .78s ease both;
-  opacity: 0;
-}
-.next-steps-title {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 14px;
-}
-.step-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
-}
-.step-row:last-child { border-bottom: none; padding-bottom: 0; }
-.step-num {
-  width: 22px; height: 22px;
-  border-radius: 50%;
-  background: var(--accent);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 800;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-.step-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
-.step-text strong { color: var(--text-primary); font-weight: 600; }
+  /* ── Buttons ── */
+  .btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .btn{padding:12px 24px;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s;font-family:inherit}
+  .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-hover)}
+  .btn-secondary{background:var(--bg);border:1px solid var(--border);color:var(--text-secondary)}.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
 
-/* ── CTA buttons ── */
-.btn-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  animation: fadeUp .4s .85s ease both;
-  opacity: 0;
-}
-.btn-primary {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--accent);
-  color: #fff;
-  border: none; cursor: pointer;
-  padding: 14px 28px;
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size: 15px;
-  font-weight: 700;
-  transition: all .2s;
-  text-decoration: none;
-}
-.btn-primary:hover {
-  background: var(--accent-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(26,92,58,.3);
-}
-.btn-secondary {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1.5px solid var(--border);
-  cursor: pointer;
-  padding: 13px 28px;
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size: 14px;
-  font-weight: 600;
-  transition: all .2s;
-  text-decoration: none;
-}
-.btn-secondary:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  background: var(--accent-light);
-}
+  /* ── Footer note ── */
+  .footer-note{margin-top:24px;font-size:12px;color:var(--text-muted);line-height:1.6}
+  .footer-note a{color:var(--accent);text-decoration:none}
 
-/* ── Brand bar ── */
-.brand-bar {
-  position: relative; z-index: 1;
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 32px;
-  animation: fadeUp .4s .05s ease both;
-  opacity: 0;
-}
-.brand-icon {
-  width: 36px; height: 36px;
-  background: var(--accent);
-  border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 17px;
-  box-shadow: 0 2px 8px rgba(26,92,58,.25);
-}
-.brand-name {
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: 20px;
-  letter-spacing: -.3px;
-}
-.brand-sub {
-  font-size: 10px;
-  color: var(--text-muted);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-weight: 500;
-  line-height: 1;
-  margin-top: 1px;
-}
-
-/* ── Shimmer receipt line ── */
-.receipt-shimmer {
-  height: 3px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, var(--accent-light), var(--accent), var(--accent-light));
-  background-size: 200% 100%;
-  animation: shimmer 2s linear infinite;
-  margin-bottom: 28px;
-  opacity: 0;
-  animation: shimmer 2s .6s linear infinite, fadeUp .4s .6s ease forwards;
-}
-
-/* ── Phone link ── */
-.phone-cta {
-  margin-top: 20px;
-  font-size: 13px;
-  color: var(--text-muted);
-  animation: fadeUp .4s .9s ease both;
-  opacity: 0;
-}
-.phone-cta a {
-  color: var(--accent);
-  font-weight: 600;
-  text-decoration: none;
-}
-.phone-cta a:hover { text-decoration: underline; }
+  /* ── Loading text ── */
+  .loading-text{font-size:15px;color:var(--text-secondary);margin-bottom:8px}
+  .loading-sub{font-size:13px;color:var(--text-muted)}
 </style>
 </head>
 <body>
 
+<nav class="nav">
+  <div class="nav-logo-icon">🔧</div>
+  <span class="nav-logo-name">FlowPipe</span>
+  <a class="nav-back" href="index.html">← Back to Site</a>
+</nav>
+
 <div class="card">
 
-  <!-- Brand -->
-  <div class="brand-bar">
-    <div class="brand-icon">🔧</div>
-    <div>
-      <div class="brand-name">FlowPipe</div>
-      <div class="brand-sub">Plumbing Co.</div>
+  <!-- ── LOADING STATE ── -->
+  <div class="state active" id="stateLoading">
+    <div class="spinner-wrap"><div class="spinner"></div></div>
+    <p class="loading-text">Confirming your booking…</p>
+    <p class="loading-sub">Please wait a moment</p>
+  </div>
+
+  <!-- ── SUCCESS STATE ── -->
+  <div class="state" id="stateSuccess">
+    <div class="checkmark">
+      <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h1>You're Confirmed! 🎉</h1>
+    <p class="subtitle">Your $100 deposit was received and your appointment is locked in. We'll call you within the hour to confirm.</p>
+
+    <div class="amount-badge">
+      ✅ $100.00 Deposit Paid <span>· Non-refundable</span>
+    </div>
+
+    <div class="detail-block" id="apptDetails" style="display:none">
+      <div class="detail-block-title">📅 Appointment Details</div>
+      <div class="detail-row"><span class="detail-row-label">Service</span><span class="detail-row-value" id="dService">—</span></div>
+      <div class="detail-row"><span class="detail-row-label">Date</span><span class="detail-row-value" id="dDate">—</span></div>
+      <div class="detail-row"><span class="detail-row-label">Time</span><span class="detail-row-value" id="dTime">—</span></div>
+      <div class="detail-row"><span class="detail-row-label">Name</span><span class="detail-row-value" id="dName">—</span></div>
+      <div class="detail-row"><span class="detail-row-label">Email</span><span class="detail-row-value" id="dEmail">—</span></div>
+      <div class="detail-row" id="dRefRow"><span class="detail-row-label">Ref #</span><span class="detail-row-value" id="dRef">—</span></div>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn btn-primary" href="index.html">← Back to Home</a>
+      <button class="btn btn-secondary" onclick="window.print()">🖨 Print Receipt</button>
+    </div>
+    <p class="footer-note">A confirmation email has been sent to you.<br>Questions? <a href="index.html#contact">Contact us</a> or call the number on our site.</p>
+  </div>
+
+  <!-- ── ERROR STATE ── -->
+  <div class="state" id="stateError">
+    <div class="error-icon">⚠️</div>
+    <h1>Something Went Wrong</h1>
+    <p class="subtitle" id="errorMsg">We couldn't confirm your payment. If your card was charged, please contact us and we'll sort it out immediately.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="index.html#book">Try Again</a>
+      <a class="btn btn-secondary" href="index.html#contact">Contact Us</a>
     </div>
   </div>
 
-  <!-- Confetti -->
-  <div class="confetti-wrap" id="confettiWrap"></div>
-
-  <!-- Check -->
-  <div class="check-wrap">
-    <div class="check-ring-pulse"></div>
-    <div class="check-circle">
-      <svg viewBox="0 0 44 44">
-        <path d="M8 22 L18 32 L36 14"/>
-      </svg>
-    </div>
-  </div>
-
-  <!-- Eyebrow + Title -->
-  <div class="success-eyebrow">Payment Confirmed · $100 Deposit</div>
-  <h1 class="success-title">You're all<br><em>booked in!</em></h1>
-  <p class="success-desc">Your deposit was processed successfully and your appointment is locked in. Our team will call you within the hour to confirm the details.</p>
-
-  <!-- Shimmer divider -->
-  <div class="receipt-shimmer"></div>
-
-  <!-- Info pills -->
-  <div class="info-strip" id="infoPills">
-    <div class="info-pill"><span class="pill-icon">✅</span> Deposit Paid</div>
-    <div class="info-pill"><span class="pill-icon">📞</span> Call within 1 hr</div>
-    <div class="info-pill"><span class="pill-icon">🔒</span> Slot Secured</div>
-  </div>
-
-  <!-- Reference number -->
-  <div class="ref-box" id="refBox" style="display:none;">
-    <div class="ref-label">Booking Reference</div>
-    <div class="ref-value" id="refValue">—</div>
-  </div>
-
-  <!-- What's next -->
-  <div class="next-steps">
-    <div class="next-steps-title">What happens next</div>
-    <div class="step-row">
-      <div class="step-num">1</div>
-      <div class="step-text"><strong>Confirmation call</strong> — we'll ring you within the hour to confirm your appointment date, time, and address.</div>
-    </div>
-    <div class="step-row">
-      <div class="step-num">2</div>
-      <div class="step-text"><strong>We show up</strong> — a licensed plumber arrives, inspects the job, and provides a full quote on the spot.</div>
-    </div>
-    <div class="step-row">
-      <div class="step-num">3</div>
-      <div class="step-text"><strong>Approve &amp; pay</strong> — you approve the quote, we do the work, then invoice you for the job total (separate from your deposit).</div>
-    </div>
-  </div>
-
-  <!-- CTAs -->
-  <div class="btn-group">
-    <a class="btn-primary" href="index.html">← Back to FlowPipe</a>
-    <a class="btn-secondary" href="tel:+19545550199">📞 Call Us Now — (954) 555-0199</a>
-  </div>
-
-  <div class="phone-cta">
-    Questions? Email us at <a href="mailto:info@flowpipe.fit">info@flowpipe.fit</a>
-  </div>
-
-</div>
+</div><!-- /card -->
 
 <script>
-(function() {
-  // ── Read URL params ──
+/* ═══════════════════════════════════════════════════
+   booking-success.html
+   
+   Called by Stripe after a successful $100 deposit.
+   URL params from stripeworker.js /checkout:
+     ?session_id=cs_live_xxx&appt=APPT-1234567890
+
+   What this page does:
+   1. Reads session_id + appt from URL
+   2. POSTs to GAS: action=updateAppointmentStatus
+      → GAS creates the Google Calendar event
+      → GAS sends confirmation email to customer
+      → GAS marks appointment "Confirmed"
+      → GAS logs $100 deposit to Revenue sheet
+   3. Renders the confirmation card with appointment details
+   ═══════════════════════════════════════════════════ */
+
+// ── Config — must match index.html ──
+const GAS_URL = 'https://google-sheets-script.thomaslancheros06.workers.dev';
+
+// ── Helpers ──
+function show(id) {
+  document.querySelectorAll('.state').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+
+function setText(id, val) {
+  var el = document.getElementById(id);
+  if (el && val) el.textContent = val;
+}
+
+// ── Main ──
+(async function init() {
   const params = new URLSearchParams(window.location.search);
-  const apptId    = params.get('appt')       || '';
-  const sessionId = params.get('session_id') || '';
+  const sessionId   = params.get('session_id') || '';
+  const appointmentId = params.get('appt') || '';
 
-  // Show reference box if we have an appt ID
-  if (apptId) {
-    const box = document.getElementById('refBox');
-    const val = document.getElementById('refValue');
-    box.style.display = 'block';
-    val.textContent = apptId;
+  // If no session_id, Stripe didn't redirect us properly
+  if (!sessionId && !appointmentId) {
+    show('stateError');
+    document.getElementById('errorMsg').textContent =
+      'No payment session found. If you completed a payment, please contact us with your confirmation email.';
+    return;
   }
 
-  // ── Confetti ──
-  const colors = ['#1a5c3a','#2d7a52','#a7d7bc','#f59e0b','#fbbf24','#34d399'];
-  const shapes = ['2px','4px','6px'];
-  const wrap   = document.getElementById('confettiWrap');
-
-  for (let i = 0; i < 22; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'confetti-dot';
-    const size = shapes[Math.floor(Math.random() * shapes.length)];
-    Object.assign(dot.style, {
-      left:             (Math.random() * 280 - 40) + 'px',
-      top:              '0px',
-      width:            size,
-      height:           size,
-      background:       colors[Math.floor(Math.random() * colors.length)],
-      borderRadius:     Math.random() > .5 ? '50%' : '2px',
-      animationDelay:   (Math.random() * .6 + .3) + 's',
-      animationDuration:(Math.random() * .6 + .7) + 's',
-    });
-    wrap.appendChild(dot);
-  }
-
-  // ── Optional: update GAS appointment status to "Confirmed" ──
-  if (apptId) {
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbwdc0kUUjwkFqOpCud_W55MP-DVTzd8m0g8b5wiFJEzbnSVR-GyuFdhtPRPNTCiDbwMlw/exec';
-    fetch(GAS_URL, {
+  try {
+    // Tell GAS the deposit is paid — it handles everything server-side
+    const res = await fetch(GAS_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action:        'updateAppointmentStatus',
-        appointmentId: apptId,
+        appointmentId: appointmentId,
         status:        'Confirmed',
         depositPaid:   true,
         stripeSession: sessionId,
       })
-    }).catch(function() { /* silent — status update is best-effort */ });
+    });
+
+    const result = await res.json();
+
+    if (result && result.success) {
+      // ── Populate appointment details if GAS returned them ──
+      // (GAS echos back what it found in the sheet)
+      const data = result.appointment || {};
+
+      // Try to fill in any fields GAS returned
+      if (data.service || data.Service) setText('dService', data.service || data.Service);
+      if (data.date    || data.Date)    setText('dDate',    data.date    || data.Date);
+      if (data.time    || data.Time)    setText('dTime',    data.time    || data.Time);
+      if (data.name    || data.Name)    setText('dName',    data.name    || data.Name);
+      if (data.email   || data.Email)   setText('dEmail',   data.email   || data.Email);
+      if (appointmentId) { setText('dRef', appointmentId); }
+
+      // Show the details block if we have at least a service or date
+      if (data.service || data.Service || data.date || data.Date || appointmentId) {
+        document.getElementById('apptDetails').style.display = 'block';
+      }
+
+      show('stateSuccess');
+
+    } else {
+      // GAS returned an error — but the payment DID go through on Stripe's end.
+      // Show success anyway (Stripe is the source of truth for money).
+      console.warn('GAS returned error:', result);
+      if (appointmentId) {
+        document.getElementById('apptDetails').style.display = 'block';
+        setText('dRef', appointmentId);
+      }
+      show('stateSuccess');
+    }
+
+  } catch (err) {
+    // Network error talking to GAS — still show success if we have a session_id,
+    // because Stripe already confirmed the payment.
+    console.error('GAS call failed:', err);
+    if (sessionId) {
+      // Payment succeeded but GAS unreachable — show success with warning note
+      if (appointmentId) {
+        document.getElementById('apptDetails').style.display = 'block';
+        setText('dRef', appointmentId);
+      }
+      document.querySelector('#stateSuccess .subtitle').textContent =
+        'Your $100 deposit was received. Your appointment is confirmed. (Our system is syncing — you may receive your confirmation email shortly.)';
+      show('stateSuccess');
+    } else {
+      show('stateError');
+      document.getElementById('errorMsg').textContent =
+        'We couldn\'t reach our booking system. If your card was charged, please contact us — your appointment IS confirmed.';
+    }
   }
 })();
 </script>
