@@ -467,7 +467,7 @@
 <div id="modalContainer"></div>
 
 <script>
-var GAS_URL=localStorage.getItem('flowpipe_gas_url')||'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+var GAS_URL=localStorage.getItem('flowpipe_gas_url')||'https://script.google.com/macros/s/AKfycbwdc0kUUjwkFqOpCud_W55MP-DVTzd8m0g8b5wiFJEzbnSVR-GyuFdhtPRPNTCiDbwMlw/exec';
 var appointments=[],quotes=[],contacts=[],clients=[];
 var currentPage='dashboard',searchQuery='';
 var activeFilters={appointments:'All',quotes:'All',contacts:'All'};
@@ -910,7 +910,7 @@ document.addEventListener('DOMContentLoaded',function(){
     }
   }).catch(function(){});
   // Stripe Worker URL setting
-  var STRIPE_WORKER_URL=localStorage.getItem('flowpipe_stripe_worker')||'';
+  var STRIPE_WORKER_URL=localStorage.getItem('flowpipe_stripe_worker')||'https://morning-forest-5c80.thomaslancheros06.workers.dev';
   if(STRIPE_WORKER_URL)document.getElementById('settingsStripeWorkerUrl').value=STRIPE_WORKER_URL;
   document.getElementById('btnSaveStripeWorkerUrl').addEventListener('click',function(){
     var u=document.getElementById('settingsStripeWorkerUrl').value.trim();
@@ -1059,7 +1059,7 @@ document.addEventListener('DOMContentLoaded',function(){
     if(!amount||amount<0.5){showToast('Enter a valid amount','error');return}
     if(!description&&!clientName){showToast('Add a client name or description','error');return}
 
-    var stripeUrl=localStorage.getItem('flowpipe_stripe_worker')||'';
+    var stripeUrl=localStorage.getItem('flowpipe_stripe_worker')||'https://morning-forest-5c80.thomaslancheros06.workers.dev';
     if(!stripeUrl||stripeUrl.indexOf('YOUR_')===0){
       // Offline fallback — just log locally with a pending status
       showToast('Stripe not configured — logging as pending invoice','info');
@@ -1081,15 +1081,13 @@ document.addEventListener('DOMContentLoaded',function(){
       body:JSON.stringify({amount:amount,description:description||('Invoice for '+clientName),customerName:clientName,customerEmail:clientEmail,jobId:jobId})
     }).then(function(r){return r.json()}).then(function(r){
       btn.textContent='Generate Payment Link →';btn.disabled=false;
+      console.log('Invoice response:', JSON.stringify(r, null, 2));
       if(r&&r.url){
-        // Show result panel
         document.getElementById('invoiceResult').style.display='block';
         document.getElementById('invResultAmount').textContent='$'+fmt$(amount);
         document.getElementById('invResultUrl').value=r.url;
         document.getElementById('invQrCode').src=r.qrUrl;
         if(clientEmail)document.getElementById('btnSendInvoiceEmail').style.display='inline-flex';
-
-        // Save to transaction log
         addTransaction({
           type:'invoice',status:'pending',amount:amount,
           clientName:clientName,clientEmail:clientEmail,
@@ -1100,10 +1098,13 @@ document.addEventListener('DOMContentLoaded',function(){
         });
         showToast('Invoice created! Share the link or QR code.');
       } else {
-        showToast('Stripe error: '+(r&&r.error||'Unknown'),'error');
+        var errMsg=r&&r.error?r.error:'Unknown error';
+        console.error('Invoice error full response:', JSON.stringify(r, null, 2));
+        showToast('Stripe error: '+errMsg,'error');
       }
     }).catch(function(e){
       btn.textContent='Generate Payment Link →';btn.disabled=false;
+      console.error('Invoice fetch failed:',e);
       showToast('Request failed: '+e.message,'error');
     });
   });
