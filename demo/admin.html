@@ -346,7 +346,7 @@
 <div id="modalContainer"></div>
 
 <script>
-var GAS_URL=localStorage.getItem('flowpipe_gas_url')||'https://script.google.com/macros/s/AKfycbwdc0kUUjwkFqOpCud_W55MP-DVTzd8m0g8b5wiFJEzbnSVR-GyuFdhtPRPNTCiDbwMlw/exec';
+var GAS_URL=localStorage.getItem('flowpipe_gas_url')||'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
 var appointments=[],quotes=[],contacts=[],clients=[];
 var currentPage='dashboard',searchQuery='';
 var activeFilters={appointments:'All',quotes:'All',contacts:'All'};
@@ -731,7 +731,7 @@ document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('btnRefreshEmail').addEventListener('click',loadEmails);
   document.getElementById('btnBackToList').addEventListener('click',function(){document.getElementById('emailDetailPanel').style.display='none'});
   document.getElementById('btnSaveEmailAliases').addEventListener('click',saveEmailAliases);
-  document.getElementById('btnSaveEmailWorkerUrl').addEventListener('click',function(){var u=document.getElementById('settingsEmailWorkerUrl').value.trim();if(!u){showToast('Enter a Worker URL','error');return}localStorage.setItem('flowpipe_email_worker_url',u);EMAIL_WORKER_URL=u;showToast('Email Worker URL saved')});
+  // Old Worker URL listener removed — new one below syncs to Config sheet too
   // Load saved worker URL
   var savedWorkerUrl=localStorage.getItem('flowpipe_email_worker_url');if(savedWorkerUrl)document.getElementById('settingsEmailWorkerUrl').value=savedWorkerUrl;
   // Email tabs
@@ -742,13 +742,40 @@ document.addEventListener('DOMContentLoaded',function(){
     var cid=document.getElementById('settingsCalendarId').value.trim()||'primary';
     postGAS({action:'saveConfig',config:{calendarId:cid}}).then(function(){showToast('Calendar ID saved: '+cid)}).catch(function(){showToast('Failed to save — check connection','error')});
   });
-  // Auto-reply noreply email
+  // Auto-reply noreply email — always saves BOTH workerUrl and noreply together
   document.getElementById('btnSaveAutoReply').addEventListener('click',function(){
     var nr=document.getElementById('settingsNoreplyEmail').value.trim();
     var workerUrl=document.getElementById('settingsEmailWorkerUrl').value.trim();
-    var config={noreplyEmail:nr};
-    if(workerUrl)config.emailWorkerUrl=workerUrl;
-    postGAS({action:'saveConfig',config:config}).then(function(){showToast('Auto-reply settings saved')}).catch(function(){showToast('Failed to save — check connection','error')});
+    if(!nr){showToast('Enter a noreply email address','error');return}
+    if(!workerUrl){showToast('Set your Email Worker URL first (below)','error');return}
+    var config={noreplyEmail:nr,emailWorkerUrl:workerUrl};
+    postGAS({action:'saveConfig',config:config}).then(function(r){
+      if(r&&r.success){
+        // Verify it saved by reading back
+        fetchGAS('getConfig').then(function(cfg){
+          if(cfg&&cfg.noreplyEmail===nr&&cfg.emailWorkerUrl===workerUrl){
+            showToast('Auto-reply settings saved & verified ✓');
+          }else{
+            showToast('Saved but verification failed — check Config sheet manually','error');
+            console.warn('Config readback:',cfg);
+          }
+        });
+      }else{
+        showToast('Failed: '+(r&&r.error||'unknown'),'error');
+      }
+    }).catch(function(){showToast('Failed to save — check connection','error')});
+  });
+  // Also make the Email Worker URL save button write to Config sheet too
+  document.getElementById('btnSaveEmailWorkerUrl').addEventListener('click',function(){
+    var u=document.getElementById('settingsEmailWorkerUrl').value.trim();
+    if(!u){showToast('Enter a Worker URL','error');return}
+    localStorage.setItem('flowpipe_email_worker_url',u);EMAIL_WORKER_URL=u;
+    // Also save to Config sheet so auto-replies can use it
+    postGAS({action:'saveConfig',config:{emailWorkerUrl:u}}).then(function(){
+      showToast('Email Worker URL saved (local + Config sheet)');
+    }).catch(function(){
+      showToast('Saved locally but Config sheet sync failed','error');
+    });
   });
   // Load config from GAS to populate new fields
   fetchGAS('getConfig').then(function(cfg){
