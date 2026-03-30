@@ -920,12 +920,56 @@ document.addEventListener('DOMContentLoaded',function(){
   });
 
   // ══════════════════════════════════════════════════════
-  //  REVENUE PAGE
+  //  REVENUE PAGE — backed by Google Sheets (Revenue tab)
   // ══════════════════════════════════════════════════════
-  var revTransactions = JSON.parse(localStorage.getItem('flowpipe_transactions')||'[]');
-  var revTabFilter = 'all';
+  var revTransactions = [];   // loaded from GAS
+  var revTabFilter    = 'all';
+  var revLoading      = false;
 
-  function saveTx(){ localStorage.setItem('flowpipe_transactions', JSON.stringify(revTransactions)); }
+  // ── GAS helpers ──
+  function gasGet(action, extra){
+    var qs = '?action='+action+(extra||'');
+    return fetch(GAS_URL+qs).then(function(r){return r.json()});
+  }
+  function gasPost(payload){
+    return fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).then(function(r){return r.json()});
+  }
+
+  /** Load all Revenue rows from GAS then re-render */
+  function loadRevenue(){
+    if(revLoading)return;
+    revLoading=true;
+    document.getElementById('revTxCount').textContent='Loading…';
+    gasGet('getRevenue').then(function(rows){
+      revLoading=false;
+      // Normalise column names to camelCase for consistency
+      revTransactions = (rows||[]).map(function(r){
+        return {
+          id:            r.ID            || r.id            || '',
+          timestamp:     r.Timestamp     || r.timestamp     || '',
+          type:          (r.Type         || r.type          || 'invoice').toLowerCase(),
+          status:        (r.Status       || r.status        || 'pending').toLowerCase(),
+          amount:        parseFloat(r.Amount || r.amount)   || 0,
+          clientName:    r.ClientName    || r.clientName    || '',
+          clientEmail:   r.ClientEmail   || r.clientEmail   || '',
+          description:   r.Description  || r.description   || '',
+          jobId:         r.JobId        || r.jobId         || '',
+          appointmentId: r.AppointmentId|| r.appointmentId || '',
+          stripeId:      r.StripeId     || r.stripeId      || '',
+          paymentUrl:    r.PaymentUrl   || r.paymentUrl    || '',
+          paidAt:        r.PaidAt       || r.paidAt        || '',
+          notes:         r.Notes        || r.notes         || '',
+          // date shorthand for chart/summary (use paidAt or timestamp)
+          date:          (r.PaidAt||r.paidAt||r.Timestamp||r.timestamp||'').slice(0,10),
+        };
+      });
+      renderRevenue();
+    }).catch(function(e){
+      revLoading=false;
+      showToast('Revenue load failed: '+e.message,'error');
+      document.getElementById('revTxCount').textContent='Error';
+    });
+  }
 
   function renderRevenue(){
     renderRevStats();
@@ -952,7 +996,7 @@ document.addEventListener('DOMContentLoaded',function(){
   function renderRevMonthlySummary(){
     var now=new Date(); var mo=now.getMonth(); var yr=now.getFullYear();
     var thisMonth=revTransactions.filter(function(t){
-      var d=new Date(t.date); return d.getMonth()===mo&&d.getFullYear()===yr&&t.status==='paid';
+      var d=new Date(t.paidAt||t.timestamp||t.date); return d.getMonth()===mo&&d.getFullYear()===yr&&t.status==='paid';
     });
     var deps=thisMonth.filter(function(t){return t.type==='deposit'});
     var invs=thisMonth.filter(function(t){return t.type==='invoice'});
@@ -976,20 +1020,21 @@ document.addEventListener('DOMContentLoaded',function(){
 
   function renderRevChart(){
     var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var now=new Date(); var data=[];
+    var now=new Date(); var chartData=[];
     for(var i=5;i>=0;i--){
       var d=new Date(now.getFullYear(),now.getMonth()-i,1);
       var mo=d.getMonth(); var yr=d.getFullYear();
       var total=revTransactions.filter(function(t){
-        var td=new Date(t.date); return td.getMonth()===mo&&td.getFullYear()===yr&&t.status==='paid';
+        var td=new Date(t.paidAt||t.timestamp||t.date);
+        return td.getMonth()===mo&&td.getFullYear()===yr&&t.status==='paid';
       }).reduce(function(s,t){return s+t.amount},0);
-      data.push({label:months[mo],total:total});
+      chartData.push({label:months[mo],total:total});
     }
-    var max=Math.max.apply(null,data.map(function(d){return d.total}))||1;
-    document.getElementById('revChart').innerHTML=data.map(function(d){
+    var max=Math.max.apply(null,chartData.map(function(d){return d.total}))||1;
+    document.getElementById('revChart').innerHTML=chartData.map(function(d){
       var h=Math.max(4,Math.round((d.total/max)*130));
       return '<div class="chart-bar-group">'
-        +'<div class="chart-bar-value" style="font-size:10px;">'+( d.total?'$'+Math.round(d.total):'—')+'</div>'
+        +'<div class="chart-bar-value" style="font-size:10px;">'+(d.total?'$'+Math.round(d.total):'—')+'</div>'
         +'<div class="chart-bar" style="width:100%;height:'+h+'px;background:var(--accent);opacity:'+(d.total?1:.15)+';"></div>'
         +'<div class="chart-bar-label">'+d.label+'</div>'
         +'</div>';
@@ -1002,20 +1047,23 @@ document.addEventListener('DOMContentLoaded',function(){
     if(revTabFilter==='invoice') filtered=filtered.filter(function(t){return t.type==='invoice'});
     if(revTabFilter==='pending') filtered=filtered.filter(function(t){return t.status==='pending'});
     document.getElementById('revTxCount').textContent=filtered.length+' transaction'+(filtered.length!==1?'s':'');
-    if(!filtered.length){document.getElementById('revTransactionTable').innerHTML='<div class="empty-state"><div class="empty-state-icon">🧾</div><div class="empty-state-text">No transactions yet. Create an invoice or a deposit to get started.</div></div>';return}
-    var rows=filtered.map(function(t,i){
-      var si=revTransactions.length-1-revTransactions.slice().reverse().indexOf(t); // actual index
+    if(!filtered.length){
+      document.getElementById('revTransactionTable').innerHTML='<div class="empty-state"><div class="empty-state-icon">🧾</div><div class="empty-state-text">No transactions yet. Create an invoice or a deposit to get started.</div></div>';
+      return;
+    }
+    var rows=filtered.map(function(t){
+      var dateDisplay=(t.paidAt||t.timestamp||t.date||'').slice(0,10);
       var badgeColor=t.status==='paid'?'#d1fae5;color:#065f46':t.status==='pending'?'var(--amber-light);color:#92400e':'var(--red-light);color:#991b1b';
       return '<tr>'
-        +'<td style="font-size:11px;color:var(--text-muted);">'+esc(t.date||'')+'</td>'
+        +'<td style="font-size:11px;color:var(--text-muted);">'+esc(dateDisplay)+'</td>'
         +'<td><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;background:'+(t.type==='deposit'?'var(--blue-light);color:#1e40af':'var(--purple-light);color:#5b21b6')+'">'+(t.type==='deposit'?'Deposit':'Invoice')+'</span></td>'
         +'<td class="name-cell">'+esc(t.clientName||'—')+'<div class="meta-cell">'+esc(t.description||'')+'</div></td>'
         +'<td style="font-weight:700;font-size:14px;color:var(--accent);">$'+fmt$(t.amount)+'</td>'
         +'<td><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:5px;background:'+badgeColor+'">'+capitalize(t.status||'pending')+'</span></td>'
         +'<td><div class="row-actions">'
-          +(t.status==='pending'?'<button class="row-btn row-btn-convert" onclick="markTxPaid('+si+')">Mark Paid</button>':'')
+          +(t.status==='pending'?'<button class="row-btn row-btn-convert" onclick="markTxPaid(\''+esc(t.id)+'\')">Mark Paid</button>':'')
           +(t.paymentUrl?'<button class="row-btn" onclick="window.open(\''+esc(t.paymentUrl)+'\',\'_blank\')">Link ↗</button>':'')
-          +'<button class="row-btn row-btn-del" onclick="deleteTx('+si+')">✕</button>'
+          +'<button class="row-btn row-btn-del" onclick="deleteTx(\''+esc(t.id)+'\')">✕</button>'
         +'</div></td>'
         +'</tr>';
     }).join('');
@@ -1024,18 +1072,19 @@ document.addEventListener('DOMContentLoaded',function(){
 
   function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
 
-  function markTxPaid(idx){
-    if(!revTransactions[idx])return;
-    revTransactions[idx].status='paid';
-    revTransactions[idx].paidAt=new Date().toISOString();
-    saveTx(); renderRevenue();
-    showToast('Marked as paid ✓');
+  function markTxPaid(id){
+    gasPost({action:'updateRevenue',id:id,status:'paid',paidAt:new Date().toISOString()}).then(function(r){
+      if(r&&r.success){showToast('Marked as paid ✓');loadRevenue();}
+      else showToast('Update failed: '+(r&&r.error||'unknown'),'error');
+    }).catch(function(e){showToast('Request failed: '+e.message,'error');});
   }
-  function deleteTx(idx){
-    if(!confirm('Delete this transaction?'))return;
-    revTransactions.splice(idx,1);
-    saveTx(); renderRevenue();
-    showToast('Deleted','error');
+
+  function deleteTx(id){
+    if(!confirm('Delete this transaction? This cannot be undone.'))return;
+    gasPost({action:'deleteRevenue',id:id}).then(function(r){
+      if(r&&r.success){showToast('Deleted','error');loadRevenue();}
+      else showToast('Delete failed: '+(r&&r.error||'unknown'),'error');
+    }).catch(function(e){showToast('Request failed: '+e.message,'error');});
   }
 
   // ── Filter pills ──
@@ -1047,6 +1096,16 @@ document.addEventListener('DOMContentLoaded',function(){
       renderRevTable();
     });
   });
+
+  /** Save a new transaction to GAS then reload */
+  function addTransaction(tx){
+    tx.action='addRevenue';
+    tx.timestamp=tx.timestamp||new Date().toISOString();
+    gasPost(tx).then(function(r){
+      if(r&&r.success){ loadRevenue(); }
+      else showToast('Save failed: '+(r&&r.error||'unknown'),'error');
+    }).catch(function(e){showToast('Save failed: '+e.message,'error');});
+  }
 
   // ── Invoice Creator ──
   document.getElementById('btnCreateInvoice').addEventListener('click',function(){
@@ -1061,13 +1120,11 @@ document.addEventListener('DOMContentLoaded',function(){
 
     var stripeUrl=localStorage.getItem('flowpipe_stripe_worker')||'https://morning-forest-5c80.thomaslancheros06.workers.dev';
     if(!stripeUrl||stripeUrl.indexOf('YOUR_')===0){
-      // Offline fallback — just log locally with a pending status
       showToast('Stripe not configured — logging as pending invoice','info');
       addTransaction({
         type:'invoice',status:'pending',amount:amount,
         clientName:clientName,clientEmail:clientEmail,
         description:description||'Job Invoice',jobId:jobId,
-        date:new Date().toISOString().slice(0,10),
       });
       return;
     }
@@ -1092,9 +1149,8 @@ document.addEventListener('DOMContentLoaded',function(){
           type:'invoice',status:'pending',amount:amount,
           clientName:clientName,clientEmail:clientEmail,
           description:description||'Job Invoice',jobId:jobId,
-          paymentUrl:r.url,qrUrl:r.qrUrl,
-          date:new Date().toISOString().slice(0,10),
-          stripeId:r.linkId,
+          paymentUrl:r.url,
+          stripeId:r.linkId||'',
         });
         showToast('Invoice created! Share the link or QR code.');
       } else {
@@ -1135,7 +1191,7 @@ document.addEventListener('DOMContentLoaded',function(){
     var emailWorker=localStorage.getItem('flowpipe_email_worker_url')||'';
     if(!emailWorker){showToast('Configure Email Worker URL in Settings first','error');return}
     if(!clientEmail){showToast('No client email entered','error');return}
-    var body='Hi '+( clientName||'there')+',\n\nYour FlowPipe plumbing invoice of $'+parseFloat(amount).toFixed(2)+' is ready.\n'+(description?'Service: '+description+'\n':'')
+    var body='Hi '+(clientName||'there')+',\n\nYour FlowPipe plumbing invoice of $'+parseFloat(amount).toFixed(2)+' is ready.\n'+(description?'Service: '+description+'\n':'')
       +'\nPay securely online:\n'+url+'\n\nThank you for choosing FlowPipe Plumbing!\n\n— FlowPipe Team';
     fetch(emailWorker,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       from:'FlowPipe Plumbing <info@flowpipe.fit>',to:clientEmail,
@@ -1146,7 +1202,7 @@ document.addEventListener('DOMContentLoaded',function(){
     }).catch(function(){showToast('Email request failed','error')});
   });
 
-  // Manual transaction
+  // Manual transaction (modal-style prompts → GAS)
   document.getElementById('btnAddManualTx').addEventListener('click',function(){
     var amount=parseFloat(prompt('Amount ($):'));
     if(!amount||isNaN(amount)){return}
@@ -1154,38 +1210,13 @@ document.addEventListener('DOMContentLoaded',function(){
     var description=prompt('Description:')||'Manual transaction';
     var type=prompt('Type (deposit/invoice):','invoice')||'invoice';
     var status=prompt('Status (paid/pending):','paid')||'paid';
-    addTransaction({type:type,status:status,amount:amount,clientName:clientName,description:description,date:new Date().toISOString().slice(0,10)});
-    showToast('Transaction added ✓');
+    addTransaction({type:type,status:status,amount:amount,clientName:clientName,description:description});
+    showToast('Saving…','info');
   });
 
-  function addTransaction(tx){
-    revTransactions.push(tx);
-    saveTx();
-    renderRevenue();
-  }
-
-  // Seed with deposit data from appointments that have "Pending Payment" or "Confirmed" status
-  function syncDepositsFromAppointments(){
-    appointments.forEach(function(a){
-      if(!a.appointmentId)return;
-      var exists=revTransactions.some(function(t){return t.appointmentId===a.appointmentId&&t.type==='deposit'});
-      if(!exists&&(a.Status==='Confirmed'||a.Status==='Completed')){
-        revTransactions.push({
-          type:'deposit',status:'paid',amount:100,
-          clientName:a.Name||'',clientEmail:a.Email||'',
-          description:'Booking deposit — '+( a.Service||''),
-          appointmentId:a.appointmentId||'',
-          date:a.Timestamp?a.Timestamp.slice(0,10):new Date().toISOString().slice(0,10),
-        });
-      }
-    });
-    saveTx();
-  }
-
-  // Render revenue when tab is opened
+  // Render revenue when tab is opened — always fresh from GAS
   document.querySelector('[data-page="revenue"]').addEventListener('click',function(){
-    syncDepositsFromAppointments();
-    renderRevenue();
+    loadRevenue();
   });
 
 });
