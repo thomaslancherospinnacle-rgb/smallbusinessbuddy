@@ -321,6 +321,18 @@
           <div class="settings-card"><h4>🏢 Business Info</h4><p>Your business details (stored locally).</p><input class="settings-input" id="settingsBizName" placeholder="Business Name"><input class="settings-input" id="settingsBizPhone" placeholder="(555) 123-4567"><input class="settings-input" id="settingsBizEmail" placeholder="info@yourbiz.com"></div>
           <div class="settings-card"><h4>📋 Services List</h4><p>One per line. Populates dropdowns everywhere.</p><textarea class="settings-input settings-textarea" id="settingsServices"></textarea><button class="header-btn" style="margin-top:6px" id="btnSaveServices">Update Services</button></div>
           <div class="settings-card"><h4>📊 Data Export</h4><p>Download your data as CSV files.</p><button class="header-btn" style="margin-bottom:6px;width:100%" id="btnExportAll">⤓ Export All Data</button><button class="header-btn" style="width:100%" id="btnExportClients">⤓ Export Clients Only</button></div>
+          <div class="settings-card"><h4>📅 Google Calendar</h4><p>Appointments auto-create calendar events. Time slots show real availability.</p>
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Calendar ID</label>
+            <input class="settings-input" id="settingsCalendarId" placeholder="primary (or your-email@gmail.com)" style="margin-bottom:4px">
+            <button class="header-btn" style="margin-top:4px" id="btnSaveCalendarId">Save to Config</button>
+            <p style="margin-top:10px;font-size:11px;color:var(--text-muted);line-height:1.6"><strong>How it works:</strong><br>• New bookings → auto-create Google Calendar event<br>• Time picker → checks calendar for conflicts (live availability)<br>• Cancel/edit appointment → updates/deletes calendar event<br>• Set reminders: 1hr + 15min before each appointment<br><br><strong>Find your Calendar ID:</strong> Google Calendar → Settings → [your calendar] → "Integrate calendar" → Calendar ID. Use "primary" for your main calendar.</p>
+          </div>
+          <div class="settings-card"><h4>📬 Auto-Reply Emails</h4><p>Sends confirmation emails when customers submit forms.</p>
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Noreply Email Address</label>
+            <input class="settings-input" id="settingsNoreplyEmail" placeholder="noreply@yourdomain.com" style="margin-bottom:8px">
+            <button class="header-btn" style="margin-top:4px" id="btnSaveAutoReply">Save to Config</button>
+            <p style="margin-top:10px;font-size:11px;color:var(--text-muted);line-height:1.6"><strong>Auto-replies are sent for:</strong><br>• Appointment bookings (with date/time/service details)<br>• Quote requests (confirmation + ETA)<br>• Contact form inquiries<br>• Homepage inquiry widget submissions<br><br>Uses your Email Worker URL (set below). If no Worker URL is set, falls back to GmailApp.<br>Business name & phone pulled from Config sheet.</p>
+          </div>
           <div class="settings-card" style="grid-column:1/-1"><h4>📧 Email Configuration</h4><p>Sends via Cloudflare Worker + Resend. Inbox reads from Gmail via GAS.</p>
             <div style="margin-bottom:14px"><label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Email Worker URL</label><input class="settings-input" id="settingsEmailWorkerUrl" placeholder="https://your-email-worker.yourname.workers.dev" style="margin-bottom:2px"><button class="header-btn" style="margin-top:4px" id="btnSaveEmailWorkerUrl">Save Worker URL</button></div>
             <div><label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Send-As Aliases (one per line)</label><textarea class="settings-input settings-textarea" id="settingsEmailAliases" placeholder="Support|support@yourbiz.com&#10;info@yourbiz.com&#10;Sales|sales@yourbiz.com"></textarea><button class="header-btn" style="margin-top:4px" id="btnSaveEmailAliases">Save Aliases</button></div>
@@ -724,7 +736,31 @@ document.addEventListener('DOMContentLoaded',function(){
   var savedWorkerUrl=localStorage.getItem('flowpipe_email_worker_url');if(savedWorkerUrl)document.getElementById('settingsEmailWorkerUrl').value=savedWorkerUrl;
   // Email tabs
   var etabs=document.querySelectorAll('.email-tab');for(var et=0;et<etabs.length;et++)(function(tab){tab.addEventListener('click',function(){emailView=tab.getAttribute('data-etab');for(var x=0;x<etabs.length;x++)etabs[x].classList.remove('active');tab.classList.add('active');loadEmails()})})(etabs[et]);
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()})
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
+  // Calendar ID settings
+  document.getElementById('btnSaveCalendarId').addEventListener('click',function(){
+    var cid=document.getElementById('settingsCalendarId').value.trim()||'primary';
+    postGAS({action:'saveConfig',config:{calendarId:cid}}).then(function(){showToast('Calendar ID saved: '+cid)}).catch(function(){showToast('Failed to save — check connection','error')});
+  });
+  // Auto-reply noreply email
+  document.getElementById('btnSaveAutoReply').addEventListener('click',function(){
+    var nr=document.getElementById('settingsNoreplyEmail').value.trim();
+    var workerUrl=document.getElementById('settingsEmailWorkerUrl').value.trim();
+    var config={noreplyEmail:nr};
+    if(workerUrl)config.emailWorkerUrl=workerUrl;
+    postGAS({action:'saveConfig',config:config}).then(function(){showToast('Auto-reply settings saved')}).catch(function(){showToast('Failed to save — check connection','error')});
+  });
+  // Load config from GAS to populate new fields
+  fetchGAS('getConfig').then(function(cfg){
+    if(cfg&&!cfg.error){
+      if(cfg.calendarId)document.getElementById('settingsCalendarId').value=cfg.calendarId;
+      if(cfg.noreplyEmail)document.getElementById('settingsNoreplyEmail').value=cfg.noreplyEmail;
+      if(cfg.emailWorkerUrl&&!document.getElementById('settingsEmailWorkerUrl').value)document.getElementById('settingsEmailWorkerUrl').value=cfg.emailWorkerUrl;
+      if(cfg.businessName)document.getElementById('settingsBizName').value=cfg.businessName;
+      if(cfg.businessPhone)document.getElementById('settingsBizPhone').value=cfg.businessPhone;
+      if(cfg.businessEmail)document.getElementById('settingsBizEmail').value=cfg.businessEmail;
+    }
+  }).catch(function(){});
 });
 </script>
 </body>
