@@ -556,7 +556,7 @@ input, textarea, select { font-family: inherit; }
 /* ═══════════════════════════════════════
    CONFIG
    ═══════════════════════════════════════ */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwb3dOMmZOpFTJXxx_1z-LDwa-ZeBZcda66MYPwYX2_944iIaUOHHW3w8ANfIdI3o-y/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyfonCxbp0jzeSSrVvrp9jaiudyavey08NqXce_AxoegkhS3rQI-cXh1m9i04O_IVnB/exec';
 
 const SERVICES = [
   { id:'s1', name:'Emergency Repair', icon:'🔧', price:'From $89', desc:'24/7 emergency plumbing repairs for burst pipes, major leaks, and flooding.', duration:60 },
@@ -766,13 +766,18 @@ async function submitInquiry() {
   const btn = document.getElementById('btnSubmitInquiry');
   setLoading(btn, true);
   try {
-    await postToGAS({
+    const result = await postToGAS({
       action: 'inquiry',
       type: inquiryType,
       name, email, phone, message,
       service: inquiryType === 'quote' ? document.getElementById('iqService').value : '',
       timestamp: new Date().toISOString()
     });
+    console.log('Inquiry GAS response:', result);
+    if (result && result.email) {
+      console.log('Auto-reply email status:', result.email);
+      if (!result.email.sent) console.warn('Email not sent:', result.email);
+    }
     const msgs = {
       question: 'Question submitted! We\'ll respond within 2 hours.',
       quote: 'Quote request submitted! We\'ll get back to you soon.',
@@ -1114,8 +1119,9 @@ async function submitBooking() {
   setLoading(btn, true);
 
   try {
+    let result;
     if (isQuote) {
-      await postToGAS({
+      result = await postToGAS({
         action: 'quote',
         name, email, phone,
         desc: document.getElementById('bkNotes').value.trim(),
@@ -1127,7 +1133,7 @@ async function submitBooking() {
       document.getElementById('confirmTitle').textContent = 'Quote Request Sent!';
       document.getElementById('confirmDesc').textContent = 'We\'ve received your request and will get back to you within 2 hours with a free estimate.';
     } else {
-      await postToGAS({
+      result = await postToGAS({
         action: 'appointment',
         name, email, phone,
         address: document.getElementById('bkAddress').value.trim(),
@@ -1147,7 +1153,19 @@ async function submitBooking() {
       }
     }
 
-    document.getElementById('confirmEmail').textContent = 'A confirmation email has been sent to ' + email;
+    // Log email status for debugging
+    console.log('GAS response:', result);
+    if (result && result.email) {
+      console.log('Auto-reply email status:', result.email);
+      if (result.email.sent) {
+        document.getElementById('confirmEmail').textContent = 'A confirmation email has been sent to ' + email;
+      } else {
+        document.getElementById('confirmEmail').textContent = 'We were unable to send a confirmation email. (Reason: ' + (result.email.reason || 'unknown') + ')';
+        console.warn('Email not sent:', result.email);
+      }
+    } else {
+      document.getElementById('confirmEmail').textContent = '';
+    }
 
     ['bookingStep1','bookingStep2','bookingStep3'].forEach(id => { document.getElementById(id).style.display = 'none'; });
     document.getElementById('bookingSteps').style.display = 'none';
