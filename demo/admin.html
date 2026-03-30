@@ -321,7 +321,10 @@
           <div class="settings-card"><h4>🏢 Business Info</h4><p>Your business details (stored locally).</p><input class="settings-input" id="settingsBizName" placeholder="Business Name"><input class="settings-input" id="settingsBizPhone" placeholder="(555) 123-4567"><input class="settings-input" id="settingsBizEmail" placeholder="info@yourbiz.com"></div>
           <div class="settings-card"><h4>📋 Services List</h4><p>One per line. Populates dropdowns everywhere.</p><textarea class="settings-input settings-textarea" id="settingsServices"></textarea><button class="header-btn" style="margin-top:6px" id="btnSaveServices">Update Services</button></div>
           <div class="settings-card"><h4>📊 Data Export</h4><p>Download your data as CSV files.</p><button class="header-btn" style="margin-bottom:6px;width:100%" id="btnExportAll">⤓ Export All Data</button><button class="header-btn" style="width:100%" id="btnExportClients">⤓ Export Clients Only</button></div>
-          <div class="settings-card" style="grid-column:1/-1"><h4>📧 Email Configuration</h4><p>Add your "Send As" email addresses below — one per line. You can use <code>Label|email@domain.com</code> or just <code>email@domain.com</code> by itself.</p><textarea class="settings-input settings-textarea" id="settingsEmailAliases" placeholder="Support|support@yourbiz.com&#10;info@yourbiz.com&#10;Sales|sales@yourbiz.com"></textarea><button class="header-btn" style="margin-top:6px" id="btnSaveEmailAliases">Save Email Aliases</button><p style="margin-top:10px;font-size:11px;color:var(--text-muted);line-height:1.5"><strong>Setup:</strong> 1) Add domain MX records → ImprovMX (forwards to your Gmail). 2) In Gmail → Settings → Accounts → "Send mail as" → add each alias (SMTP: smtp.gmail.com, your Gmail credentials or app password). 3) GAS sends via <code>GmailApp.sendEmail</code> using the alias. That's it.</p></div>
+          <div class="settings-card" style="grid-column:1/-1"><h4>📧 Email Configuration</h4><p>Sends via Cloudflare Worker + Resend. Inbox reads from Gmail via GAS.</p>
+            <div style="margin-bottom:14px"><label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Email Worker URL</label><input class="settings-input" id="settingsEmailWorkerUrl" placeholder="https://your-email-worker.yourname.workers.dev" style="margin-bottom:2px"><button class="header-btn" style="margin-top:4px" id="btnSaveEmailWorkerUrl">Save Worker URL</button></div>
+            <div><label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Send-As Aliases (one per line)</label><textarea class="settings-input settings-textarea" id="settingsEmailAliases" placeholder="Support|support@yourbiz.com&#10;info@yourbiz.com&#10;Sales|sales@yourbiz.com"></textarea><button class="header-btn" style="margin-top:4px" id="btnSaveEmailAliases">Save Aliases</button></div>
+            <p style="margin-top:12px;font-size:11px;color:var(--text-muted);line-height:1.6"><strong>Setup:</strong><br>1) <strong>Resend:</strong> Add your domain → add DNS records (DKIM/SPF) in Cloudflare → get API key<br>2) <strong>Worker:</strong> Create Cloudflare Worker with email-worker.js → add env var RESEND_API_KEY → deploy → paste URL above<br>3) <strong>ImprovMX:</strong> Add domain → set MX records in Cloudflare → forward *@domain → your Gmail<br>4) <strong>Aliases:</strong> Add your from-addresses above (must match verified Resend domain)</p></div>
         </div>
       </div>
 
@@ -642,32 +645,45 @@ function openEmailDetail(idx){
   })}
 }
 
+var EMAIL_WORKER_URL=localStorage.getItem('flowpipe_email_worker_url')||'';
+
 function sendEmail(){
-  var from=document.getElementById('emailFrom').value;
+  var fromEmail=document.getElementById('emailFrom').value;
   var to=document.getElementById('emailTo').value.trim();
   var subject=document.getElementById('emailSubject').value.trim();
   var body=document.getElementById('emailBody').value.trim();
   if(!to){showToast('Enter a recipient','error');return}
   if(!subject&&!body){showToast('Enter a subject or message','error');return}
-  if(!from){showToast('Select a "Send As" address (set up in Settings)','error');return}
+  if(!fromEmail){showToast('Select a "Send As" address (set up in Settings)','error');return}
+  if(!EMAIL_WORKER_URL){showToast('Set your Email Worker URL in Settings first','error');return}
+
+  // Find the alias label for the "from" display name
+  var fromLabel='';
+  for(var i=0;i<EMAIL_ALIASES.length;i++){if(EMAIL_ALIASES[i].email===fromEmail){fromLabel=EMAIL_ALIASES[i].label;break}}
+  var fromFormatted=fromLabel?(fromLabel+' <'+fromEmail+'>'):fromEmail;
 
   var btn=document.getElementById('btnSendEmail');
   btn.textContent='Sending...';btn.disabled=true;showLoading(true);
 
-  postGAS({action:'sendEmail',from:from,to:to,subject:subject,body:body}).then(function(r){
+  fetch(EMAIL_WORKER_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({from:fromFormatted,to:to,subject:subject,body:body})
+  }).then(function(r){return r.json()}).then(function(r){
     if(r&&r.success){
       showToast('Email sent!');
       document.getElementById('emailTo').value='';
       document.getElementById('emailSubject').value='';
       document.getElementById('emailBody').value='';
-      // Add to local sent
-      emailSent.unshift({from:from,to:to,subject:subject,body:body,date:new Date().toISOString(),snippet:body.substring(0,100)});
+      emailSent.unshift({from:fromEmail,to:to,subject:subject,body:body,date:new Date().toISOString(),snippet:body.substring(0,100)});
+      // Also log to GAS sheet
+      try{postGAS({action:'sendEmail',from:fromEmail,to:to,subject:subject,body:body})}catch(e){}
     }else{
       showToast('Failed: '+(r&&r.error||'Unknown error'),'error');
     }
     btn.textContent='Send →';btn.disabled=false;showLoading(false);
   }).catch(function(e){
-    showToast('Send failed — check GAS setup','error');
+    showToast('Send failed — check Worker URL in Settings','error');
     console.error(e);
     btn.textContent='Send →';btn.disabled=false;showLoading(false);
   });
@@ -703,6 +719,9 @@ document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('btnRefreshEmail').addEventListener('click',loadEmails);
   document.getElementById('btnBackToList').addEventListener('click',function(){document.getElementById('emailDetailPanel').style.display='none'});
   document.getElementById('btnSaveEmailAliases').addEventListener('click',saveEmailAliases);
+  document.getElementById('btnSaveEmailWorkerUrl').addEventListener('click',function(){var u=document.getElementById('settingsEmailWorkerUrl').value.trim();if(!u){showToast('Enter a Worker URL','error');return}localStorage.setItem('flowpipe_email_worker_url',u);EMAIL_WORKER_URL=u;showToast('Email Worker URL saved')});
+  // Load saved worker URL
+  var savedWorkerUrl=localStorage.getItem('flowpipe_email_worker_url');if(savedWorkerUrl)document.getElementById('settingsEmailWorkerUrl').value=savedWorkerUrl;
   // Email tabs
   var etabs=document.querySelectorAll('.email-tab');for(var et=0;et<etabs.length;et++)(function(tab){tab.addEventListener('click',function(){emailView=tab.getAttribute('data-etab');for(var x=0;x<etabs.length;x++)etabs[x].classList.remove('active');tab.classList.add('active');loadEmails()})})(etabs[et]);
   document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()})
