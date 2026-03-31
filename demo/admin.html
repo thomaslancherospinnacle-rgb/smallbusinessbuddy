@@ -802,6 +802,13 @@ function openEmailDetail(idx){
 
 var EMAIL_WORKER_URL='https://email.thomaslancheros06.workers.dev';
 
+var EMAIL_TEMPLATES = [
+  { label:'Follow-up',    subject:'Following up on your service', body:'Hi,\n\nJust checking in after your recent service with {biz}. We hope everything is working great! If you have any questions or concerns please don\'t hesitate to reach out.\n\nBest,\nThe {biz} Team' },
+  { label:'Review Ask',   subject:'How did we do? Leave us a review', body:'Hi,\n\nThank you for choosing {biz}! We hope your experience was excellent. If you have a moment, we\'d really appreciate a quick review:\n{reviewLink}\n\nThank you!\nThe {biz} Team' },
+  { label:'Appointment',  subject:'Your appointment is confirmed', body:'Hi,\n\nYour appointment with {biz} is confirmed for {date}. Our technician will arrive within the scheduled window.\n\nQuestions? Reply to this email or call us directly.\n\nSee you soon,\nThe {biz} Team' },
+  { label:'Invoice',      subject:'Your invoice from {biz}', body:'Hi,\n\nPlease find your invoice attached. You can pay securely online using the link below.\n\nThank you for your business!\nThe {biz} Team' },
+];
+
 function sendEmail(){
   var fromEmail=document.getElementById('emailFrom').value;
   var to=document.getElementById('emailTo').value.trim();
@@ -874,7 +881,10 @@ document.addEventListener('DOMContentLoaded',function(){
     });
   });
   // Load emails when tab is opened
-  document.querySelector('[data-page="email"]').addEventListener('click', loadEmails);
+  document.querySelector('[data-page="email"]').addEventListener('click', function(){
+    loadEmails();
+    renderEmailTemplates();
+  });
   // Populate From dropdown aliases
   var fromSel = document.getElementById('emailFrom');
   EMAIL_ALIASES.forEach(function(a){
@@ -883,6 +893,7 @@ document.addEventListener('DOMContentLoaded',function(){
     opt.textContent = a.label + ' — ' + a.email;
     fromSel.appendChild(opt);
   });
+  renderEmailTemplates();
 
 
   // ══════════════════════════════════════════════════════
