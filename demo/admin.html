@@ -285,8 +285,6 @@
                 <label>From</label>
                 <select id="emailFrom">
                   <option value="">— select sender —</option>
-                  <option value="office@flowpipe.fit">Office — office@flowpipe.fit</option>
-                  <option value="support@flowpipe.fit">Support — support@flowpipe.fit</option>
                 </select>
               </div>
               <div class="email-compose-row">
@@ -553,7 +551,7 @@
 </div>
 <div id="modalContainer"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 var GAS_URL='https://google-sheets-script.thomaslancheros06.workers.dev';
 var appointments=[],quotes=[],contacts=[],clients=[];
 var currentPage='dashboard',searchQuery='';
@@ -852,8 +850,6 @@ function clearCompose(){
   document.getElementById('emailBody').value='';
 }
 
-/* SETTINGS */
-
 /* INIT */
 document.addEventListener('DOMContentLoaded',function(){
   var sl=document.querySelectorAll('#sidebarNav .sidebar-link');for(var i=0;i<sl.length;i++)(function(l){l.addEventListener('click',function(){showAdminPage(l.getAttribute('data-page'))})})(sl[i]);
@@ -861,6 +857,32 @@ document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('sidebarOverlay').addEventListener('click',closeSidebar);
   document.getElementById('btnRefresh').addEventListener('click',loadAll);
   document.getElementById('btnAddClient').addEventListener('click',openAddClientModal);
+
+  /* ── Email buttons ── */
+  document.getElementById('btnSendEmail').addEventListener('click', sendEmail);
+  document.getElementById('btnClearCompose').addEventListener('click', clearCompose);
+  document.getElementById('btnRefreshEmail').addEventListener('click', loadEmails);
+  document.getElementById('btnBackToList').addEventListener('click', function(){
+    document.getElementById('emailDetailPanel').style.display='none';
+  });
+  document.querySelectorAll('.email-tab').forEach(function(tab){
+    tab.addEventListener('click', function(){
+      emailView = tab.getAttribute('data-etab');
+      document.querySelectorAll('.email-tab').forEach(function(t){t.classList.remove('active')});
+      tab.classList.add('active');
+      loadEmails();
+    });
+  });
+  // Load emails when tab is opened
+  document.querySelector('[data-page="email"]').addEventListener('click', loadEmails);
+  // Populate From dropdown aliases
+  var fromSel = document.getElementById('emailFrom');
+  EMAIL_ALIASES.forEach(function(a){
+    var opt = document.createElement('option');
+    opt.value = a.email;
+    opt.textContent = a.label + ' — ' + a.email;
+    fromSel.appendChild(opt);
+  });
 
 
   // ══════════════════════════════════════════════════════
@@ -1581,15 +1603,4 @@ document.addEventListener('DOMContentLoaded',function(){
       businessEmail: document.getElementById('settingsBizEmail').value,
       businessHours: document.getElementById('settingsHours').value,
       serviceArea:   document.getElementById('settingsArea').value,
-    }}).then(function(){showToast('Business info saved ✓');btn.textContent='Save Business Info';btn.disabled=false;})
-     .catch(function(){showToast('Save failed','error');btn.textContent='Save Business Info';btn.disabled=false;});
-  });
-
-  document.querySelector('[data-page="settings"]').addEventListener('click', loadSettings);
-  // Load settings on start too
-  loadSettings();
-
-});
-</script>
-</body>
-</html>
+    }}).then(function(){showToast('Business info saved ✓');btn.textContent='Save Business Info';btn.dis
