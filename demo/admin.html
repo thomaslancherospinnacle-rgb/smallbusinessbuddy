@@ -200,6 +200,12 @@
 .toast-success{background:var(--accent)}.toast-error{background:var(--red)}.toast-info{background:var(--blue)}
 .admin-page{display:none}.admin-page.active{display:block}
 ::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--text-muted)}
+.drag-handle{cursor:grab;color:var(--text-muted);padding:0 6px;font-size:14px;user-select:none}.drag-handle:active{cursor:grabbing}
+.service-active-toggle{width:36px;height:20px;border-radius:10px;border:none;cursor:pointer;transition:background .2s;flex-shrink:0}
+.service-active-toggle.on{background:var(--accent)}.service-active-toggle.off{background:var(--border)}
+.team-member-block,.guarantee-block{border:1px solid var(--border-light);border-radius:var(--radius);padding:14px;margin-bottom:10px;position:relative}
+.block-remove{position:absolute;top:8px;right:8px;font-size:10px;color:var(--text-muted);padding:3px 7px;border-radius:5px;border:1px solid var(--border);background:none;cursor:pointer}.block-remove:hover{border-color:var(--red);color:var(--red)}
+.rating-stars{display:flex;gap:4px}.rating-star{font-size:20px;cursor:pointer;color:var(--border);transition:color .1s}.rating-star.on{color:#f59e0b}
 </style>
 </head>
 <body>
@@ -217,6 +223,11 @@
       <button class="sidebar-link" data-page="clients"><span class="sl-icon">👤</span> Clients <span class="badge" id="badgeClients" style="display:none">0</span></button>
       <button class="sidebar-link" data-page="email"><span class="sl-icon">📧</span> Email <span class="badge badge-blue" id="badgeEmail" style="display:none">0</span></button>
       <button class="sidebar-link" data-page="revenue"><span class="sl-icon">💳</span> Revenue</button>
+      <div class="sidebar-section">Content</div>
+      <button class="sidebar-link" data-page="reviews"><span class="sl-icon">⭐</span> Reviews <span class="badge badge-amber" id="badgeReviews" style="display:none">0</span></button>
+      <button class="sidebar-link" data-page="services"><span class="sl-icon">🔧</span> Services</button>
+      <button class="sidebar-link" data-page="about"><span class="sl-icon">📄</span> About Page</button>
+      <button class="sidebar-link" data-page="settings"><span class="sl-icon">⚙️</span> Settings</button>
     </nav>
     <div class="sidebar-footer">
       <div style="padding:4px 14px 10px;display:flex;align-items:center;font-size:11px;color:var(--text-muted)"><span class="connection-dot" id="connDot"></span><span id="connLabel">Checking...</span></div>
@@ -420,6 +431,126 @@
           <div style="overflow-x:auto;" id="revTransactionTable"></div>
         </div>
       </div>
+
+      <!-- ═══ REVIEWS ═══ -->
+      <div id="admin-reviews" class="admin-page">
+        <div class="data-panel fade-up">
+          <div class="data-panel-header">
+            <span class="data-panel-title">⭐ Customer Reviews</span>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <div class="filter-pills" id="reviewFilters">
+                <button class="filter-pill active" data-rvf="All">All</button>
+                <button class="filter-pill" data-rvf="Published">Published</button>
+                <button class="filter-pill" data-rvf="Pending">Pending</button>
+                <button class="filter-pill" data-rvf="Hidden">Hidden</button>
+              </div>
+              <button class="header-btn header-btn-primary" id="btnAddReview" style="font-size:11px;">+ Add Review</button>
+              <span class="data-panel-count" id="reviewCount">0</span>
+            </div>
+          </div>
+          <div style="overflow-x:auto;" id="reviewsTable"></div>
+        </div>
+      </div>
+
+      <!-- ═══ SERVICES ═══ -->
+      <div id="admin-services" class="admin-page">
+        <div class="data-panel fade-up">
+          <div class="data-panel-header">
+            <span class="data-panel-title">🔧 Services</span>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button class="header-btn header-btn-primary" id="btnAddService" style="font-size:11px;">+ Add Service</button>
+              <span style="font-size:11px;color:var(--text-muted);">Drag rows to reorder (saved automatically)</span>
+            </div>
+          </div>
+          <div style="overflow-x:auto;" id="servicesTable"></div>
+        </div>
+      </div>
+
+      <!-- ═══ ABOUT ═══ -->
+      <div id="admin-about" class="admin-page">
+        <div class="settings-grid fade-up">
+
+          <!-- Hero text -->
+          <div class="settings-card" style="grid-column:1/-1;">
+            <h4>🏠 Hero Section</h4>
+            <p>Main headline and sub-headline shown at the top of the About page.</p>
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Headline</label>
+            <input class="settings-input" id="aboutHeadline" placeholder="Trusted Plumbing, Done Right">
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;margin-top:8px;">Sub-headline</label>
+            <input class="settings-input" id="aboutSubheadline" placeholder="Family-owned since 2006">
+          </div>
+
+          <!-- Story & Mission -->
+          <div class="settings-card" style="grid-column:1/-1;">
+            <h4>📖 Story & Mission</h4>
+            <p>Shown on the About page under "Our Story".</p>
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Company Story</label>
+            <textarea class="settings-input settings-textarea" id="aboutStory" style="min-height:100px;"></textarea>
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;margin-top:8px;">Mission Statement</label>
+            <input class="settings-input" id="aboutMission" placeholder="Our mission is...">
+          </div>
+
+          <!-- Stats -->
+          <div class="settings-card">
+            <h4>📊 Stats Bar</h4>
+            <p>Numbers shown on the homepage hero bar.</p>
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;">Years in Business</label>
+            <input class="settings-input" id="aboutYears" placeholder="18+">
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;margin-top:8px;">Jobs Completed</label>
+            <input class="settings-input" id="aboutJobs" placeholder="4,500+">
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;margin-top:8px;">Satisfaction Rate</label>
+            <input class="settings-input" id="aboutSatisfaction" placeholder="99%">
+            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px;margin-top:8px;">Team Size</label>
+            <input class="settings-input" id="aboutTeamSize" placeholder="12">
+          </div>
+
+          <!-- Guarantees -->
+          <div class="settings-card">
+            <h4>🛡️ Guarantees</h4>
+            <p>Up to 4 guarantee blocks shown on the About page.</p>
+            <div id="guaranteesEditor"></div>
+            <button class="header-btn" id="btnAddGuarantee" style="margin-top:10px;font-size:11px;">+ Add Guarantee</button>
+          </div>
+
+          <!-- Team Members -->
+          <div class="settings-card" style="grid-column:1/-1;">
+            <h4>👷 Team Members</h4>
+            <p>Each member shows on the About page.</p>
+            <div id="teamEditor"></div>
+            <button class="header-btn" id="btnAddTeamMember" style="margin-top:10px;font-size:11px;">+ Add Member</button>
+          </div>
+
+          <div style="grid-column:1/-1;display:flex;justify-content:flex-end;">
+            <button class="header-btn header-btn-primary" id="btnSaveAbout" style="padding:10px 24px;font-size:14px;">Save About Page</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SETTINGS ═══ -->
+      <div id="admin-settings" class="admin-page">
+        <div class="settings-grid fade-up">
+          <div class="settings-card">
+            <h4>🏢 Business Info</h4>
+            <p>Shown in emails, the website footer, and contact page.</p>
+            <input class="settings-input" id="settingsBizName" placeholder="Business Name">
+            <input class="settings-input" id="settingsBizPhone" placeholder="Phone Number">
+            <input class="settings-input" id="settingsBizEmail" placeholder="Public Email">
+            <input class="settings-input" id="settingsHours" placeholder="Business Hours (e.g. Mon-Sat: 7am-8pm)">
+            <input class="settings-input" id="settingsArea" placeholder="Service Area">
+            <button class="header-btn header-btn-primary" id="btnSaveBiz" style="width:100%;margin-top:4px;">Save Business Info</button>
+          </div>
+          <div class="settings-card">
+            <h4>📧 Email & Worker URLs</h4>
+            <p>GAS web app URL and Cloudflare Worker endpoints.</p>
+            <input class="settings-input" id="settingsGasUrl" placeholder="GAS Web App URL">
+            <input class="settings-input" id="settingsEmailWorker" placeholder="Email Worker URL">
+            <input class="settings-input" id="settingsNoreply" placeholder="Noreply Email (noreply@yourdomain.com)">
+            <input class="settings-input" id="settingsCalendarId" placeholder="Google Calendar ID">
+            <button class="header-btn header-btn-primary" id="btnSaveWorkers" style="width:100%;margin-top:4px;">Save Worker Settings</button>
+          </div>
+        </div>
+      </div>
+
 </div>
       </div>
 
@@ -438,7 +569,7 @@ var QUOTE_STATUSES=['Pending','Responded','Accepted','Declined','Closed'];
 var CONTACT_STATUSES=['Unread','Read','Responded','Closed'];
 var CLIENT_STATUSES=['Active','Inactive'];
 var SERVICES_LIST=['Emergency Repair','Drain Cleaning','Water Heater','Pipe Installation','Fixture Install','Inspection','Sewer Line','Gas Line'];
-var PAGE_TITLES={dashboard:'Dashboard',appointments:'Appointments',quotes:'Quote Requests',contacts:'Messages',clients:'Clients',email:'Email',revenue:'Revenue & Payments'};
+var PAGE_TITLES={dashboard:'Dashboard',appointments:'Appointments',quotes:'Quote Requests',contacts:'Messages',clients:'Clients',email:'Email',revenue:'Revenue & Payments',reviews:'Reviews',services:'Services',about:'About Page',settings:'Settings'};
 
 function showLoading(v){document.getElementById('loadingBar').style.display=v?'block':'none'}
 function showToast(msg,type){type=type||'success';var el=document.createElement('div');el.className='toast toast-'+type;el.innerHTML=(type==='success'?'✓ ':type==='error'?'✕ ':'ℹ ')+msg;document.body.appendChild(el);setTimeout(function(){el.style.opacity='0';el.style.transform='translateX(40px)';el.style.transition='all .3s'},2800);setTimeout(function(){el.remove()},3200)}
@@ -1043,6 +1174,422 @@ document.addEventListener('DOMContentLoaded',function(){
   document.querySelector('[data-page="revenue"]').addEventListener('click',function(){
     loadRevenue();
   });
+
+  /* ══════════════════════════════════════════
+     REVIEWS
+  ══════════════════════════════════════════ */
+  var reviews = [], reviewFilter = 'All';
+
+  function loadReviews(){
+    showLoading(true);
+    fetchGAS('getReviews').then(function(r){
+      reviews = Array.isArray(r) ? r : [];
+      renderReviewsTable();
+      var pending = reviews.filter(function(rv){return rv.Status==='Pending'||!rv.Status}).length;
+      setBadge('badgeReviews', pending);
+      showLoading(false);
+    }).catch(function(){ showLoading(false); });
+  }
+
+  function renderReviewsTable(){
+    var filtered = reviewFilter==='All' ? reviews : reviews.filter(function(r){return r.Status===reviewFilter});
+    document.getElementById('reviewCount').textContent = filtered.length + ' reviews';
+    if(!filtered.length){
+      document.getElementById('reviewsTable').innerHTML = emptyState('No reviews yet.');
+      return;
+    }
+    var html = '<table class="data-table"><thead><tr><th>Name</th><th>Rating</th><th>Review</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+    filtered.forEach(function(r){
+      var stars = '';
+      var rating = parseInt(r.Rating)||0;
+      for(var i=1;i<=5;i++) stars += i<=rating ? '★' : '☆';
+      html += '<tr>';
+      html += '<td class="name-cell">'+esc(r.Name||'Anonymous')+'</td>';
+      html += '<td style="color:#f59e0b;font-size:15px;letter-spacing:1px;">'+stars+'</td>';
+      html += '<td class="truncate" style="max-width:220px;">'+esc((r.ReviewText||'').substring(0,80))+'</td>';
+      html += '<td class="meta-cell">'+fmtDate(r.Timestamp)+'</td>';
+      html += '<td>'+statusBadge(r.Status||'Pending')+'</td>';
+      html += '<td><div class="row-actions">';
+      if(r.Status!=='Published') html += '<button class="row-btn row-btn-convert" onclick="publishReview(''+r.ID+'')">Publish</button>';
+      if(r.Status==='Published') html += '<button class="row-btn" onclick="hideReview(''+r.ID+'')">Hide</button>';
+      html += '<button class="row-btn row-btn-edit" onclick="editReview(''+r.ID+'')">Edit</button>';
+      html += '<button class="row-btn row-btn-del" onclick="deleteReview(''+r.ID+'')">Del</button>';
+      html += '</div></td></tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('reviewsTable').innerHTML = html;
+  }
+
+  window.publishReview = function(id){
+    postGAS({action:'updateReview',id:id,status:'Published'}).then(function(){
+      reviews.forEach(function(r){if(r.ID===id)r.Status='Published'});
+      renderReviewsTable();showToast('Review published ✓');
+    });
+  };
+  window.hideReview = function(id){
+    postGAS({action:'updateReview',id:id,status:'Hidden'}).then(function(){
+      reviews.forEach(function(r){if(r.ID===id)r.Status='Hidden'});
+      renderReviewsTable();showToast('Review hidden');
+    });
+  };
+  window.deleteReview = function(id){
+    if(!confirm('Delete this review?'))return;
+    postGAS({action:'deleteReview',id:id}).then(function(){
+      reviews=reviews.filter(function(r){return r.ID!==id});
+      renderReviewsTable();showToast('Deleted','error');
+    });
+  };
+  window.editReview = function(id){
+    var rv = reviews.find(function(r){return r.ID===id}); if(!rv)return;
+    var ratingHtml = '';
+    for(var i=1;i<=5;i++) ratingHtml += '<span class="rating-star'+(i<=(parseInt(rv.Rating)||5)?' on':'')+'" data-v="'+i+'">★</span>';
+    document.getElementById('modalContainer').innerHTML =
+      '<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox">'+
+      '<div class="modal-head"><div><h3>Edit Review</h3><p>'+esc(rv.Name)+'</p></div><button class="modal-close" id="modalCloseBtn">✕</button></div>'+
+      '<div class="modal-body"><div class="form-grid">'+
+      '<div class="form-group"><label>Name</label><input id="rv_name" value="'+esc(rv.Name||'')+'"></div>'+
+      '<div class="form-group"><label>Rating</label><div class="rating-stars" id="rvStars">'+ratingHtml+'</div><input type="hidden" id="rv_rating" value="'+(rv.Rating||5)+'"></div>'+
+      '<div class="form-group"><label>Review Text</label><textarea id="rv_text" style="min-height:80px;">'+esc(rv.ReviewText||'')+'</textarea></div>'+
+      '<div class="form-group"><label>Status</label><select class="status-select" id="rv_status"><option'+(rv.Status==='Published'?' selected':'')+'>Published</option><option'+(rv.Status==='Pending'?' selected':'')+'>Pending</option><option'+(rv.Status==='Hidden'?' selected':'')+'>Hidden</option></select></div>'+
+      '</div></div>'+
+      '<div class="modal-foot"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalSaveReviewBtn">Save</button></div>'+
+      '</div></div>';
+    wireModal();
+    // Wire star rating
+    document.querySelectorAll('#rvStars .rating-star').forEach(function(s){
+      s.addEventListener('click',function(){
+        var v=parseInt(s.getAttribute('data-v'));
+        document.getElementById('rv_rating').value=v;
+        document.querySelectorAll('#rvStars .rating-star').forEach(function(st,idx){st.classList.toggle('on',idx<v)});
+      });
+    });
+    document.getElementById('modalSaveReviewBtn').addEventListener('click',function(){
+      var btn=this; btn.textContent='Saving...'; btn.disabled=true;
+      postGAS({action:'updateReview',id:id,
+        name:document.getElementById('rv_name').value,
+        rating:parseInt(document.getElementById('rv_rating').value),
+        reviewText:document.getElementById('rv_text').value,
+        status:document.getElementById('rv_status').value
+      }).then(function(){
+        loadReviews(); closeModal(); showToast('Review updated ✓');
+      }).catch(function(){showToast('Save failed','error');btn.textContent='Save';btn.disabled=false;});
+    });
+  };
+
+  function openAddReviewModal(){
+    var ratingHtml=''; for(var i=1;i<=5;i++) ratingHtml+='<span class="rating-star on" data-v="'+i+'">★</span>';
+    document.getElementById('modalContainer').innerHTML =
+      '<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox">'+
+      '<div class="modal-head"><div><h3>Add Review</h3><p>Add a customer review manually.</p></div><button class="modal-close" id="modalCloseBtn">✕</button></div>'+
+      '<div class="modal-body"><div class="form-grid">'+
+      '<div class="form-group"><label>Customer Name *</label><input id="rv_name" placeholder="Jane Smith"></div>'+
+      '<div class="form-group"><label>Rating</label><div class="rating-stars" id="rvStars">'+ratingHtml+'</div><input type="hidden" id="rv_rating" value="5"></div>'+
+      '<div class="form-group"><label>Review Text *</label><textarea id="rv_text" style="min-height:80px;" placeholder="Great service!"></textarea></div>'+
+      '<div class="form-group"><label>Status</label><select class="status-select" id="rv_status"><option>Published</option><option>Pending</option><option>Hidden</option></select></div>'+
+      '</div></div>'+
+      '<div class="modal-foot"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalAddReviewBtn">Add Review</button></div>'+
+      '</div></div>';
+    wireModal();
+    document.querySelectorAll('#rvStars .rating-star').forEach(function(s){
+      s.addEventListener('click',function(){
+        var v=parseInt(s.getAttribute('data-v'));
+        document.getElementById('rv_rating').value=v;
+        document.querySelectorAll('#rvStars .rating-star').forEach(function(st,idx){st.classList.toggle('on',idx<v)});
+      });
+    });
+    document.getElementById('modalAddReviewBtn').addEventListener('click',function(){
+      var n=document.getElementById('rv_name').value.trim(),t=document.getElementById('rv_text').value.trim();
+      if(!n||!t){showToast('Name and review text required','error');return}
+      var btn=this; btn.textContent='Adding...'; btn.disabled=true;
+      postGAS({action:'addReview',name:n,rating:parseInt(document.getElementById('rv_rating').value),
+        reviewText:t,status:document.getElementById('rv_status').value,timestamp:new Date().toISOString()
+      }).then(function(){loadReviews();closeModal();showToast('Review added ✓');})
+       .catch(function(){showToast('Failed','error');btn.textContent='Add Review';btn.disabled=false;});
+    });
+  }
+
+  document.getElementById('btnAddReview').addEventListener('click', openAddReviewModal);
+  document.querySelectorAll('[data-rvf]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      reviewFilter=btn.dataset.rvf;
+      document.querySelectorAll('[data-rvf]').forEach(function(b){b.classList.remove('active')});
+      btn.classList.add('active');
+      renderReviewsTable();
+    });
+  });
+  document.querySelector('[data-page="reviews"]').addEventListener('click', loadReviews);
+
+  /* ══════════════════════════════════════════
+     SERVICES
+  ══════════════════════════════════════════ */
+  var siteServices = [];
+
+  function loadServices(){
+    showLoading(true);
+    fetchGAS('getServices').then(function(r){
+      siteServices = Array.isArray(r) ? r : [];
+      renderServicesTable();
+      showLoading(false);
+    }).catch(function(){showLoading(false);});
+  }
+
+  function renderServicesTable(){
+    if(!siteServices.length){
+      document.getElementById('servicesTable').innerHTML = emptyState('No services. Click + Add Service.');
+      return;
+    }
+    var html='<table class="data-table"><thead><tr><th></th><th>#</th><th>Icon</th><th>Name</th><th>Price</th><th>Duration</th><th>Active</th><th>Description</th><th>Actions</th></tr></thead><tbody id="servicesTbody">';
+    siteServices.forEach(function(s){
+      var isOn = s.Active!==false && s.Active!=='FALSE' && s.Active!=='false';
+      html += '<tr data-sid="'+s.ID+'">';
+      html += '<td><span class="drag-handle">⠿</span></td>';
+      html += '<td class="meta-cell">'+esc(String(s.Order||''))+'</td>';
+      html += '<td style="font-size:20px;">'+esc(s.Icon||'🔧')+'</td>';
+      html += '<td class="name-cell">'+esc(s.Name||'')+'</td>';
+      html += '<td style="color:var(--accent);font-weight:600;">'+esc(s.Price||'')+'</td>';
+      html += '<td class="meta-cell">'+esc(String(s.Duration||60))+'m</td>';
+      html += '<td><button class="service-active-toggle '+(isOn?'on':'off')+'" onclick="toggleService(''+s.ID+'','+(isOn?'false':'true')+')">'+(isOn?'ON':'OFF')+'</button></td>';
+      html += '<td class="truncate" style="max-width:180px;">'+esc((s.Description||'').substring(0,60))+'</td>';
+      html += '<td><div class="row-actions"><button class="row-btn row-btn-edit" onclick="editService(''+s.ID+'')">Edit</button><button class="row-btn row-btn-del" onclick="deleteService(''+s.ID+'')">Del</button></div></td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    document.getElementById('servicesTable').innerHTML = html;
+  }
+
+  window.toggleService = function(id, newActive){
+    postGAS({action:'updateService',id:id,active:newActive}).then(function(){
+      siteServices.forEach(function(s){if(s.ID===id)s.Active=newActive});
+      renderServicesTable(); showToast(newActive?'Service enabled':'Service hidden');
+    });
+  };
+  window.deleteService = function(id){
+    if(!confirm('Delete this service?'))return;
+    postGAS({action:'deleteService',id:id}).then(function(){
+      siteServices=siteServices.filter(function(s){return s.ID!==id});
+      renderServicesTable(); showToast('Service deleted','error');
+    });
+  };
+  window.editService = function(id){
+    var sv=siteServices.find(function(s){return s.ID===id}); if(!sv)return;
+    document.getElementById('modalContainer').innerHTML =
+      '<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox">'+
+      '<div class="modal-head"><div><h3>Edit Service</h3><p>'+esc(sv.Name)+'</p></div><button class="modal-close" id="modalCloseBtn">✕</button></div>'+
+      '<div class="modal-body"><div class="form-grid">'+
+      '<div class="form-row"><div class="form-group"><label>Icon (emoji)</label><input id="sv_icon" value="'+esc(sv.Icon||'')+'"></div><div class="form-group"><label>Name</label><input id="sv_name" value="'+esc(sv.Name||'')+'"></div></div>'+
+      '<div class="form-row"><div class="form-group"><label>Price</label><input id="sv_price" value="'+esc(sv.Price||'')+'"></div><div class="form-group"><label>Duration (min)</label><input type="number" id="sv_duration" value="'+esc(String(sv.Duration||60))+'"></div></div>'+
+      '<div class="form-group"><label>Description</label><textarea id="sv_desc" style="min-height:70px;">'+esc(sv.Description||'')+'</textarea></div>'+
+      '<div class="form-group"><label>Active</label><select class="status-select" id="sv_active"><option value="true"'+(sv.Active!==false?' selected':'')+'>Yes — Show on site</option><option value="false"'+(sv.Active===false?' selected':'')+'>No — Hide</option></select></div>'+
+      '</div></div>'+
+      '<div class="modal-foot"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalSaveServiceBtn">Save Changes</button></div>'+
+      '</div></div>';
+    wireModal();
+    document.getElementById('modalSaveServiceBtn').addEventListener('click',function(){
+      var btn=this; btn.textContent='Saving...'; btn.disabled=true;
+      postGAS({action:'updateService',id:id,
+        icon:document.getElementById('sv_icon').value,
+        name:document.getElementById('sv_name').value,
+        price:document.getElementById('sv_price').value,
+        duration:parseInt(document.getElementById('sv_duration').value)||60,
+        description:document.getElementById('sv_desc').value,
+        active:document.getElementById('sv_active').value==='true'
+      }).then(function(){ loadServices(); closeModal(); showToast('Service updated ✓'); })
+       .catch(function(){showToast('Save failed','error');btn.textContent='Save Changes';btn.disabled=false;});
+    });
+  };
+
+  function openAddServiceModal(){
+    document.getElementById('modalContainer').innerHTML =
+      '<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modalBox">'+
+      '<div class="modal-head"><div><h3>Add Service</h3><p>Will appear on the website immediately.</p></div><button class="modal-close" id="modalCloseBtn">✕</button></div>'+
+      '<div class="modal-body"><div class="form-grid">'+
+      '<div class="form-row"><div class="form-group"><label>Icon (emoji)</label><input id="sv_icon" placeholder="🔧"></div><div class="form-group"><label>Name *</label><input id="sv_name" placeholder="Leak Detection"></div></div>'+
+      '<div class="form-row"><div class="form-group"><label>Price</label><input id="sv_price" placeholder="From $95"></div><div class="form-group"><label>Duration (min)</label><input type="number" id="sv_duration" placeholder="60" value="60"></div></div>'+
+      '<div class="form-group"><label>Description</label><textarea id="sv_desc" style="min-height:70px;" placeholder="Brief description of the service..."></textarea></div>'+
+      '</div></div>'+
+      '<div class="modal-foot"><button class="modal-btn modal-btn-cancel" id="modalCancelBtn">Cancel</button><button class="modal-btn modal-btn-primary" id="modalAddServiceBtn">Add Service</button></div>'+
+      '</div></div>';
+    wireModal();
+    document.getElementById('modalAddServiceBtn').addEventListener('click',function(){
+      var n=document.getElementById('sv_name').value.trim();
+      if(!n){showToast('Service name required','error');return;}
+      var btn=this; btn.textContent='Adding...'; btn.disabled=true;
+      postGAS({action:'addService',
+        name:n, icon:document.getElementById('sv_icon').value||'🔧',
+        price:document.getElementById('sv_price').value,
+        duration:parseInt(document.getElementById('sv_duration').value)||60,
+        description:document.getElementById('sv_desc').value,
+        active:true
+      }).then(function(){loadServices();closeModal();showToast('Service added ✓');})
+       .catch(function(){showToast('Failed','error');btn.textContent='Add Service';btn.disabled=false;});
+    });
+  }
+  document.getElementById('btnAddService').addEventListener('click', openAddServiceModal);
+  document.querySelector('[data-page="services"]').addEventListener('click', loadServices);
+
+  /* ══════════════════════════════════════════
+     ABOUT PAGE EDITOR
+  ══════════════════════════════════════════ */
+  var aboutData = {};
+  var teamCount = 0;
+  var guaranteeCount = 0;
+
+  function loadAbout(){
+    showLoading(true);
+    fetchGAS('getAbout').then(function(r){
+      aboutData = (r && typeof r==='object' && !r.error) ? r : {};
+      renderAboutEditor();
+      showLoading(false);
+    }).catch(function(){showLoading(false);});
+  }
+
+  function renderAboutEditor(){
+    var a = aboutData;
+    function sv(id, val){ var el=document.getElementById(id); if(el&&val) el.value=val; }
+    sv('aboutHeadline', a.headline);
+    sv('aboutSubheadline', a.subheadline);
+    sv('aboutStory', a.story);
+    sv('aboutMission', a.mission);
+    sv('aboutYears', a.yearsInBusiness);
+    sv('aboutJobs', a.jobsCompleted);
+    sv('aboutSatisfaction', a.satisfactionRate);
+    sv('aboutTeamSize', a.teamSize);
+
+    // Guarantees
+    var gHtml = '';
+    guaranteeCount = 0;
+    for(var i=1;i<=8;i++){
+      if(!a['guarantee'+i+'Title']) break;
+      guaranteeCount++;
+      gHtml += buildGuaranteeBlock(i, a['guarantee'+i+'Title'], a['guarantee'+i+'Desc']);
+    }
+    document.getElementById('guaranteesEditor').innerHTML = gHtml;
+
+    // Team members
+    var tHtml = '';
+    teamCount = 0;
+    for(var j=1;j<=10;j++){
+      if(!a['teamMember'+j+'Name']) break;
+      teamCount++;
+      tHtml += buildTeamBlock(j, a['teamMember'+j+'Name'], a['teamMember'+j+'Role'], a['teamMember'+j+'Years'], a['teamMember'+j+'Cert']);
+    }
+    document.getElementById('teamEditor').innerHTML = tHtml;
+  }
+
+  function buildGuaranteeBlock(num, title, desc){
+    return '<div class="guarantee-block" id="gb'+num+'">'+
+      '<button class="block-remove" onclick="removeGuarantee('+num+')">✕</button>'+
+      '<div style="display:grid;gap:6px;">'+
+      '<input class="settings-input" id="g'+num+'_title" placeholder="Guarantee title" value="'+esc(title||'')+'" style="margin:0;">'+
+      '<input class="settings-input" id="g'+num+'_desc" placeholder="Short description" value="'+esc(desc||'')+'" style="margin:0;">'+
+      '</div></div>';
+  }
+
+  function buildTeamBlock(num, name, role, years, cert){
+    return '<div class="team-member-block" id="tb'+num+'">'+
+      '<button class="block-remove" onclick="removeTeamMember('+num+')">✕</button>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">'+
+      '<input class="settings-input" id="t'+num+'_name" placeholder="Full Name" value="'+esc(name||'')+'" style="margin:0;">'+
+      '<input class="settings-input" id="t'+num+'_role" placeholder="Role/Title" value="'+esc(role||'')+'" style="margin:0;">'+
+      '<input class="settings-input" id="t'+num+'_years" placeholder="Years exp." value="'+esc(String(years||''))+'" style="margin:0;">'+
+      '<input class="settings-input" id="t'+num+'_cert" placeholder="Certification" value="'+esc(cert||'')+'" style="margin:0;">'+
+      '</div></div>';
+  }
+
+  window.removeGuarantee = function(num){
+    var el=document.getElementById('gb'+num); if(el) el.remove();
+  };
+  window.removeTeamMember = function(num){
+    var el=document.getElementById('tb'+num); if(el) el.remove();
+  };
+
+  document.getElementById('btnAddGuarantee').addEventListener('click',function(){
+    guaranteeCount++;
+    var el=document.createElement('div');
+    el.innerHTML=buildGuaranteeBlock(guaranteeCount,'','');
+    document.getElementById('guaranteesEditor').appendChild(el.firstChild);
+  });
+  document.getElementById('btnAddTeamMember').addEventListener('click',function(){
+    teamCount++;
+    var el=document.createElement('div');
+    el.innerHTML=buildTeamBlock(teamCount,'','','','');
+    document.getElementById('teamEditor').appendChild(el.firstChild);
+  });
+
+  document.getElementById('btnSaveAbout').addEventListener('click',function(){
+    var fields={
+      headline: document.getElementById('aboutHeadline').value,
+      subheadline: document.getElementById('aboutSubheadline').value,
+      story: document.getElementById('aboutStory').value,
+      mission: document.getElementById('aboutMission').value,
+      yearsInBusiness: document.getElementById('aboutYears').value,
+      jobsCompleted: document.getElementById('aboutJobs').value,
+      satisfactionRate: document.getElementById('aboutSatisfaction').value,
+      teamSize: document.getElementById('aboutTeamSize').value,
+    };
+    // Guarantees
+    for(var i=1;i<=10;i++){
+      var ti=document.getElementById('g'+i+'_title');
+      var di=document.getElementById('g'+i+'_desc');
+      if(ti){ fields['guarantee'+i+'Title']=ti.value; fields['guarantee'+i+'Desc']=di?di.value:''; }
+    }
+    // Team members
+    for(var j=1;j<=12;j++){
+      var tn=document.getElementById('t'+j+'_name');
+      if(tn){ fields['teamMember'+j+'Name']=tn.value; fields['teamMember'+j+'Role']=(document.getElementById('t'+j+'_role')||{}).value||''; fields['teamMember'+j+'Years']=(document.getElementById('t'+j+'_years')||{}).value||''; fields['teamMember'+j+'Cert']=(document.getElementById('t'+j+'_cert')||{}).value||''; }
+    }
+    var btn=this; btn.textContent='Saving...'; btn.disabled=true;
+    postGAS({action:'saveAbout',fields:fields}).then(function(){
+      showToast('About page saved ✓'); btn.textContent='Save About Page'; btn.disabled=false;
+    }).catch(function(){ showToast('Save failed','error'); btn.textContent='Save About Page'; btn.disabled=false; });
+  });
+
+  document.querySelector('[data-page="about"]').addEventListener('click', loadAbout);
+
+  /* ══════════════════════════════════════════
+     SETTINGS
+  ══════════════════════════════════════════ */
+  function loadSettings(){
+    fetchGAS('getConfig').then(function(cfg){
+      if(!cfg||cfg.error)return;
+      function sv(id,val){var el=document.getElementById(id);if(el&&val!==undefined)el.value=val;}
+      sv('settingsBizName',   cfg.businessName);
+      sv('settingsBizPhone',  cfg.businessPhone);
+      sv('settingsBizEmail',  cfg.businessEmail);
+      sv('settingsHours',     cfg.businessHours);
+      sv('settingsArea',      cfg.serviceArea);
+      sv('settingsGasUrl',    cfg.gasUrl||GAS_URL);
+      sv('settingsEmailWorker',cfg.emailWorkerUrl);
+      sv('settingsNoreply',   cfg.noreplyEmail);
+      sv('settingsCalendarId',cfg.calendarId);
+    });
+  }
+
+  document.getElementById('btnSaveBiz').addEventListener('click',function(){
+    var btn=this; btn.textContent='Saving...'; btn.disabled=true;
+    postGAS({action:'saveConfig',config:{
+      businessName:  document.getElementById('settingsBizName').value,
+      businessPhone: document.getElementById('settingsBizPhone').value,
+      businessEmail: document.getElementById('settingsBizEmail').value,
+      businessHours: document.getElementById('settingsHours').value,
+      serviceArea:   document.getElementById('settingsArea').value,
+    }}).then(function(){showToast('Business info saved ✓');btn.textContent='Save Business Info';btn.disabled=false;})
+     .catch(function(){showToast('Save failed','error');btn.textContent='Save Business Info';btn.disabled=false;});
+  });
+
+  document.getElementById('btnSaveWorkers').addEventListener('click',function(){
+    var btn=this; btn.textContent='Saving...'; btn.disabled=true;
+    postGAS({action:'saveConfig',config:{
+      emailWorkerUrl: document.getElementById('settingsEmailWorker').value,
+      noreplyEmail:   document.getElementById('settingsNoreply').value,
+      calendarId:     document.getElementById('settingsCalendarId').value,
+    }}).then(function(){showToast('Worker settings saved ✓');btn.textContent='Save Worker Settings';btn.disabled=false;})
+     .catch(function(){showToast('Save failed','error');btn.textContent='Save Worker Settings';btn.disabled=false;});
+  });
+
+  document.querySelector('[data-page="settings"]').addEventListener('click', loadSettings);
+  // Load settings on start too
+  loadSettings();
 
 });
 </script>
