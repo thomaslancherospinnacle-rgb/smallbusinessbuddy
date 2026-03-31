@@ -492,7 +492,7 @@ function getStatuses(s){if(s==='Appointments')return APPT_STATUSES;if(s==='Quote
 function esc(s){if(s===null||s===undefined)return'—';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 function fetchGAS(a){return fetch(GAS_URL+'?action='+a).then(function(r){return r.json()})}
-function postGAS(p){return fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(p)}).then(function(r){return r.json()})}
+function postGAS(p){return fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}).then(function(r){return r.json()})}
 
 function testConnection(){var dot=document.getElementById('connDot'),lbl=document.getElementById('connLabel');dot.className='connection-dot';lbl.textContent='Checking...';if(!GAS_URL||GAS_URL.indexOf('YOUR_')===0){dot.className='connection-dot offline';lbl.textContent='Not configured';return}fetchGAS('ping').then(function(r){if(r&&r.status==='ok'){dot.className='connection-dot online';lbl.textContent='Connected'}else{dot.className='connection-dot offline';lbl.textContent='Error'}}).catch(function(){dot.className='connection-dot offline';lbl.textContent='Offline'})}
 
@@ -926,21 +926,12 @@ document.addEventListener('DOMContentLoaded',function(){
   var revTabFilter    = 'all';
   var revLoading      = false;
 
-  // ── GAS helpers ──
-  function gasGet(action, extra){
-    var qs = '?action='+action+(extra||'');
-    return fetch(GAS_URL+qs).then(function(r){return r.json()});
-  }
-  function gasPost(payload){
-    return fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}).then(function(r){return r.json()});
-  }
-
   /** Load all Revenue rows from GAS then re-render */
   function loadRevenue(){
     if(revLoading)return;
     revLoading=true;
     document.getElementById('revTxCount').textContent='Loading…';
-    gasGet('getRevenue').then(function(rows){
+    fetchGAS('getRevenue').then(function(rows){
       revLoading=false;
       // Normalise column names to camelCase for consistency
       revTransactions = (rows||[]).map(function(r){
@@ -1073,7 +1064,7 @@ document.addEventListener('DOMContentLoaded',function(){
   function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
 
   function markTxPaid(id){
-    gasPost({action:'updateRevenue',id:id,status:'paid',paidAt:new Date().toISOString()}).then(function(r){
+    postGAS({action:'updateRevenue',id:id,status:'paid',paidAt:new Date().toISOString()}).then(function(r){
       if(r&&r.success){showToast('Marked as paid ✓');loadRevenue();}
       else showToast('Update failed: '+(r&&r.error||'unknown'),'error');
     }).catch(function(e){showToast('Request failed: '+e.message,'error');});
@@ -1081,7 +1072,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
   function deleteTx(id){
     if(!confirm('Delete this transaction? This cannot be undone.'))return;
-    gasPost({action:'deleteRevenue',id:id}).then(function(r){
+    postGAS({action:'deleteRevenue',id:id}).then(function(r){
       if(r&&r.success){showToast('Deleted','error');loadRevenue();}
       else showToast('Delete failed: '+(r&&r.error||'unknown'),'error');
     }).catch(function(e){showToast('Request failed: '+e.message,'error');});
@@ -1101,7 +1092,7 @@ document.addEventListener('DOMContentLoaded',function(){
   function addTransaction(tx){
     tx.action='addRevenue';
     tx.timestamp=tx.timestamp||new Date().toISOString();
-    gasPost(tx).then(function(r){
+    postGAS(tx).then(function(r){
       if(r&&r.success){ loadRevenue(); }
       else showToast('Save failed: '+(r&&r.error||'unknown'),'error');
     }).catch(function(e){showToast('Save failed: '+e.message,'error');});
