@@ -551,7 +551,7 @@
 </div>
 <div id="modalContainer"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 var GAS_URL='https://google-sheets-script.thomaslancheros06.workers.dev';
 var appointments=[],quotes=[],contacts=[],clients=[];
 var currentPage='dashboard',searchQuery='';
@@ -706,6 +706,13 @@ function exportCurrentPage(){var m={appointments:{d:appointments,n:'appointments
 var emailInbox=[],emailSent=[];
 var emailView='inbox'; // inbox | sent
 var EMAIL_ALIASES = [{label:'Office', email:'office@flowpipe.fit'},{label:'Support', email:'support@flowpipe.fit'}];
+var EMAIL_WORKER_URL = 'https://email.thomaslancheros06.workers.dev';
+var EMAIL_TEMPLATES = [
+  { label:'Follow-up',   subject:'Following up on your service',      body:'Hi,\n\nJust checking in after your recent service with {biz}. We hope everything is working great!\n\nBest,\nThe {biz} Team' },
+  { label:'Review Ask',  subject:'How did we do? Leave us a review',  body:'Hi,\n\nThank you for choosing {biz}! If you have a moment, we\'d love a quick review:\n{reviewLink}\n\nThank you!\nThe {biz} Team' },
+  { label:'Appointment', subject:'Your appointment is confirmed',      body:'Hi,\n\nYour appointment with {biz} is confirmed for {date}. Our technician will arrive within the scheduled window.\n\nSee you soon,\nThe {biz} Team' },
+  { label:'Invoice',     subject:'Your invoice from {biz}',           body:'Hi,\n\nYour invoice is ready. Please use the secure link sent separately to pay online.\n\nThank you!\nThe {biz} Team' },
+];
 
 function renderEmailTemplates(){
   var html='';
@@ -800,14 +807,6 @@ function openEmailDetail(idx){
   })}
 }
 
-var EMAIL_WORKER_URL='https://email.thomaslancheros06.workers.dev';
-
-var EMAIL_TEMPLATES = [
-  { label:'Follow-up',    subject:'Following up on your service', body:'Hi,\n\nJust checking in after your recent service with {biz}. We hope everything is working great! If you have any questions or concerns please don\'t hesitate to reach out.\n\nBest,\nThe {biz} Team' },
-  { label:'Review Ask',   subject:'How did we do? Leave us a review', body:'Hi,\n\nThank you for choosing {biz}! We hope your experience was excellent. If you have a moment, we\'d really appreciate a quick review:\n{reviewLink}\n\nThank you!\nThe {biz} Team' },
-  { label:'Appointment',  subject:'Your appointment is confirmed', body:'Hi,\n\nYour appointment with {biz} is confirmed for {date}. Our technician will arrive within the scheduled window.\n\nQuestions? Reply to this email or call us directly.\n\nSee you soon,\nThe {biz} Team' },
-  { label:'Invoice',      subject:'Your invoice from {biz}', body:'Hi,\n\nPlease find your invoice attached. You can pay securely online using the link below.\n\nThank you for your business!\nThe {biz} Team' },
-];
 
 function sendEmail(){
   var fromEmail=document.getElementById('emailFrom').value;
