@@ -217,8 +217,6 @@
       <button class="sidebar-link" data-page="clients"><span class="sl-icon">👤</span> Clients <span class="badge" id="badgeClients" style="display:none">0</span></button>
       <button class="sidebar-link" data-page="email"><span class="sl-icon">📧</span> Email <span class="badge badge-blue" id="badgeEmail" style="display:none">0</span></button>
       <button class="sidebar-link" data-page="revenue"><span class="sl-icon">💳</span> Revenue</button>
-      <div class="sidebar-section">System</div>
-      <button class="sidebar-link" data-page="settings"><span class="sl-icon">⚙️</span> Settings</button>
     </nav>
     <div class="sidebar-footer">
       <div style="padding:4px 14px 10px;display:flex;align-items:center;font-size:11px;color:var(--text-muted)"><span class="connection-dot" id="connDot"></span><span id="connLabel">Checking...</span></div>
@@ -234,7 +232,6 @@
       <div class="main-header-actions">
         <div class="search-box"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="5"/><path d="M13 13l-3.5-3.5"/></svg><input type="text" placeholder="Search everything..." id="globalSearch"></div>
         <button class="header-btn" id="btnRefresh">↻ Refresh</button>
-        <button class="header-btn" id="btnExport">⤓ Export</button>
         <button class="header-btn header-btn-primary" id="btnAddClient">+ Client</button>
       </div>
     </header>
@@ -423,42 +420,7 @@
           <div style="overflow-x:auto;" id="revTransactionTable"></div>
         </div>
       </div>
-
-      <div id="admin-settings" class="admin-page">
-        <div class="settings-grid">
-          <div class="settings-card"><h4>🔗 Backend URL</h4><p>Your Google Apps Script Web App URL.</p><input class="settings-input" id="settingsGasUrl" placeholder="https://script.google.com/macros/s/.../exec"><button class="header-btn header-btn-primary" style="margin-top:6px" id="btnSaveGasUrl">Save & Test</button></div>
-          <div class="settings-card"><h4>🏢 Business Info</h4><p>Your business details (stored locally).</p><input class="settings-input" id="settingsBizName" placeholder="Business Name"><input class="settings-input" id="settingsBizPhone" placeholder="(555) 123-4567"><input class="settings-input" id="settingsBizEmail" placeholder="info@yourbiz.com"></div>
-          <div class="settings-card"><h4>📋 Services List</h4><p>One per line. Populates dropdowns everywhere.</p><textarea class="settings-input settings-textarea" id="settingsServices"></textarea><button class="header-btn" style="margin-top:6px" id="btnSaveServices">Update Services</button></div>
-          <div class="settings-card"><h4>📊 Data Export</h4><p>Download your data as CSV files.</p><button class="header-btn" style="margin-bottom:6px;width:100%" id="btnExportAll">⤓ Export All Data</button><button class="header-btn" style="width:100%" id="btnExportClients">⤓ Export Clients Only</button></div>
-          <div class="settings-card"><h4>📅 Google Calendar</h4><p>Appointments auto-create calendar events. Time slots show real availability.</p>
-            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Calendar ID</label>
-            <input class="settings-input" id="settingsCalendarId" placeholder="primary (or your-email@gmail.com)" style="margin-bottom:4px">
-            <button class="header-btn" style="margin-top:4px" id="btnSaveCalendarId">Save to Config</button>
-            <p style="margin-top:10px;font-size:11px;color:var(--text-muted);line-height:1.6"><strong>How it works:</strong><br>• New bookings → auto-create Google Calendar event<br>• Time picker → checks calendar for conflicts (live availability)<br>• Cancel/edit appointment → updates/deletes calendar event<br>• Set reminders: 1hr + 15min before each appointment<br><br><strong>Find your Calendar ID:</strong> Google Calendar → Settings → [your calendar] → "Integrate calendar" → Calendar ID. Use "primary" for your main calendar.</p>
-          </div>
-          <div class="settings-card"><h4>📬 Auto-Reply Emails</h4><p>Sends confirmation emails when customers submit forms.</p>
-            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Noreply Email Address</label>
-            <input class="settings-input" id="settingsNoreplyEmail" placeholder="noreply@yourdomain.com" style="margin-bottom:8px">
-            <button class="header-btn" style="margin-top:4px" id="btnSaveAutoReply">Save to Config</button>
-            <p style="margin-top:10px;font-size:11px;color:var(--text-muted);line-height:1.6"><strong>Auto-replies are sent for:</strong><br>• Appointment bookings (with date/time/service details)<br>• Quote requests (confirmation + ETA)<br>• Contact form inquiries<br>• Homepage inquiry widget submissions<br><br>Uses your Email Worker URL (set below). If no Worker URL is set, falls back to GmailApp.<br>Business name & phone pulled from Config sheet.</p>
-          </div>
-          <div class="settings-card" style="grid-column:1/-1"><h4>💳 Stripe Payments</h4><p>Configure your Cloudflare Stripe Worker for deposit checkout and job invoices.</p>
-            <label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Stripe Worker URL</label>
-            <input class="settings-input" id="settingsStripeWorkerUrl" placeholder="https://flowpipe-stripe.yourname.workers.dev" style="margin-bottom:2px">
-            <button class="header-btn header-btn-primary" style="margin-top:4px" id="btnSaveStripeWorkerUrl">Save Worker URL</button>
-            <p style="margin-top:12px;font-size:11px;color:var(--text-muted);line-height:1.7"><strong>Setup:</strong><br>
-            1) Go to <strong>dash.cloudflare.com → Workers &amp; Pages → Create Worker</strong><br>
-            2) Paste the contents of <code>stripe-worker.js</code> and deploy<br>
-            3) Add env vars: <code>STRIPE_SECRET_KEY</code> (from stripe.com → API Keys) and <code>SITE_URL</code> (https://flowpipe.fit)<br>
-            4) Paste the Worker URL above and save<br>
-            5) Also paste it in <code>index.html</code> → <code>STRIPE_WORKER_URL</code><br><br>
-            <strong>Endpoints:</strong> <code>/checkout</code> → $100 deposit · <code>/invoice</code> → custom job invoice · <code>/email</code> → Resend emails</p>
-          </div>
-          <div class="settings-card" style="grid-column:1/-1"><h4>📧 Email Configuration</h4><p>Sends via Cloudflare Worker + Resend. Inbox reads from Gmail via GAS.</p>
-            <div style="margin-bottom:14px"><label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Email Worker URL</label><input class="settings-input" id="settingsEmailWorkerUrl" placeholder="https://your-email-worker.yourname.workers.dev" style="margin-bottom:2px"><button class="header-btn" style="margin-top:4px" id="btnSaveEmailWorkerUrl">Save Worker URL</button></div>
-            <div><label style="font-size:12px;font-weight:600;color:var(--text-secondary);display:block;margin-bottom:4px">Send-As Aliases (one per line)</label><textarea class="settings-input settings-textarea" id="settingsEmailAliases" placeholder="Support|support@yourbiz.com&#10;info@yourbiz.com&#10;Sales|sales@yourbiz.com"></textarea><button class="header-btn" style="margin-top:4px" id="btnSaveEmailAliases">Save Aliases</button></div>
-            <p style="margin-top:12px;font-size:11px;color:var(--text-muted);line-height:1.6"><strong>Setup:</strong><br>1) <strong>Resend:</strong> Add your domain → add DNS records (DKIM/SPF) in Cloudflare → get API key<br>2) <strong>Worker:</strong> Create Cloudflare Worker with email-worker.js → add env var RESEND_API_KEY → deploy → paste URL above<br>3) <strong>ImprovMX:</strong> Add domain → set MX records in Cloudflare → forward *@domain → your Gmail<br>4) <strong>Aliases:</strong> Add your from-addresses above (must match verified Resend domain)</p></div>
-        </div>
+</div>
       </div>
 
     </div>
@@ -467,7 +429,7 @@
 <div id="modalContainer"></div>
 
 <script>
-var GAS_URL=localStorage.getItem('flowpipe_gas_url')||'https://google-sheets-script.thomaslancheros06.workers.dev';
+var GAS_URL='https://google-sheets-script.thomaslancheros06.workers.dev';
 var appointments=[],quotes=[],contacts=[],clients=[];
 var currentPage='dashboard',searchQuery='';
 var activeFilters={appointments:'All',quotes:'All',contacts:'All'};
@@ -476,7 +438,7 @@ var QUOTE_STATUSES=['Pending','Responded','Accepted','Declined','Closed'];
 var CONTACT_STATUSES=['Unread','Read','Responded','Closed'];
 var CLIENT_STATUSES=['Active','Inactive'];
 var SERVICES_LIST=['Emergency Repair','Drain Cleaning','Water Heater','Pipe Installation','Fixture Install','Inspection','Sewer Line','Gas Line'];
-var PAGE_TITLES={dashboard:'Dashboard',appointments:'Appointments',quotes:'Quote Requests',contacts:'Messages',clients:'Clients',email:'Email',revenue:'Revenue & Payments',settings:'Settings'};
+var PAGE_TITLES={dashboard:'Dashboard',appointments:'Appointments',quotes:'Quote Requests',contacts:'Messages',clients:'Clients',email:'Email',revenue:'Revenue & Payments'};
 
 function showLoading(v){document.getElementById('loadingBar').style.display=v?'block':'none'}
 function showToast(msg,type){type=type||'success';var el=document.createElement('div');el.className='toast toast-'+type;el.innerHTML=(type==='success'?'✓ ':type==='error'?'✕ ':'ℹ ')+msg;document.body.appendChild(el);setTimeout(function(){el.style.opacity='0';el.style.transform='translateX(40px)';el.style.transition='all .3s'},2800);setTimeout(function(){el.remove()},3200)}
@@ -620,70 +582,7 @@ function exportCurrentPage(){var m={appointments:{d:appointments,n:'appointments
    ═══════════════════════════════════════ */
 var emailInbox=[],emailSent=[];
 var emailView='inbox'; // inbox | sent
-var EMAIL_ALIASES=JSON.parse(localStorage.getItem('flowpipe_email_aliases')||'[]'); // [{label,email}]
-
-var EMAIL_TEMPLATES=[
-  {label:'Appt Confirm',subject:'Appointment Confirmed',body:'Hi {name},\n\nThis confirms your appointment on {date}. We look forward to seeing you!\n\nIf you need to reschedule, just reply to this email or call us.\n\nThank you,\n{biz}'},
-  {label:'Quote Follow-up',subject:'Your Quote Request',body:'Hi {name},\n\nThank you for your quote request. We\'ve reviewed the details and would love to discuss your project.\n\nPlease give us a call or reply to this email with any questions.\n\nBest,\n{biz}'},
-  {label:'Job Complete',subject:'Job Complete — Thank You!',body:'Hi {name},\n\nGreat news — your job has been completed! We hope everything meets your expectations.\n\nIf you have a moment, we\'d really appreciate a Google review:\n{reviewLink}\n\nThank you for choosing us!\n\n{biz}'},
-  {label:'Payment Due',subject:'Invoice / Payment Reminder',body:'Hi {name},\n\nThis is a friendly reminder that payment is due for the recent service. Please let us know if you have any questions.\n\nThank you,\n{biz}'}
-];
-
-function initEmailAliases(){
-  var stored=localStorage.getItem('flowpipe_email_aliases');
-  if(stored){try{EMAIL_ALIASES=JSON.parse(stored)}catch(e){EMAIL_ALIASES=[]}}
-  var sel=document.getElementById('emailFrom');
-  sel.innerHTML='';
-  if(!EMAIL_ALIASES.length){
-    sel.innerHTML='<option value="">— set up in Settings →</option>';
-  }else{
-    for(var i=0;i<EMAIL_ALIASES.length;i++){
-      sel.innerHTML+='<option value="'+esc(EMAIL_ALIASES[i].email)+'">'+esc(EMAIL_ALIASES[i].label)+' ('+esc(EMAIL_ALIASES[i].email)+')</option>';
-    }
-  }
-  // Load into settings textarea
-  var ta=document.getElementById('settingsEmailAliases');
-  if(ta) ta.value=EMAIL_ALIASES.map(function(a){return a.label+'|'+a.email}).join('\n');
-}
-
-function saveEmailAliases(){
-  var raw=document.getElementById('settingsEmailAliases').value.trim();
-  if(!raw){EMAIL_ALIASES=[];localStorage.setItem('flowpipe_email_aliases','[]');initEmailAliases();showToast('Email aliases cleared','info');return}
-  var lines=raw.split('\n').filter(function(l){return l.trim().length>0});
-  EMAIL_ALIASES=[];
-  var skipped=[];
-  for(var i=0;i<lines.length;i++){
-    var line=lines[i].trim();
-    var label='',email='';
-    // Try pipe separator first: "Support|support@domain.com"
-    if(line.indexOf('|')!==-1){
-      var parts=line.split('|');
-      label=parts[0].trim();
-      email=parts[1].trim();
-    }
-    // Try just a bare email: "support@domain.com" → derive label from local part
-    else if(line.indexOf('@')!==-1){
-      email=line.trim();
-      label=email.split('@')[0];
-      label=label.charAt(0).toUpperCase()+label.slice(1);
-    }
-    // Validate it looks like an email
-    if(email&&email.indexOf('@')!==-1&&email.indexOf('.')!==-1){
-      EMAIL_ALIASES.push({label:label,email:email});
-    }else{
-      skipped.push(line);
-    }
-  }
-  localStorage.setItem('flowpipe_email_aliases',JSON.stringify(EMAIL_ALIASES));
-  initEmailAliases();
-  if(skipped.length>0){
-    showToast('Saved '+EMAIL_ALIASES.length+', skipped '+skipped.length+' invalid','error');
-  }else if(EMAIL_ALIASES.length>0){
-    showToast('Saved '+EMAIL_ALIASES.length+' email aliases');
-  }else{
-    showToast('No valid emails found. Use: Label|email@domain.com','error');
-  }
-}
+var EMAIL_ALIASES = [{label:'FlowPipe', email:'info@flowpipe.fit'},{label:'Noreply', email:'noreply@flowpipe.fit'}];
 
 function renderEmailTemplates(){
   var html='';
@@ -778,7 +677,7 @@ function openEmailDetail(idx){
   })}
 }
 
-var EMAIL_WORKER_URL=localStorage.getItem('flowpipe_email_worker_url')||'https://email.thomaslancheros06.workers.dev';
+var EMAIL_WORKER_URL='https://email.thomaslancheros06.workers.dev';
 
 function sendEmail(){
   var fromEmail=document.getElementById('emailFrom').value;
@@ -829,7 +728,6 @@ function clearCompose(){
 }
 
 /* SETTINGS */
-function initSettings(){var u=localStorage.getItem('flowpipe_gas_url');if(u)document.getElementById('settingsGasUrl').value=u;document.getElementById('settingsServices').value=SERVICES_LIST.join('\n')}
 
 /* INIT */
 document.addEventListener('DOMContentLoaded',function(){
@@ -838,86 +736,7 @@ document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('sidebarOverlay').addEventListener('click',closeSidebar);
   document.getElementById('btnRefresh').addEventListener('click',loadAll);
   document.getElementById('btnAddClient').addEventListener('click',openAddClientModal);
-  document.getElementById('btnExport').addEventListener('click',exportCurrentPage);
-  document.getElementById('globalSearch').addEventListener('input',function(){searchQuery=this.value;renderAll()});
-  document.getElementById('btnSaveGasUrl').addEventListener('click',function(){var u=document.getElementById('settingsGasUrl').value.trim();if(!u){showToast('Enter a URL','error');return}localStorage.setItem('flowpipe_gas_url',u);GAS_URL=u;showToast('Saved! Testing...','info');testConnection();setTimeout(loadAll,1500)});
-  document.getElementById('btnSaveServices').addEventListener('click',function(){var r=document.getElementById('settingsServices').value.trim();SERVICES_LIST=r.split('\n').map(function(s){return s.trim()}).filter(function(s){return s.length>0});showToast('Services updated ('+SERVICES_LIST.length+')')});
-  document.getElementById('btnExportAll').addEventListener('click',function(){var all=[];appointments.forEach(function(a){var o=Object.assign({},a);o._Sheet='Appointments';all.push(o)});quotes.forEach(function(q){var o=Object.assign({},q);o._Sheet='Quotes';all.push(o)});contacts.forEach(function(c){var o=Object.assign({},c);o._Sheet='Contacts';all.push(o)});clients.forEach(function(cl){var o=Object.assign({},cl);o._Sheet='Clients';all.push(o)});exportToCSV(all,'flowpipe-all-'+new Date().toISOString().slice(0,10))});
-  document.getElementById('btnExportClients').addEventListener('click',function(){exportToCSV(clients,'flowpipe-clients-'+new Date().toISOString().slice(0,10))});
-  initSettings();testConnection();renderAll();loadAll();
-  // Email init
-  initEmailAliases();renderEmailTemplates();
-  document.getElementById('btnSendEmail').addEventListener('click',sendEmail);
-  document.getElementById('btnClearCompose').addEventListener('click',clearCompose);
-  document.getElementById('btnRefreshEmail').addEventListener('click',loadEmails);
-  document.getElementById('btnBackToList').addEventListener('click',function(){document.getElementById('emailDetailPanel').style.display='none'});
-  document.getElementById('btnSaveEmailAliases').addEventListener('click',saveEmailAliases);
-  // Old Worker URL listener removed — new one below syncs to Config sheet too
-  // Load saved worker URL
-  var savedWorkerUrl=localStorage.getItem('flowpipe_email_worker_url');if(savedWorkerUrl)document.getElementById('settingsEmailWorkerUrl').value=savedWorkerUrl;
-  // Email tabs
-  var etabs=document.querySelectorAll('.email-tab');for(var et=0;et<etabs.length;et++)(function(tab){tab.addEventListener('click',function(){emailView=tab.getAttribute('data-etab');for(var x=0;x<etabs.length;x++)etabs[x].classList.remove('active');tab.classList.add('active');loadEmails()})})(etabs[et]);
-  document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
-  // Calendar ID settings
-  document.getElementById('btnSaveCalendarId').addEventListener('click',function(){
-    var cid=document.getElementById('settingsCalendarId').value.trim()||'primary';
-    postGAS({action:'saveConfig',config:{calendarId:cid}}).then(function(){showToast('Calendar ID saved: '+cid)}).catch(function(){showToast('Failed to save — check connection','error')});
-  });
-  // Auto-reply noreply email — always saves BOTH workerUrl and noreply together
-  document.getElementById('btnSaveAutoReply').addEventListener('click',function(){
-    var nr=document.getElementById('settingsNoreplyEmail').value.trim();
-    var workerUrl=document.getElementById('settingsEmailWorkerUrl').value.trim();
-    if(!nr){showToast('Enter a noreply email address','error');return}
-    if(!workerUrl){showToast('Set your Email Worker URL first (below)','error');return}
-    var config={noreplyEmail:nr,emailWorkerUrl:workerUrl};
-    postGAS({action:'saveConfig',config:config}).then(function(r){
-      if(r&&r.success){
-        // Verify it saved by reading back
-        fetchGAS('getConfig').then(function(cfg){
-          if(cfg&&cfg.noreplyEmail===nr&&cfg.emailWorkerUrl===workerUrl){
-            showToast('Auto-reply settings saved & verified ✓');
-          }else{
-            showToast('Saved but verification failed — check Config sheet manually','error');
-            console.warn('Config readback:',cfg);
-          }
-        });
-      }else{
-        showToast('Failed: '+(r&&r.error||'unknown'),'error');
-      }
-    }).catch(function(){showToast('Failed to save — check connection','error')});
-  });
-  // Also make the Email Worker URL save button write to Config sheet too
-  document.getElementById('btnSaveEmailWorkerUrl').addEventListener('click',function(){
-    var u=document.getElementById('settingsEmailWorkerUrl').value.trim();
-    if(!u){showToast('Enter a Worker URL','error');return}
-    localStorage.setItem('flowpipe_email_worker_url',u);EMAIL_WORKER_URL=u;
-    // Also save to Config sheet so auto-replies can use it
-    postGAS({action:'saveConfig',config:{emailWorkerUrl:u}}).then(function(){
-      showToast('Email Worker URL saved (local + Config sheet)');
-    }).catch(function(){
-      showToast('Saved locally but Config sheet sync failed','error');
-    });
-  });
-  // Load config from GAS to populate new fields
-  fetchGAS('getConfig').then(function(cfg){
-    if(cfg&&!cfg.error){
-      if(cfg.calendarId)document.getElementById('settingsCalendarId').value=cfg.calendarId;
-      if(cfg.noreplyEmail)document.getElementById('settingsNoreplyEmail').value=cfg.noreplyEmail;
-      if(cfg.emailWorkerUrl&&!document.getElementById('settingsEmailWorkerUrl').value)document.getElementById('settingsEmailWorkerUrl').value=cfg.emailWorkerUrl;
-      if(cfg.businessName)document.getElementById('settingsBizName').value=cfg.businessName;
-      if(cfg.businessPhone)document.getElementById('settingsBizPhone').value=cfg.businessPhone;
-      if(cfg.businessEmail)document.getElementById('settingsBizEmail').value=cfg.businessEmail;
-    }
-  }).catch(function(){});
-  // Stripe Worker URL setting
-  var STRIPE_WORKER_URL=localStorage.getItem('flowpipe_stripe_worker')||'https://stripe.thomaslancheros06.workers.dev';
-  if(STRIPE_WORKER_URL)document.getElementById('settingsStripeWorkerUrl').value=STRIPE_WORKER_URL;
-  document.getElementById('btnSaveStripeWorkerUrl').addEventListener('click',function(){
-    var u=document.getElementById('settingsStripeWorkerUrl').value.trim();
-    if(!u){showToast('Enter a Stripe Worker URL','error');return}
-    localStorage.setItem('flowpipe_stripe_worker',u);STRIPE_WORKER_URL=u;
-    showToast('Stripe Worker URL saved ✓');
-  });
+
 
   // ══════════════════════════════════════════════════════
   //  REVENUE PAGE — backed by Google Sheets (Revenue tab)
@@ -1066,20 +885,20 @@ document.addEventListener('DOMContentLoaded',function(){
 
   function capitalize(s){return s?s.charAt(0).toUpperCase()+s.slice(1):'';}
 
-  function markTxPaid(id){
+  window.markTxPaid = function(id){
     postGAS({action:'updateRevenue',id:id,status:'paid',paidAt:new Date().toISOString()}).then(function(r){
       if(r&&r.success){showToast('Marked as paid ✓');setTimeout(loadRevenue,800);}
       else showToast('Update failed: '+(r&&r.error||'unknown'),'error');
     }).catch(function(e){showToast('Request failed: '+e.message,'error');});
-  }
+  };
 
-  function deleteTx(id){
+  window.deleteTx = function(id){
     if(!confirm('Delete this transaction? This cannot be undone.'))return;
     postGAS({action:'deleteRevenue',id:id}).then(function(r){
       if(r&&r.success){showToast('Deleted','error');setTimeout(loadRevenue,800);}
       else showToast('Delete failed: '+(r&&r.error||'unknown'),'error');
     }).catch(function(e){showToast('Request failed: '+e.message,'error');});
-  }
+  };
 
   // ── Filter pills ──
   document.querySelectorAll('[data-rtab]').forEach(function(btn){
@@ -1124,7 +943,7 @@ document.addEventListener('DOMContentLoaded',function(){
     if(!amount||amount<0.5){showToast('Enter a valid amount','error');return}
     if(!description&&!clientName){showToast('Add a client name or description','error');return}
 
-    var stripeUrl=localStorage.getItem('flowpipe_stripe_worker')||'https://stripe.thomaslancheros06.workers.dev';
+    var stripeUrl='https://stripe.thomaslancheros06.workers.dev';
     if(!stripeUrl||stripeUrl.indexOf('YOUR_')===0){
       showToast('Stripe not configured — logging as pending invoice','info');
       addTransaction({
@@ -1194,7 +1013,7 @@ document.addEventListener('DOMContentLoaded',function(){
     var amount=document.getElementById('invAmount').value;
     var description=document.getElementById('invDescription').value.trim();
     var url=document.getElementById('invResultUrl').value;
-    var emailWorker=localStorage.getItem('flowpipe_email_worker_url')||'';
+    var emailWorker='https://email.thomaslancheros06.workers.dev';
     if(!emailWorker){showToast('Configure Email Worker URL in Settings first','error');return}
     if(!clientEmail){showToast('No client email entered','error');return}
     var body='Hi '+(clientName||'there')+',\n\nYour FlowPipe plumbing invoice of $'+parseFloat(amount).toFixed(2)+' is ready.\n'+(description?'Service: '+description+'\n':'')
