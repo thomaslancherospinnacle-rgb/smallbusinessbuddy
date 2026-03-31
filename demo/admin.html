@@ -539,15 +539,7 @@
             <input class="settings-input" id="settingsArea" placeholder="Service Area">
             <button class="header-btn header-btn-primary" id="btnSaveBiz" style="width:100%;margin-top:4px;">Save Business Info</button>
           </div>
-          <div class="settings-card">
-            <h4>📧 Email & Worker URLs</h4>
-            <p>GAS web app URL and Cloudflare Worker endpoints.</p>
-            <input class="settings-input" id="settingsGasUrl" placeholder="GAS Web App URL">
-            <input class="settings-input" id="settingsEmailWorker" placeholder="Email Worker URL">
-            <input class="settings-input" id="settingsNoreply" placeholder="Noreply Email (noreply@yourdomain.com)">
-            <input class="settings-input" id="settingsCalendarId" placeholder="Google Calendar ID">
-            <button class="header-btn header-btn-primary" id="btnSaveWorkers" style="width:100%;margin-top:4px;">Save Worker Settings</button>
-          </div>
+
         </div>
       </div>
 
@@ -1576,9 +1568,6 @@ document.addEventListener('DOMContentLoaded',function(){
       sv('settingsHours',     cfg.businessHours);
       sv('settingsArea',      cfg.serviceArea);
       sv('settingsGasUrl',    cfg.gasUrl||GAS_URL);
-      sv('settingsEmailWorker',cfg.emailWorkerUrl);
-      sv('settingsNoreply',   cfg.noreplyEmail);
-      sv('settingsCalendarId',cfg.calendarId);
     });
   }
 
@@ -1592,16 +1581,6 @@ document.addEventListener('DOMContentLoaded',function(){
       serviceArea:   document.getElementById('settingsArea').value,
     }}).then(function(){showToast('Business info saved ✓');btn.textContent='Save Business Info';btn.disabled=false;})
      .catch(function(){showToast('Save failed','error');btn.textContent='Save Business Info';btn.disabled=false;});
-  });
-
-  document.getElementById('btnSaveWorkers').addEventListener('click',function(){
-    var btn=this; btn.textContent='Saving...'; btn.disabled=true;
-    postGAS({action:'saveConfig',config:{
-      emailWorkerUrl: document.getElementById('settingsEmailWorker').value,
-      noreplyEmail:   document.getElementById('settingsNoreply').value,
-      calendarId:     document.getElementById('settingsCalendarId').value,
-    }}).then(function(){showToast('Worker settings saved ✓');btn.textContent='Save Worker Settings';btn.disabled=false;})
-     .catch(function(){showToast('Save failed','error');btn.textContent='Save Worker Settings';btn.disabled=false;});
   });
 
   document.querySelector('[data-page="settings"]').addEventListener('click', loadSettings);
