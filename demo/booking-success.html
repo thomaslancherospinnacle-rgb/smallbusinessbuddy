@@ -184,6 +184,11 @@ function setText(id, val) {
     return;
   }
 
+  // ── Prevent duplicate calendar events / emails on page refresh ──
+  // Only send depositPaid:true the first time this session+appt combo is seen.
+  const processedKey = 'appt_processed_' + appointmentId + '_' + sessionId;
+  const alreadyProcessed = sessionStorage.getItem(processedKey) === '1';
+
   try {
     // Tell GAS the deposit is paid — it handles everything server-side
     const res = await fetch(GAS_URL, {
@@ -193,7 +198,7 @@ function setText(id, val) {
         action:        'updateAppointmentStatus',
         appointmentId: appointmentId,
         status:        'Confirmed',
-        depositPaid:   true,
+        depositPaid:   !alreadyProcessed,   // false on refresh — skips duplicate cal event + email
         stripeSession: sessionId,
       })
     });
@@ -201,6 +206,8 @@ function setText(id, val) {
     const result = await res.json();
 
     if (result && result.success) {
+      // ── Mark this session as processed so a page refresh doesn't re-fire ──
+      sessionStorage.setItem(processedKey, '1');
       // ── Populate appointment details if GAS returned them ──
       // (GAS echos back what it found in the sheet)
       const data = result.appointment || {};
