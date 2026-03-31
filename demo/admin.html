@@ -933,8 +933,9 @@ document.addEventListener('DOMContentLoaded',function(){
     document.getElementById('revTxCount').textContent='Loading…';
     fetchGAS('getRevenue').then(function(rows){
       revLoading=false;
+      if(!Array.isArray(rows)){ renderRevenue(); return; } // empty sheet or error object
       // Normalise column names to camelCase for consistency
-      revTransactions = (rows||[]).map(function(r){
+      revTransactions = rows.map(function(r){
         return {
           id:            r.ID            || r.id            || '',
           timestamp:     r.Timestamp     || r.timestamp     || '',
@@ -959,6 +960,8 @@ document.addEventListener('DOMContentLoaded',function(){
       revLoading=false;
       showToast('Revenue load failed: '+e.message,'error');
       document.getElementById('revTxCount').textContent='Error';
+    }).finally(function(){
+      revLoading=false; // always unlock regardless of outcome
     });
   }
 
