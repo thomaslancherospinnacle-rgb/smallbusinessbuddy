@@ -1065,7 +1065,7 @@ document.addEventListener('DOMContentLoaded',function(){
 
   function markTxPaid(id){
     postGAS({action:'updateRevenue',id:id,status:'paid',paidAt:new Date().toISOString()}).then(function(r){
-      if(r&&r.success){showToast('Marked as paid ✓');loadRevenue();}
+      if(r&&r.success){showToast('Marked as paid ✓');setTimeout(loadRevenue,800);}
       else showToast('Update failed: '+(r&&r.error||'unknown'),'error');
     }).catch(function(e){showToast('Request failed: '+e.message,'error');});
   }
@@ -1073,7 +1073,7 @@ document.addEventListener('DOMContentLoaded',function(){
   function deleteTx(id){
     if(!confirm('Delete this transaction? This cannot be undone.'))return;
     postGAS({action:'deleteRevenue',id:id}).then(function(r){
-      if(r&&r.success){showToast('Deleted','error');loadRevenue();}
+      if(r&&r.success){showToast('Deleted','error');setTimeout(loadRevenue,800);}
       else showToast('Delete failed: '+(r&&r.error||'unknown'),'error');
     }).catch(function(e){showToast('Request failed: '+e.message,'error');});
   }
@@ -1092,10 +1092,22 @@ document.addEventListener('DOMContentLoaded',function(){
   function addTransaction(tx){
     tx.action='addRevenue';
     tx.timestamp=tx.timestamp||new Date().toISOString();
+    console.log('[Revenue] Sending to GAS:', JSON.stringify(tx));
+    showToast('Saving transaction…','info');
     postGAS(tx).then(function(r){
-      if(r&&r.success){ loadRevenue(); }
-      else showToast('Save failed: '+(r&&r.error||'unknown'),'error');
-    }).catch(function(e){showToast('Save failed: '+e.message,'error');});
+      console.log('[Revenue] GAS response:', JSON.stringify(r));
+      if(r&&r.success){
+        showToast('Transaction saved ✓');
+        // Small delay so GAS sheet write is fully committed before we read
+        setTimeout(loadRevenue, 800);
+      } else {
+        showToast('Save failed: '+(r&&r.error||JSON.stringify(r)||'no response'),'error');
+        console.error('[Revenue] addRevenue failed:', r);
+      }
+    }).catch(function(e){
+      console.error('[Revenue] postGAS threw:', e);
+      showToast('Save failed: '+e.message,'error');
+    });
   }
 
   // ── Invoice Creator ──
