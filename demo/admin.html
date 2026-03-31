@@ -284,7 +284,9 @@
               <div class="email-compose-row">
                 <label>From</label>
                 <select id="emailFrom">
-                  <option value="">— configure in Settings —</option>
+                  <option value="">— select sender —</option>
+                  <option value="office@flowpipe.fit">Office — office@flowpipe.fit</option>
+                  <option value="support@flowpipe.fit">Support — support@flowpipe.fit</option>
                 </select>
               </div>
               <div class="email-compose-row">
@@ -705,7 +707,7 @@ function exportCurrentPage(){var m={appointments:{d:appointments,n:'appointments
    ═══════════════════════════════════════ */
 var emailInbox=[],emailSent=[];
 var emailView='inbox'; // inbox | sent
-var EMAIL_ALIASES = [{label:'FlowPipe', email:'info@flowpipe.fit'},{label:'Noreply', email:'noreply@flowpipe.fit'}];
+var EMAIL_ALIASES = [{label:'Office', email:'office@flowpipe.fit'},{label:'Support', email:'support@flowpipe.fit'}];
 
 function renderEmailTemplates(){
   var html='';
