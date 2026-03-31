@@ -1613,4 +1613,14 @@ document.addEventListener('DOMContentLoaded',function(){
       businessEmail: document.getElementById('settingsBizEmail').value,
       businessHours: document.getElementById('settingsHours').value,
       serviceArea:   document.getElementById('settingsArea').value,
-    }}).then(function(){showToast('Business info saved ✓');btn.textContent='Save Business Info';btn.dis
+    }}).then(function(){showToast('Business info saved ✓');btn.textContent='Save Business Info';btn.disabled=false;})
+     .catch(function(){showToast('Save failed','error');btn.textContent='Save Business Info';btn.disabled=false;});
+  });
+
+  document.querySelector('[data-page="settings"]').addEventListener('click', loadSettings);
+  loadSettings();
+
+});
+</script>
+</body>
+</html>
