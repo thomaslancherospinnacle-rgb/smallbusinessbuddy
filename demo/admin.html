@@ -778,7 +778,7 @@ function openEmailDetail(idx){
   })}
 }
 
-var EMAIL_WORKER_URL=localStorage.getItem('flowpipe_email_worker_url')||'';
+var EMAIL_WORKER_URL=localStorage.getItem('flowpipe_email_worker_url')||'https://email.thomaslancheros06.workers.dev';
 
 function sendEmail(){
   var fromEmail=document.getElementById('emailFrom').value;
@@ -910,7 +910,7 @@ document.addEventListener('DOMContentLoaded',function(){
     }
   }).catch(function(){});
   // Stripe Worker URL setting
-  var STRIPE_WORKER_URL=localStorage.getItem('flowpipe_stripe_worker')||'https://morning-forest-5c80.thomaslancheros06.workers.dev';
+  var STRIPE_WORKER_URL=localStorage.getItem('flowpipe_stripe_worker')||'https://stripe.thomaslancheros06.workers.dev';
   if(STRIPE_WORKER_URL)document.getElementById('settingsStripeWorkerUrl').value=STRIPE_WORKER_URL;
   document.getElementById('btnSaveStripeWorkerUrl').addEventListener('click',function(){
     var u=document.getElementById('settingsStripeWorkerUrl').value.trim();
@@ -1118,7 +1118,7 @@ document.addEventListener('DOMContentLoaded',function(){
     if(!amount||amount<0.5){showToast('Enter a valid amount','error');return}
     if(!description&&!clientName){showToast('Add a client name or description','error');return}
 
-    var stripeUrl=localStorage.getItem('flowpipe_stripe_worker')||'https://morning-forest-5c80.thomaslancheros06.workers.dev';
+    var stripeUrl=localStorage.getItem('flowpipe_stripe_worker')||'https://stripe.thomaslancheros06.workers.dev';
     if(!stripeUrl||stripeUrl.indexOf('YOUR_')===0){
       showToast('Stripe not configured — logging as pending invoice','info');
       addTransaction({
