@@ -1210,14 +1210,23 @@ document.addEventListener('DOMContentLoaded',function(){
       html += '<td class="meta-cell">'+fmtDate(r.Timestamp)+'</td>';
       html += '<td>'+statusBadge(r.Status||'Pending')+'</td>';
       html += '<td><div class="row-actions">';
-      if(r.Status!=='Published') html += '<button class="row-btn row-btn-convert" onclick="publishReview('"+ r.ID +"')">Publish</button>';
-      if(r.Status==='Published') html += '<button class="row-btn" onclick="hideReview('"+ r.ID +"')">Hide</button>';
-      html += '<button class="row-btn row-btn-edit" onclick="editReview('"+ r.ID +"')">Edit</button>';
-      html += '<button class="row-btn row-btn-del" onclick="deleteReview('"+ r.ID +"')">Del</button>';
+      if(r.Status!=='Published') html += '<button class="row-btn row-btn-convert rv-btn" data-action="publish" data-id="'+r.ID+'">Publish</button>';
+      if(r.Status==='Published')  html += '<button class="row-btn rv-btn" data-action="hide" data-id="'+r.ID+'">Hide</button>';
+      html += '<button class="row-btn row-btn-edit rv-btn" data-action="edit" data-id="'+r.ID+'">Edit</button>';
+      html += '<button class="row-btn row-btn-del rv-btn" data-action="del" data-id="'+r.ID+'">Del</button>';
       html += '</div></td></tr>';
     });
     html += '</tbody></table>';
     document.getElementById('reviewsTable').innerHTML = html;
+    document.getElementById('reviewsTable').querySelectorAll('.rv-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var id=btn.getAttribute('data-id'), act=btn.getAttribute('data-action');
+        if(act==='publish') window.publishReview(id);
+        else if(act==='hide') window.hideReview(id);
+        else if(act==='edit') window.editReview(id);
+        else if(act==='del') window.deleteReview(id);
+      });
+    });
   }
 
   window.publishReview = function(id){
@@ -1348,13 +1357,21 @@ document.addEventListener('DOMContentLoaded',function(){
       html += '<td class="name-cell">'+esc(s.Name||'')+'</td>';
       html += '<td style="color:var(--accent);font-weight:600;">'+esc(s.Price||'')+'</td>';
       html += '<td class="meta-cell">'+esc(String(s.Duration||60))+'m</td>';
-      html += '<td><button class="service-active-toggle '+(isOn?'on':'off')+'" onclick="toggleService('"+ s.ID +"','+(isOn?'false':'true')+')">'+(isOn?'ON':'OFF')+'</button></td>';
+      html += '<td><button class="service-active-toggle '+(isOn?'on':'off')+' svc-btn" data-action="toggle" data-id="'+s.ID+'" data-active="'+(isOn?'false':'true')+'">'+(isOn?'ON':'OFF')+'</button></td>';
       html += '<td class="truncate" style="max-width:180px;">'+esc((s.Description||'').substring(0,60))+'</td>';
-      html += '<td><div class="row-actions"><button class="row-btn row-btn-edit" onclick="editService('"+ s.ID +"')">Edit</button><button class="row-btn row-btn-del" onclick="deleteService('"+ s.ID +"')">Del</button></div></td>';
+      html += '<td><div class="row-actions"><button class="row-btn row-btn-edit svc-btn" data-action="edit" data-id="'+s.ID+'">Edit</button><button class="row-btn row-btn-del svc-btn" data-action="del" data-id="'+s.ID+'">Del</button></div></td>';
       html += '</tr>';
     });
     html += '</tbody></table>';
     document.getElementById('servicesTable').innerHTML = html;
+    document.getElementById('servicesTable').querySelectorAll('.svc-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var id=btn.getAttribute('data-id'), act=btn.getAttribute('data-action');
+        if(act==='toggle') window.toggleService(id, btn.getAttribute('data-active'));
+        else if(act==='edit') window.editService(id);
+        else if(act==='del') window.deleteService(id);
+      });
+    });
   }
 
   window.toggleService = function(id, newActive){
