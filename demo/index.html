@@ -579,7 +579,7 @@ input, textarea, select { font-family: inherit; }
   </div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 /* ═══════════════════════════════════════
    CONFIG
    ═══════════════════════════════════════ */
@@ -1183,19 +1183,30 @@ async function submitBooking() {
       const appointmentId = 'APPT-' + Date.now();
 
       // Log to Google Sheet (even before payment — status will be "Pending Payment")
-      await postToGAS({
-        action: 'appointment',
-        name, email, phone,
-        address: document.getElementById('bkAddress').value.trim(),
-        notes: document.getElementById('bkNotes').value.trim(),
-        service: bkService ? bkService.name : '',
-        date: bkDate ? fmtDate(bkDate) : '',
-        time: bkTime ? fmtTime(bkTime.h, bkTime.m) : '',
-        duration: bkService ? bkService.duration : 60,
-        appointmentId,
-        status: 'Pending Payment',
-        timestamp: new Date().toISOString()
-      });
+      // Wrapped in try/catch: GAS failure must not block the Stripe redirect.
+      // If GAS is down, booking-success.html will still confirm the payment
+      // but the appointment row may be missing — the console.error flags this.
+      try {
+        const gasResult = await postToGAS({
+          action: 'appointment',
+          name, email, phone,
+          address: document.getElementById('bkAddress').value.trim(),
+          notes: document.getElementById('bkNotes').value.trim(),
+          service: bkService ? bkService.name : '',
+          date: bkDate ? fmtDate(bkDate) : '',
+          time: bkTime ? fmtTime(bkTime.h, bkTime.m) : '',
+          duration: bkService ? bkService.duration : 60,
+          appointmentId,
+          status: 'Pending Payment',
+          timestamp: new Date().toISOString()
+        });
+        if (!gasResult || !gasResult.success) {
+          console.error('GAS failed to log appointment before Stripe redirect:', gasResult);
+        }
+      } catch (gasErr) {
+        console.error('GAS unreachable before Stripe redirect:', gasErr);
+        // Still proceed to Stripe — payment is more important than pre-logging
+      }
 
       // Check if worker is configured
       if (!STRIPE_WORKER_URL || STRIPE_WORKER_URL.startsWith('YOUR_')) {
@@ -1299,4 +1310,13 @@ async function submitContact() {
       const el = document.getElementById(id); if (el) el.style.display = 'none';
     });
     const steps = document.getElementById('bookingSteps');
-    const toggl
+    const toggl = document.querySelector('.booking-mode-toggle');
+    if (steps)  steps.style.display = 'none';
+    if (toggl)  toggl.style.display = 'none';
+    document.getElementById('bookingConfirm').style.display = 'block';
+    showPage('booking');
+  }
+})();
+</script>
+</body>
+</html>
