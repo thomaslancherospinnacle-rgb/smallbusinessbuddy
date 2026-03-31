@@ -705,7 +705,7 @@ function exportCurrentPage(){var m={appointments:{d:appointments,n:'appointments
    ═══════════════════════════════════════ */
 var emailInbox=[],emailSent=[];
 var emailView='inbox'; // inbox | sent
-var EMAIL_ALIASES = [{label:'Office', email:'office@flowpipe.fit'},{label:'Support', email:'support@flowpipe.fit'}];
+var EMAIL_ALIASES = [{label:'Office', email:'office@flowpipe.fit'},{label:'Support', email:'support@flowpipe.fit'},{label:'Billing', email:'billing@flowpipe.fit'}];
 var EMAIL_WORKER_URL = 'https://email.thomaslancheros06.workers.dev';
 var EMAIL_TEMPLATES = [
   { label:'Follow-up',   subject:'Following up on your service',      body:'Hi,\n\nJust checking in after your recent service with {biz}. We hope everything is working great!\n\nBest,\nThe {biz} Team' },
@@ -1170,18 +1170,18 @@ document.addEventListener('DOMContentLoaded',function(){
     var amount=document.getElementById('invAmount').value;
     var description=document.getElementById('invDescription').value.trim();
     var url=document.getElementById('invResultUrl').value;
-    var emailWorker='https://email.thomaslancheros06.workers.dev';
-    if(!emailWorker){showToast('Configure Email Worker URL in Settings first','error');return}
     if(!clientEmail){showToast('No client email entered','error');return}
+    var btn=this;btn.textContent='Sending...';btn.disabled=true;
     var body='Hi '+(clientName||'there')+',\n\nYour FlowPipe plumbing invoice of $'+parseFloat(amount).toFixed(2)+' is ready.\n'+(description?'Service: '+description+'\n':'')
       +'\nPay securely online:\n'+url+'\n\nThank you for choosing FlowPipe Plumbing!\n\n— FlowPipe Team';
-    fetch(emailWorker,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
-      from:'FlowPipe Plumbing <info@flowpipe.fit>',to:clientEmail,
+    fetch(EMAIL_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      from:'FlowPipe Billing <billing@flowpipe.fit>',to:clientEmail,
       subject:'Your FlowPipe Invoice — $'+parseFloat(amount).toFixed(2),body:body
     })}).then(function(r){return r.json()}).then(function(r){
+      btn.textContent='✉️ Email to Client';btn.disabled=false;
       if(r&&r.success)showToast('Invoice emailed to '+clientEmail+' ✓');
       else showToast('Email failed: '+(r&&r.error||'unknown'),'error');
-    }).catch(function(){showToast('Email request failed','error')});
+    }).catch(function(){btn.textContent='✉️ Email to Client';btn.disabled=false;showToast('Email request failed','error')});
   });
 
   // Manual transaction (modal-style prompts → GAS)
