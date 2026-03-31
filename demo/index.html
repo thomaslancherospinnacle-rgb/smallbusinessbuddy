@@ -332,10 +332,10 @@ input, textarea, select { font-family: inherit; }
       </div>
     </div>
     <div class="stats fade-up fade-up-4">
-      <div class="stat"><div class="stat-value">18+</div><div class="stat-label">Years Exp.</div></div>
-      <div class="stat"><div class="stat-value">4,200+</div><div class="stat-label">Jobs Done</div></div>
-      <div class="stat"><div class="stat-value">4.9★</div><div class="stat-label">Rating</div></div>
-      <div class="stat"><div class="stat-value">30min</div><div class="stat-label">Avg Response</div></div>
+      <div class="stat"><div class="stat-value" id="statYears">18+</div><div class="stat-label">Years Exp.</div></div>
+      <div class="stat"><div class="stat-value" id="statJobs">4,500+</div><div class="stat-label">Jobs Done</div></div>
+      <div class="stat"><div class="stat-value" id="statSatisfaction">99%</div><div class="stat-label">Satisfaction</div></div>
+      <div class="stat"><div class="stat-value" id="statTeam">12</div><div class="stat-label">Team Size</div></div>
     </div>
   </section>
 
@@ -501,10 +501,28 @@ input, textarea, select { font-family: inherit; }
 
 <!-- ABOUT -->
 <div id="page-about" class="page">
+  <section class="hero" style="padding:60px 24px 40px;">
+    <div class="hero-inner">
+      <h1 class="fade-up" style="font-size:clamp(30px,4vw,52px);" id="aboutHeadline">Trusted Plumbing, Done Right</h1>
+      <p class="fade-up fade-up-1" id="aboutSubheadline">Family-owned and serving South Florida since 2006</p>
+    </div>
+  </section>
+  <section class="section section-alt">
+    <div class="section-inner" style="max-width:780px;">
+      <div class="section-header"><h2>Our Story</h2></div>
+      <p style="font-size:16px;color:var(--text-secondary);line-height:1.8;margin-bottom:20px;" id="aboutStory">Loading...</p>
+      <p style="font-size:15px;font-style:italic;color:var(--accent);font-weight:600;" id="aboutMission"></p>
+    </div>
+  </section>
   <section class="section">
     <div class="section-inner">
-      <div class="section-header"><h2>About FlowPipe</h2><p>Founded in 2008, we've grown from a one-man operation to South Florida's most trusted plumbing team.</p></div>
+      <div class="section-header"><h2>Meet the Team</h2><p>Licensed, experienced, and passionate about quality work.</p></div>
       <div class="team-grid" id="teamGrid"></div>
+    </div>
+  </section>
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div class="section-header"><h2>Our Guarantees</h2></div>
       <div class="guarantees-grid" id="guaranteesGrid"></div>
     </div>
   </section>
@@ -515,7 +533,7 @@ input, textarea, select { font-family: inherit; }
   <section class="section section-alt">
     <div class="section-inner">
       <div class="section-header"><h2>Customer Reviews</h2><p>Hear from the homeowners and businesses we've helped.</p></div>
-      <div class="reviews-grid" id="reviewsGrid"></div>
+      <div class="reviews-grid" id="reviewsGrid"><div style="text-align:center;padding:40px;color:var(--text-muted);">Loading reviews...</div></div>
     </div>
   </section>
 </div>
@@ -588,37 +606,21 @@ const GAS_URL = 'https://google-sheets-script.thomaslancheros06.workers.dev';
 // ── Stripe Worker URL ── set after deploying stripe-worker.js to Cloudflare
 const STRIPE_WORKER_URL = localStorage.getItem('flowpipe_stripe_worker') || 'https://stripe.thomaslancheros06.workers.dev';
 
-const SERVICES = [
-  { id:'s1', name:'Emergency Repair', icon:'🔧', price:'From $89', desc:'24/7 emergency plumbing repairs for burst pipes, major leaks, and flooding.', duration:60 },
-  { id:'s2', name:'Drain Cleaning', icon:'🚿', price:'From $65', desc:'Professional drain unclogging for kitchens, bathrooms, and main lines.', duration:45 },
-  { id:'s3', name:'Water Heater', icon:'🔥', price:'From $120', desc:'Installation, repair, and maintenance of all water heater types.', duration:90 },
-  { id:'s4', name:'Pipe Installation', icon:'🔩', price:'From $150', desc:'New pipe installation, repiping, and pipe replacement services.', duration:120 },
-  { id:'s5', name:'Fixture Install', icon:'🚰', price:'From $75', desc:'Faucet, toilet, shower, and sink installation and replacement.', duration:60 },
-  { id:'s6', name:'Inspection', icon:'🔍', price:'From $49', desc:'Comprehensive plumbing inspection with camera and detailed report.', duration:45 },
-  { id:'s7', name:'Sewer Line', icon:'🏗️', price:'From $200', desc:'Sewer line repair, replacement, and trenchless solutions.', duration:180 },
-  { id:'s8', name:'Gas Line', icon:'⚡', price:'From $175', desc:'Gas line installation, repair, and leak detection services.', duration:90 },
-];
+// ── Dynamic data — loaded from GAS sheets ──
+let SERVICES  = [];  // populated by loadSiteData()
+let REVIEWS   = [];
+let ABOUT_DATA = {};
 
-const REVIEWS = [
-  { name:'Maria G.', rating:5, text:'Fixed our burst pipe in under an hour. Incredibly professional and fair pricing!', date:'2 weeks ago', service:'Emergency Repair' },
-  { name:'James T.', rating:5, text:'Punctual, clean, and thorough. Our new water heater works perfectly.', date:'1 month ago', service:'Water Heater' },
-  { name:'Sophia R.', rating:5, text:'Best plumber in the area. They even fixed a small leak they noticed for free.', date:'3 weeks ago', service:'Inspection' },
-  { name:'Derek M.', rating:4, text:'Great service. Drain was cleared quickly and they explained the cause.', date:'1 month ago', service:'Drain Cleaning' },
-  { name:'Linda K.', rating:5, text:'Replaced all our old fixtures beautifully. The bathroom looks brand new!', date:'2 months ago', service:'Fixture Install' },
-  { name:'Carlos P.', rating:5, text:'Emergency call at 11pm and they showed up within 30 minutes. Lifesavers!', date:'1 week ago', service:'Emergency Repair' },
-];
-
-const TEAM = [
-  { name:'Mike Henderson', role:'Master Plumber / Owner', years:18, cert:'Licensed & Insured', img:'👨‍🔧' },
-  { name:'Sarah Chen', role:'Lead Technician', years:12, cert:'Certified Pipefitter', img:'👩‍🔧' },
-  { name:'Tony Reeves', role:'Senior Plumber', years:9, cert:'Backflow Certified', img:'🧑‍🔧' },
-];
-
-const GUARANTEES = [
-  { icon:'🛡️', title:'Licensed & Bonded', desc:'Full state licensing with comprehensive bonding coverage.' },
-  { icon:'✅', title:'Satisfaction Guarantee', desc:"Not happy? We'll make it right or your money back." },
-  { icon:'⏰', title:'24/7 Emergency', desc:'Round-the-clock emergency response, 365 days a year.' },
-  { icon:'💰', title:'Upfront Pricing', desc:'No hidden fees. You approve the price before we start.' },
+// Fallback services used while GAS is loading or if fetch fails
+const SERVICES_FALLBACK = [
+  { ID:'s1', Name:'Emergency Repair', Icon:'🔧', Price:'From $89', Description:'24/7 emergency plumbing repairs for burst pipes, major leaks, and flooding.', Duration:60, Active:true },
+  { ID:'s2', Name:'Drain Cleaning',   Icon:'🚿', Price:'From $65', Description:'Professional drain unclogging for kitchens, bathrooms, and main lines.',    Duration:45, Active:true },
+  { ID:'s3', Name:'Water Heater',     Icon:'🔥', Price:'From $120', Description:'Installation, repair, and maintenance of all water heater types.',           Duration:90, Active:true },
+  { ID:'s4', Name:'Pipe Installation',Icon:'🔩', Price:'From $150', Description:'New pipe installation, repiping, and pipe replacement services.',            Duration:120,Active:true },
+  { ID:'s5', Name:'Fixture Install',  Icon:'🚰', Price:'From $75', Description:'Faucet, toilet, shower, and sink installation and replacement.',             Duration:60, Active:true },
+  { ID:'s6', Name:'Inspection',       Icon:'🔍', Price:'From $49', Description:'Comprehensive plumbing inspection with camera and detailed report.',          Duration:45, Active:true },
+  { ID:'s7', Name:'Sewer Line',       Icon:'🏗️', Price:'From $200', Description:'Sewer line repair, replacement, and trenchless solutions.',                  Duration:180,Active:true },
+  { ID:'s8', Name:'Gas Line',         Icon:'⚡', Price:'From $175', Description:'Gas line installation, repair, and leak detection services.',                Duration:90, Active:true },
 ];
 
 const NAV_ITEMS = [
@@ -678,24 +680,26 @@ document.getElementById('hamburgerBtn').addEventListener('click', () => {
    RENDER STATIC CONTENT
    ═══════════════════════════════════════ */
 function renderServiceCards(containerId) {
-  document.getElementById(containerId).innerHTML = SERVICES.map(s => `
+  const active = SERVICES.filter(s => s.Active !== false);
+  document.getElementById(containerId).innerHTML = active.map(s => `
     <div class="service-card">
-      <div class="service-card-icon">${s.icon}</div>
-      <h3>${s.name}</h3>
-      <p>${s.desc}</p>
-      <div class="service-card-price">${s.price}</div>
-      <div class="service-card-duration">~${s.duration} min</div>
+      <div class="service-card-icon">${s.Icon || s.icon || '🔧'}</div>
+      <h3>${s.Name || s.name}</h3>
+      <p>${s.Description || s.desc}</p>
+      <div class="service-card-price">${s.Price || s.price}</div>
+      <div class="service-card-duration">~${s.Duration || s.duration} min</div>
     </div>
-  `).join('');
+  `).join('') || '<p style="color:var(--text-muted);text-align:center;padding:24px;">No services available.</p>';
 }
 
 function renderServiceSelectGrid() {
+  const active = SERVICES.filter(s => s.Active !== false);
   const el = document.getElementById('serviceSelectGrid');
-  el.innerHTML = SERVICES.map(s => `
-    <button class="service-select-btn" data-sid="${s.id}">
-      <div class="s-icon">${s.icon}</div>
-      <div class="s-name">${s.name}</div>
-      <div class="s-price">${s.price}</div>
+  el.innerHTML = active.map(s => `
+    <button class="service-select-btn" data-sid="${s.ID || s.id}">
+      <div class="s-icon">${s.Icon || s.icon || '🔧'}</div>
+      <div class="s-name">${s.Name || s.name}</div>
+      <div class="s-price">${s.Price || s.price}</div>
     </button>
   `).join('');
   el.querySelectorAll('.service-select-btn').forEach(btn => {
@@ -714,36 +718,71 @@ function renderInquiryServiceOptions() {
 }
 
 function renderReviews() {
-  document.getElementById('reviewsGrid').innerHTML = REVIEWS.map(r => `
-    <div class="review-card">
-      <div class="review-header">
-        <div class="review-author">
-          <div class="review-avatar">${r.name[0]}</div>
-          <div><div class="review-name">${r.name}</div><div class="review-meta">${r.date} · ${r.service}</div></div>
+  const published = REVIEWS.filter(r => !r.Status || r.Status === 'Published');
+  const el = document.getElementById('reviewsGrid');
+  if (!published.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No reviews yet. Be the first!</div>';
+    return;
+  }
+  el.innerHTML = published.map(r => {
+    const name = r.Name || r.name || 'Anonymous';
+    const rating = parseInt(r.Rating || r.rating) || 5;
+    const text = r.ReviewText || r.text || '';
+    const ts = r.Timestamp || r.date || '';
+    const date = ts ? new Date(ts).toLocaleDateString('en-US', {month:'short', year:'numeric'}) : '';
+    return `
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-author">
+            <div class="review-avatar">${name[0].toUpperCase()}</div>
+            <div><div class="review-name">${name}</div><div class="review-meta">${date}</div></div>
+          </div>
+          <div class="review-stars">${'★'.repeat(rating)}${'☆'.repeat(Math.max(0, 5-rating))}</div>
         </div>
-        <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
+        <p class="review-text">"${text}"</p>
       </div>
-      <p class="review-text">"${r.text}"</p>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function renderTeam() {
-  document.getElementById('teamGrid').innerHTML = TEAM.map(t => `
+  const a = ABOUT_DATA;
+  // Build team members from about data keys: teamMember1Name, teamMember1Role etc.
+  const members = [];
+  for (let i = 1; i <= 10; i++) {
+    const n = a['teamMember'+i+'Name'];
+    if (!n) break;
+    members.push({
+      name: n,
+      role: a['teamMember'+i+'Role'] || '',
+      years: a['teamMember'+i+'Years'] || '',
+      cert: a['teamMember'+i+'Cert'] || '',
+    });
+  }
+  const TEAM_ICONS = ['👨‍🔧','👩‍🔧','🧑‍🔧','👷','🔧'];
+  document.getElementById('teamGrid').innerHTML = members.map((t, i) => `
     <div class="team-card">
-      <div class="team-avatar">${t.img}</div>
+      <div class="team-avatar">${TEAM_ICONS[i % TEAM_ICONS.length]}</div>
       <div class="team-name">${t.name}</div>
       <div class="team-role">${t.role}</div>
-      <div class="team-detail">${t.years} yrs experience · ${t.cert}</div>
+      <div class="team-detail">${t.years ? t.years+' yrs experience' : ''}${t.years && t.cert ? ' · ' : ''}${t.cert}</div>
     </div>
-  `).join('');
-  document.getElementById('guaranteesGrid').innerHTML = GUARANTEES.map(g => `
+  `).join('') || '<p style="color:var(--text-muted);text-align:center;">No team members added yet.</p>';
+
+  const guarantees = [];
+  const GUARANTEE_ICONS = ['🛡️','✅','⏰','💰','🏆','🔒'];
+  for (let i = 1; i <= 8; i++) {
+    const t = a['guarantee'+i+'Title'];
+    if (!t) break;
+    guarantees.push({ icon: GUARANTEE_ICONS[i-1] || '✅', title: t, desc: a['guarantee'+i+'Desc'] || '' });
+  }
+  document.getElementById('guaranteesGrid').innerHTML = guarantees.map(g => `
     <div class="guarantee-card">
       <div style="font-size:22px;">${g.icon}</div>
       <h4>${g.title}</h4>
       <p>${g.desc}</p>
     </div>
-  `).join('');
+  `).join('') || '';
 }
 
 /* ═══════════════════════════════════════
@@ -921,7 +960,18 @@ function goBookingStep(step) {
 }
 
 function selectService(id) {
-  bkService = SERVICES.find(s => s.id === id);
+  bkService = SERVICES.find(s => (s.ID || s.id) === id);
+  // Normalise to consistent shape for booking logic
+  if (bkService) {
+    bkService = {
+      id:       bkService.ID       || bkService.id,
+      name:     bkService.Name     || bkService.name,
+      icon:     bkService.Icon     || bkService.icon,
+      price:    bkService.Price    || bkService.price,
+      desc:     bkService.Description || bkService.desc,
+      duration: parseInt(bkService.Duration || bkService.duration) || 60,
+    };
+  }
   document.querySelectorAll('.service-select-btn').forEach(b => {
     b.classList.toggle('selected', b.dataset.sid === id);
   });
@@ -1273,26 +1323,97 @@ async function submitContact() {
 }
 
 /* ═══════════════════════════════════════
+   ABOUT PAGE RENDERER
+   ═══════════════════════════════════════ */
+function renderAbout() {
+  const a = ABOUT_DATA;
+  const hl = document.getElementById('aboutHeadline');
+  const sl = document.getElementById('aboutSubheadline');
+  const st = document.getElementById('aboutStory');
+  const ms = document.getElementById('aboutMission');
+  if (hl && a.headline)    hl.textContent = a.headline;
+  if (sl && a.subheadline) sl.textContent = a.subheadline;
+  if (st && a.story)       st.textContent = a.story;
+  if (ms && a.mission)     ms.textContent = '"' + a.mission + '"';
+  // Stats
+  if (a.yearsInBusiness)  { const el = document.getElementById('statYears');        if(el) el.textContent = a.yearsInBusiness; }
+  if (a.jobsCompleted)    { const el = document.getElementById('statJobs');         if(el) el.textContent = a.jobsCompleted; }
+  if (a.satisfactionRate) { const el = document.getElementById('statSatisfaction'); if(el) el.textContent = a.satisfactionRate; }
+  if (a.teamSize)         { const el = document.getElementById('statTeam');         if(el) el.textContent = a.teamSize; }
+  renderTeam();
+}
+
+/* ═══════════════════════════════════════
+   LOAD SITE DATA FROM GAS
+   ═══════════════════════════════════════ */
+async function loadSiteData() {
+  // Load all three in parallel
+  const [svcRes, revRes, aboutRes] = await Promise.allSettled([
+    fetch(GAS_URL + '?action=getServices'),
+    fetch(GAS_URL + '?action=getReviews'),
+    fetch(GAS_URL + '?action=getAbout'),
+  ]);
+
+  // Services
+  try {
+    const svcData = await svcRes.value.json();
+    if (Array.isArray(svcData) && svcData.length) {
+      SERVICES = svcData.filter(s => s.Active !== false && s.Active !== 'FALSE');
+    } else {
+      SERVICES = SERVICES_FALLBACK;
+    }
+  } catch(e) {
+    SERVICES = SERVICES_FALLBACK;
+  }
+
+  // Reviews
+  try {
+    const revData = await revRes.value.json();
+    REVIEWS = Array.isArray(revData) ? revData : [];
+  } catch(e) { REVIEWS = []; }
+
+  // About
+  try {
+    const aboutData = await aboutRes.value.json();
+    if (aboutData && typeof aboutData === 'object' && !aboutData.error) {
+      ABOUT_DATA = aboutData;
+    }
+  } catch(e) {}
+
+  // Re-render everything that depends on dynamic data
+  renderServiceCards('homeServicesGrid');
+  renderServiceCards('servicesGrid');
+  renderServiceSelectGrid();
+  renderInquiryServiceOptions();
+  renderReviews();
+  renderAbout();
+}
+
+/* ═══════════════════════════════════════
    INIT
    ═══════════════════════════════════════ */
 (function init() {
+  // Render with fallback data immediately so the page isn't blank
+  SERVICES = SERVICES_FALLBACK;
   buildNav();
   renderServiceCards('homeServicesGrid');
   renderServiceCards('servicesGrid');
   renderInquiryServiceOptions();
-  renderReviews();
   renderTeam();
   initInquiry();
   initBooking();
   renderServiceSelectGrid();
+
+  // Then fetch live data from sheets and re-render
+  loadSiteData().catch(e => console.warn('loadSiteData failed:', e));
 
   // Populate service dropdowns
   const svcSelects = document.querySelectorAll('#iqService');
   svcSelects.forEach(sel => {
     SERVICES.forEach(s => {
       const opt = document.createElement('option');
-      opt.value = s.id;
-      opt.textContent = s.name;
+      opt.value = s.Name || s.name;
+      opt.textContent = s.Name || s.name;
       sel.appendChild(opt);
     });
   });
