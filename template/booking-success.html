@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Confirmed — {{COMPANY_NAME}}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family={{FONT_BODY_GOOG}}:wght@300;400;500;600;700;800&family={{FONT_DISPLAY_GOOG}}:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --accent:{{COLOR_ACCENT}};--accent-light:{{COLOR_ACCENT_LIGHT}};--accent-hover:{{COLOR_ACCENT_HOVER}};
+    --text-primary:#1a1a1a;--text-secondary:#5a5a5a;--text-muted:#8a8a8a;
+    --bg:#f8f8f6;--bg-card:#ffffff;--border:#e5e4e1;--border-light:#f0efed;
+    --radius:10px;--radius-lg:16px;--radius-xl:24px;
+    --shadow-md:0 4px 20px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.1);
+    --font-body:'Outfit',sans-serif;--font-display:'Fraunces',serif;
+    --red:#ef4444;--amber:#f59e0b;
+  }
+  body{font-family:var(--font-body);background:var(--bg);color:var(--text-primary);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased}
+
+  /* ── Nav strip ── */
+  .nav{position:fixed;top:0;left:0;right:0;background:#fff;border-bottom:1px solid var(--border-light);padding:14px 28px;display:flex;align-items:center;gap:10px;z-index:50}
+  .nav-logo-icon{width:34px;height:34px;background:var(--accent);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;color:#fff;flex-shrink:0}
+  .nav-logo-name{font-family:var(--font-display);font-weight:800;font-size:18px;color:var(--text-primary)}
+  .nav-back{margin-left:auto;padding:7px 16px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid var(--border);color:var(--text-secondary);background:var(--bg);text-decoration:none;transition:all .2s}
+  .nav-back:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* ── Card ── */
+  .card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);max-width:520px;width:100%;padding:48px 40px 40px;text-align:center;margin-top:72px}
+  @media(max-width:560px){.card{padding:36px 24px 28px}}
+
+  /* ── States ── */
+  .state{display:none}.state.active{display:block}
+
+  /* ── Success checkmark ── */
+  .checkmark{width:80px;height:80px;margin:0 auto 28px;background:var(--accent-light);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:popIn .5s cubic-bezier(.175,.885,.32,1.275) both}
+  .checkmark svg{width:38px;height:38px;stroke:var(--accent);stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .checkmark svg path{stroke-dasharray:50;stroke-dashoffset:50;animation:drawCheck .5s .3s ease forwards}
+  @keyframes drawCheck{to{stroke-dashoffset:0}}
+  @keyframes popIn{0%{opacity:0;transform:scale(.7)}100%{opacity:1;transform:scale(1)}}
+
+  /* ── Spinner (loading state) ── */
+  .spinner-wrap{width:80px;height:80px;margin:0 auto 28px;display:flex;align-items:center;justify-content:center}
+  .spinner{width:44px;height:44px;border:3px solid var(--border-light);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ── Error icon ── */
+  .error-icon{width:80px;height:80px;margin:0 auto 28px;background:#fee2e2;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:34px}
+
+  /* ── Typography ── */
+  h1{font-family:var(--font-display);font-weight:800;font-size:30px;line-height:1.15;margin-bottom:10px}
+  .subtitle{font-size:15px;color:var(--text-secondary);line-height:1.6;margin-bottom:32px}
+
+  /* ── Detail block ── */
+  .detail-block{background:var(--bg);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:20px 22px;text-align:left;margin-bottom:28px}
+  .detail-block-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+  .detail-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--border-light);font-size:13px}
+  .detail-row:last-child{border-bottom:none;padding-bottom:0}
+  .detail-row-label{color:var(--text-muted);font-weight:500;white-space:nowrap;flex-shrink:0}
+  .detail-row-value{color:var(--text-primary);font-weight:600;text-align:right;word-break:break-word}
+
+  /* ── Amount badge ── */
+  .amount-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-light);color:var(--accent);font-weight:700;font-size:15px;padding:10px 20px;border-radius:100px;margin-bottom:28px}
+  .amount-badge span{font-size:11px;font-weight:600;opacity:.75}
+
+  /* ── Buttons ── */
+  .btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .btn{padding:12px 24px;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:all .2s;font-family:inherit}
+  .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-hover)}
+  .btn-secondary{background:var(--bg);border:1px solid var(--border);color:var(--text-secondary)}.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* ── Footer note ── */
+  .footer-note{margin-top:24px;font-size:12px;color:var(--text-muted);line-height:1.6}
+  .footer-note a{color:var(--accent);text-decoration:none}
+
+  /* ── Loading text ── */
+  .loading-text{font-size:15px;color:var(--text-secondary);margin-bottom:8px}
+  .loading-sub{font-size:13px;color:var(--text-muted)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo-icon">🔧</div>
+  <span class="nav-logo-name">{{COMPANY_SHORT}}</span>
+  <a class="nav-back" href="index.html">← Back to Site</a>
+</nav>
+
+<div class="card">
+
+  <!-- ── LOADING STATE ── -->
+  <div class="state active" id="stateLoading">
+    <div class="spinner-wrap"><div class="spinner"></div></div>
+    <p class="loading-text">Confirming your booking…</p>
+    <p class="loading-sub">Please wait a moment</p>
+  </div>
+
+  <!-- ── SUCCESS STATE ── -->
+  <div class="state" id="stateSuccess">
+    <div class="checkmark">
+      <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h1>You're Confirmed! 🎉</h1>
+    <p class="subtitle">Your ${{DEPOSIT_AMOUNT}} deposit was received and your appointment is locked in. We'll call you within the hour to confirm.</p>
+
+    <div class="amount-badge">
+      ✅ ${{DEPOSIT_AMOUNT}}.00 Deposit Paid <span>· Non-refundable</span>
+    </div>
+
+    <div class="detail-block" id="apptDetails" style="display:none">
+      <div class="detail-block-title">📅 Appointment Details</div>
+      <div class="detail-row"><span class="detail-row-label">Service</span><span class="detail-row-value" id="dService">—</span></div>
+      <div class="detail-row"><span class="detail-row-label">Date</span><span class="detail-row-value" id="dDate">—</span></div>
+      <div class="detail-row"><span class="detail-row-label">Time</span><span class="detail-row-value" id="dTime">—</span></div>
+      <div class="detail-row"><span class="detail-row-label">Name</span><span class="detail-row-value" id="dName">—</span></div>
+      <div class="detail-row"><span class="detail-row-label">Email</span><span class="detail-row-value" id="dEmail">—</span></div>
+      <div class="detail-row" id="dRefRow"><span class="detail-row-label">Ref #</span><span class="detail-row-value" id="dRef">—</span></div>
+    </div>
+
+    <div class="btn-row">
+      <a class="btn btn-primary" href="index.html">← Back to Home</a>
+      <button class="btn btn-secondary" onclick="window.print()">🖨 Print Receipt</button>
+    </div>
+    <p class="footer-note">A confirmation email has been sent to you.<br>Questions? <a href="index.html#contact">Contact us</a> or call the number on our site.</p>
+  </div>
+
+  <!-- ── ERROR STATE ── -->
+  <div class="state" id="stateError">
+    <div class="error-icon">⚠️</div>
+    <h1>Something Went Wrong</h1>
+    <p class="subtitle" id="errorMsg">We couldn't confirm your payment. If your card was charged, please contact us and we'll sort it out immediately.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="index.html#book">Try Again</a>
+      <a class="btn btn-secondary" href="index.html#contact">Contact Us</a>
+    </div>
+  </div>
+
+</div><!-- /card -->
+
+<script>
+/* ═══════════════════════════════════════════════════
+   booking-success.html
+   
+   Called by Stripe after a successful $100 deposit.
+   URL params from stripeworker.js /checkout:
+     ?session_id=cs_live_xxx&appt=APPT-1234567890
+
+   What this page does:
+   1. Reads session_id + appt from URL
+   2. POSTs to GAS: action=updateAppointmentStatus
+      → GAS creates the Google Calendar event
+      → GAS sends confirmation email to customer
+      → GAS marks appointment "Confirmed"
+      → GAS logs $100 deposit to Revenue sheet
+   3. Renders the confirmation card with appointment details
+   ═══════════════════════════════════════════════════ */
+
+// ── Config — must match index.html ──
+const GAS_URL = '{{GAS_WORKER_URL}}';
+
+// ── Helpers ──
+function show(id) {
+  document.querySelectorAll('.state').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+
+function setText(id, val) {
+  var el = document.getElementById(id);
+  if (el && val) el.textContent = val;
+}
+
+// ── Main ──
+(async function init() {
+  const params = new URLSearchParams(window.location.search);
+  const sessionId   = params.get('session_id') || '';
+  const appointmentId = params.get('appt') || '';
+
+  // If no session_id, Stripe didn't redirect us properly
+  if (!sessionId && !appointmentId) {
+    show('stateError');
+    document.getElementById('errorMsg').textContent =
+      'No payment session found. If you completed a payment, please contact us with your confirmation email.';
+    return;
+  }
+
+  // ── Prevent duplicate calendar events / emails on page refresh ──
+  // Only send depositPaid:true the first time this session+appt combo is seen.
+  const processedKey = 'appt_processed_' + appointmentId + '_' + sessionId;
+  const alreadyProcessed = sessionStorage.getItem(processedKey) === '1';
+
+  try {
+    // Tell GAS the deposit is paid — it handles everything server-side
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action:        'updateAppointmentStatus',
+        appointmentId: appointmentId,
+        status:        'Confirmed',
+        depositPaid:   !alreadyProcessed,   // false on refresh — skips duplicate cal event + email
+        stripeSession: sessionId,
+      })
+    });
+
+    const result = await res.json();
+
+    if (result && result.success) {
+      // ── Mark this session as processed so a page refresh doesn't re-fire ──
+      sessionStorage.setItem(processedKey, '1');
+      // ── Populate appointment details if GAS returned them ──
+      // (GAS echos back what it found in the sheet)
+      const data = result.appointment || {};
+
+      // Try to fill in any fields GAS returned
+      if (data.service || data.Service) setText('dService', data.service || data.Service);
+      if (data.date    || data.Date)    setText('dDate',    data.date    || data.Date);
+      if (data.time    || data.Time)    setText('dTime',    data.time    || data.Time);
+      if (data.name    || data.Name)    setText('dName',    data.name    || data.Name);
+      if (data.email   || data.Email)   setText('dEmail',   data.email   || data.Email);
+      if (appointmentId) { setText('dRef', appointmentId); }
+
+      // Show the details block if we have at least a service or date
+      if (data.service || data.Service || data.date || data.Date || appointmentId) {
+        document.getElementById('apptDetails').style.display = 'block';
+      }
+
+      show('stateSuccess');
+
+    } else {
+      // GAS returned an error — but the payment DID go through on Stripe's end.
+      // Show success anyway (Stripe is the source of truth for money).
+      console.warn('GAS returned error:', result);
+      if (appointmentId) {
+        document.getElementById('apptDetails').style.display = 'block';
+        setText('dRef', appointmentId);
+      }
+      show('stateSuccess');
+    }
+
+  } catch (err) {
+    // Network error talking to GAS — still show success if we have a session_id,
+    // because Stripe already confirmed the payment.
+    console.error('GAS call failed:', err);
+    if (sessionId) {
+      // Payment succeeded but GAS unreachable — show success with warning note
+      if (appointmentId) {
+        document.getElementById('apptDetails').style.display = 'block';
+        setText('dRef', appointmentId);
+      }
+      document.querySelector('#stateSuccess .subtitle').textContent =
+        'Your ${{DEPOSIT_AMOUNT}} deposit was received. Your appointment is confirmed. (Our system is syncing — you may receive your confirmation email shortly.)';
+      show('stateSuccess');
+    } else {
+      show('stateError');
+      document.getElementById('errorMsg').textContent =
+        'We couldn\'t reach our booking system. If your card was charged, please contact us — your appointment IS confirmed.';
+    }
+  }
+})();
+</script>
+</body>
+</html>

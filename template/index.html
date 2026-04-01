@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{COMPANY_NAME}} — Professional {{INDUSTRY_TITLE}} Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family={{FONT_BODY_GOOG}}:wght@300;400;500;600;700;800&family={{FONT_DISPLAY_GOOG}}:wght@700;800;900&display=swap" rel="stylesheet">
+<script>
+// Early stub — ensures onclick="showPage(...)" never throws before the main
+// script block at the bottom of <body> has executed.
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  var t = document.getElementById('page-' + id);
+  if (t) t.classList.add('active');
+  document.querySelectorAll('.nav-desktop .nav-link').forEach(function(l){
+    l.classList.toggle('active', l.dataset.nav === id);
+  });
+  var mob = document.getElementById('navMobile');
+  if (mob) mob.classList.remove('open');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Let the main script update its own currentPage tracker if it's loaded
+  if (typeof _showPageFull === 'function') _showPageFull(id);
+}
+</script>
+<style>
+:root {
+  --accent: {{COLOR_ACCENT}};
+  --accent-light: {{COLOR_ACCENT_LIGHT}};
+  --accent-hover: {{COLOR_ACCENT_HOVER}};
+  --text-primary: #1a1a1a;
+  --text-secondary: #5a5a5a;
+  --text-muted: #8a8a8a;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f8f6;
+  --bg-tertiary: #f0efed;
+  --border: #e5e4e1;
+  --border-light: #f0efed;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.06);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+  --font-body: '{{FONT_BODY}}', sans-serif;
+  --font-display: '{{FONT_DISPLAY}}', serif;
+  --max-width: 1140px;
+  --nav-height: 72px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); color: var(--text-primary); background: var(--bg-primary); -webkit-font-smoothing: antialiased; }
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, textarea, select { font-family: inherit; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes checkPop { 0% { transform:scale(0); } 60% { transform:scale(1.2); } 100% { transform:scale(1); } }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.fade-up { animation: fadeUp .6s ease both; }
+.fade-up-1 { animation-delay:.1s; }
+.fade-up-2 { animation-delay:.2s; }
+.fade-up-3 { animation-delay:.3s; }
+.fade-up-4 { animation-delay:.4s; }
+
+/* ─── NAV ─── */
+.nav { position:sticky; top:0; z-index:100; background:rgba(255,255,255,.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border-light); height:var(--nav-height); }
+.nav-inner { max-width:var(--max-width); margin:0 auto; padding:0 24px; height:100%; display:flex; align-items:center; justify-content:space-between; }
+.nav-logo { display:flex; align-items:center; gap:10px; cursor:pointer; }
+.nav-logo-icon { width:38px; height:38px; background:var(--accent); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; }
+.nav-logo-text { font-family:var(--font-display); font-weight:800; font-size:22px; letter-spacing:-.5px; }
+.nav-logo-sub { font-size:10px; color:var(--text-muted); letter-spacing:2px; text-transform:uppercase; font-weight:500; margin-top:-2px; }
+.nav-desktop { display:flex; gap:4px; align-items:center; }
+.nav-link { padding:8px 16px; border-radius:8px; font-size:14px; font-weight:500; color:var(--text-secondary); transition:all .2s; }
+.nav-link:hover { background:var(--bg-secondary); color:var(--text-primary); }
+.nav-link.active { background:var(--accent-light); color:var(--accent); }
+.nav-cta { padding:10px 22px; border-radius:8px; font-size:14px; font-weight:600; color:#fff; background:var(--accent); transition:all .2s; margin-left:8px; }
+.nav-cta:hover { background:var(--accent-hover); transform:translateY(-1px); box-shadow:var(--shadow-md); }
+.nav-hamburger { display:none; padding:8px; }
+.nav-mobile { display:none; position:absolute; top:var(--nav-height); left:0; right:0; background:var(--bg-primary); border-bottom:1px solid var(--border); padding:12px; z-index:99; animation:slideDown .3s ease; }
+.nav-mobile.open { display:block; }
+.nav-mobile button { display:block; width:100%; text-align:left; padding:12px 16px; border-radius:8px; font-size:15px; font-weight:500; color:var(--text-secondary); }
+.nav-mobile button:hover { background:var(--bg-secondary); }
+@media (max-width:768px) {
+  .nav-desktop { display:none; }
+  .nav-hamburger { display:block; }
+}
+
+/* ─── HERO ─── */
+.hero { padding:100px 24px 80px; text-align:center; position:relative; overflow:hidden; }
+.hero::before { content:''; position:absolute; top:-200px; right:-200px; width:500px; height:500px; background:var(--accent-light); border-radius:50%; opacity:.4; }
+.hero::after { content:''; position:absolute; bottom:-150px; left:-100px; width:400px; height:400px; background:var(--bg-tertiary); border-radius:50%; opacity:.5; }
+.hero-inner { position:relative; z-index:1; max-width:720px; margin:0 auto; }
+.hero-badge { display:inline-flex; align-items:center; gap:6px; background:var(--accent-light); color:var(--accent); padding:6px 16px; border-radius:100px; font-size:13px; font-weight:600; margin-bottom:28px; }
+.hero-badge-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse 2s infinite; }
+.hero h1 { font-family:var(--font-display); font-size:clamp(38px,5.5vw,64px); font-weight:900; line-height:1.08; letter-spacing:-1.5px; margin-bottom:20px; }
+.hero h1 em { font-style:normal; color:var(--accent); }
+.hero p { font-size:18px; color:var(--text-secondary); line-height:1.7; max-width:520px; margin:0 auto 36px; }
+.hero-actions { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.btn-primary { display:inline-flex; align-items:center; gap:8px; padding:14px 32px; background:var(--accent); color:#fff; border-radius:var(--radius); font-size:15px; font-weight:600; transition:all .25s; }
+.btn-primary:hover { background:var(--accent-hover); transform:translateY(-2px); box-shadow:0 8px 24px rgba(26,92,58,.18); }
+.btn-secondary { display:inline-flex; align-items:center; gap:8px; padding:14px 32px; background:var(--bg-primary); color:var(--text-primary); border:1.5px solid var(--border); border-radius:var(--radius); font-size:15px; font-weight:500; transition:all .2s; }
+.btn-secondary:hover { border-color:var(--text-muted); background:var(--bg-secondary); }
+
+/* ─── STATS ─── */
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); max-width:700px; margin:64px auto 0; border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow-sm); }
+.stat { background:var(--bg-primary); padding:28px 16px; text-align:center; }
+.stat-value { font-family:var(--font-display); font-size:28px; font-weight:800; }
+.stat-label { font-size:12px; color:var(--text-muted); margin-top:4px; font-weight:500; text-transform:uppercase; letter-spacing:.5px; }
+@media (max-width:600px) { .stats { grid-template-columns:repeat(2,1fr); } }
+
+/* ─── SECTIONS ─── */
+.section { padding:80px 24px; }
+.section-alt { background:var(--bg-secondary); }
+.section-inner { max-width:var(--max-width); margin:0 auto; }
+.section-header { text-align:center; margin-bottom:48px; }
+.section-header h2 { font-family:var(--font-display); font-size:36px; font-weight:800; margin-bottom:12px; letter-spacing:-.5px; }
+.section-header p { font-size:16px; color:var(--text-secondary); max-width:480px; margin:0 auto; line-height:1.6; }
+
+/* ─── SERVICE CARDS ─── */
+.services-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+.service-card { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:28px; transition:all .3s; }
+.service-card:hover { border-color:var(--accent); transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+.service-card-icon { width:48px; height:48px; background:var(--accent-light); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:16px; }
+.service-card h3 { font-size:17px; font-weight:700; margin-bottom:8px; }
+.service-card p { font-size:14px; color:var(--text-secondary); line-height:1.6; margin-bottom:14px; }
+.service-card-price { font-size:14px; font-weight:700; color:var(--accent); }
+.service-card-duration { font-size:12px; color:var(--text-muted); margin-top:4px; }
+
+/* ─── INQUIRY WIDGET (homepage) ─── */
+.inquiry-section { padding:0 24px 80px; position:relative; z-index:1; margin-top:-20px; }
+.inquiry-card { max-width:680px; margin:0 auto; background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:36px; box-shadow:var(--shadow-lg); }
+.inquiry-card h3 { font-family:var(--font-display); font-size:24px; font-weight:800; text-align:center; margin-bottom:6px; }
+.inquiry-card .subtitle { font-size:14px; color:var(--text-secondary); text-align:center; margin-bottom:24px; }
+.inquiry-type-selector { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:24px; }
+.inquiry-type-btn { padding:14px 10px; border-radius:var(--radius); border:1.5px solid var(--border); background:var(--bg-primary); text-align:center; cursor:pointer; transition:all .2s; }
+.inquiry-type-btn:hover { border-color:var(--accent); }
+.inquiry-type-btn.selected { border-color:var(--accent); background:var(--accent-light); }
+.inquiry-type-btn .iq-icon { font-size:22px; margin-bottom:4px; }
+.inquiry-type-btn .iq-label { font-size:13px; font-weight:600; color:var(--text-primary); }
+.inquiry-type-btn .iq-desc { font-size:11px; color:var(--text-muted); margin-top:2px; }
+.inquiry-type-btn.selected .iq-label { color:var(--accent); }
+
+/* ─── BOOKING ─── */
+.booking-container { max-width:860px; margin:0 auto; }
+.booking-mode-toggle { display:flex; gap:8px; justify-content:center; margin-bottom:32px; }
+.booking-mode-btn { padding:10px 28px; border-radius:100px; font-size:14px; font-weight:600; border:1.5px solid var(--border); background:var(--bg-primary); color:var(--text-secondary); transition:all .2s; cursor:pointer; }
+.booking-mode-btn:hover { border-color:var(--accent); color:var(--accent); }
+.booking-mode-btn.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+.booking-steps { display:flex; justify-content:center; gap:8px; margin-bottom:40px; }
+.booking-step { display:flex; align-items:center; gap:8px; }
+.booking-step-num { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; background:var(--bg-tertiary); color:var(--text-muted); transition:all .3s; }
+.booking-step-num.active { background:var(--accent); color:#fff; }
+.booking-step-num.done { background:var(--accent-light); color:var(--accent); }
+.booking-step-label { font-size:14px; color:var(--text-muted); font-weight:500; }
+.booking-step-label.active { color:var(--text-primary); }
+.booking-step-line { width:40px; height:2px; background:var(--border); border-radius:1px; }
+.booking-step-line.done { background:var(--accent); }
+
+.cal-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+@media (max-width:700px) { .cal-grid { grid-template-columns:1fr; } }
+.cal-panel { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:24px; }
+.cal-nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.cal-nav button { background:var(--bg-secondary); border:1px solid var(--border); width:34px; height:34px; border-radius:8px; font-size:16px; cursor:pointer; color:var(--text-primary); }
+.cal-nav span { font-weight:600; font-size:16px; }
+.cal-weekdays { display:grid; grid-template-columns:repeat(7,1fr); text-align:center; margin-bottom:8px; }
+.cal-weekdays span { font-size:12px; color:var(--text-muted); font-weight:600; padding:8px 0; }
+.cal-days { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.cal-day { aspect-ratio:1; border-radius:8px; border:none; background:none; font-size:14px; color:var(--text-primary); cursor:pointer; transition:all .15s; font-weight:500; }
+.cal-day:hover:not(:disabled) { background:var(--accent-light); }
+.cal-day.selected { background:var(--accent) !important; color:#fff !important; font-weight:700; }
+.cal-day:disabled { color:var(--border); cursor:default; }
+.cal-day.today { outline:2px solid var(--accent); outline-offset:-2px; }
+
+.time-slots { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; max-height:340px; overflow-y:auto; }
+.time-slot { padding:12px; border-radius:8px; border:1px solid var(--border); background:var(--bg-primary); font-size:14px; font-weight:500; color:var(--text-secondary); cursor:pointer; transition:all .15s; text-align:center; }
+.time-slot:hover:not(:disabled):not(.unavailable) { border-color:var(--accent); color:var(--accent); }
+.time-slot.selected { background:var(--accent); color:#fff; border-color:var(--accent); font-weight:600; }
+.time-slot.unavailable { background:var(--bg-tertiary); color:var(--text-muted); cursor:not-allowed; text-decoration:line-through; opacity:.5; border-color:transparent; }
+.time-slot.loading-slot { background:linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-tertiary) 50%, var(--bg-secondary) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-color:transparent; color:transparent; pointer-events:none; }
+.slots-loading-msg { text-align:center; font-size:13px; color:var(--text-muted); padding:12px; }
+.cal-source-badge { display:inline-flex; align-items:center; gap:4px; font-size:10px; color:var(--text-muted); background:var(--bg-secondary); padding:3px 8px; border-radius:4px; margin-top:8px; }
+.cal-source-badge.live { color:var(--accent); background:var(--accent-light); }
+
+/* ─── FORMS ─── */
+.form-grid { display:grid; gap:16px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media (max-width:500px) { .form-row { grid-template-columns:1fr; } }
+.form-group label { display:block; font-size:13px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; }
+.form-group input, .form-group textarea, .form-group select {
+  width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:var(--radius);
+  font-size:15px; color:var(--text-primary); background:var(--bg-primary); outline:none; transition:border-color .2s;
+}
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color:var(--accent); }
+.form-group textarea { min-height:80px; resize:vertical; }
+.form-group input::placeholder, .form-group textarea::placeholder { color:var(--text-muted); }
+
+.booking-summary { background:var(--accent-light); border-radius:var(--radius); padding:16px 20px; margin-bottom:24px; display:flex; gap:24px; flex-wrap:wrap; }
+.booking-summary-label { font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; font-weight:600; }
+.booking-summary-value { font-size:14px; font-weight:600; color:var(--accent); margin-top:2px; }
+
+.booking-nav { display:flex; justify-content:space-between; margin-top:32px; }
+.btn-back { padding:12px 24px; border-radius:var(--radius); font-size:14px; font-weight:500; color:var(--text-secondary); background:var(--bg-secondary); border:1px solid var(--border); }
+.btn-back:hover { background:var(--bg-tertiary); }
+.btn-next { padding:12px 28px; border-radius:var(--radius); font-size:14px; font-weight:600; color:#fff; background:var(--accent); transition:all .25s; }
+.btn-next:hover:not(:disabled) { background:var(--accent-hover); }
+.btn-next:disabled { opacity:.4; cursor:default; }
+
+.service-select-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; }
+.service-select-btn { padding:18px 14px; border-radius:var(--radius); border:1.5px solid var(--border); background:var(--bg-primary); text-align:left; cursor:pointer; transition:all .2s; }
+.service-select-btn:hover { border-color:var(--accent); }
+.service-select-btn.selected { border-color:var(--accent); background:var(--accent-light); }
+.service-select-btn .s-icon { font-size:24px; margin-bottom:8px; }
+.service-select-btn .s-name { font-size:14px; font-weight:600; color:var(--text-primary); }
+.service-select-btn .s-price { font-size:12px; color:var(--accent); font-weight:600; margin-top:2px; }
+
+/* ─── QUOTE (now inside booking) ─── */
+.quote-card { max-width:600px; margin:0 auto; background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:40px; box-shadow:var(--shadow-md); }
+
+/* ─── REVIEWS ─── */
+.reviews-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+.review-card { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:28px; transition:all .3s; }
+.review-card:hover { box-shadow:var(--shadow-md); }
+.review-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; }
+.review-author { display:flex; align-items:center; gap:12px; }
+.review-avatar { width:42px; height:42px; border-radius:50%; background:var(--accent-light); display:flex; align-items:center; justify-content:center; color:var(--accent); font-weight:700; font-size:16px; }
+.review-name { font-size:15px; font-weight:600; }
+.review-meta { font-size:12px; color:var(--text-muted); }
+.review-stars { color:{{COLOR_STARS}}; font-size:14px; letter-spacing:1px; }
+.review-text { font-size:14px; color:var(--text-secondary); line-height:1.65; font-style:italic; }
+
+/* ─── TEAM ─── */
+.team-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
+.team-card { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:32px; text-align:center; transition:all .3s; }
+.team-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+.team-avatar { width:72px; height:72px; border-radius:50%; background:var(--accent-light); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px; }
+.team-name { font-size:18px; font-weight:700; margin-bottom:2px; }
+.team-role { font-size:14px; color:var(--accent); font-weight:500; margin-bottom:8px; }
+.team-detail { font-size:12px; color:var(--text-muted); }
+
+.guarantees-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-top:48px; }
+.guarantee-card { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius); padding:24px; }
+.guarantee-card h4 { font-size:15px; font-weight:600; margin:10px 0 6px; }
+.guarantee-card p { font-size:13px; color:var(--text-secondary); line-height:1.6; }
+
+/* ─── CONTACT ─── */
+.contact-grid { display:grid; grid-template-columns:1fr 1.2fr; gap:40px; }
+@media (max-width:700px) { .contact-grid { grid-template-columns:1fr; } }
+.contact-info-item { display:flex; gap:14px; align-items:flex-start; margin-bottom:24px; }
+.contact-info-icon { width:42px; height:42px; border-radius:10px; background:var(--accent-light); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:18px; }
+.contact-info-label { font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px; font-weight:600; }
+.contact-info-value { font-size:15px; font-weight:600; }
+.contact-info-sub { font-size:12px; color:var(--text-muted); }
+
+/* ─── CTA ─── */
+.cta-banner { max-width:700px; margin:0 auto; background:var(--accent); border-radius:var(--radius-lg); padding:56px 40px; text-align:center; color:#fff; position:relative; overflow:hidden; }
+.cta-banner::before { content:''; position:absolute; top:-80px; right:-80px; width:200px; height:200px; background:rgba(255,255,255,.08); border-radius:50%; }
+.cta-banner h2 { font-family:var(--font-display); font-size:32px; font-weight:800; margin-bottom:12px; }
+.cta-banner p { font-size:16px; opacity:.85; margin-bottom:28px; }
+.btn-white { background:#fff; color:var(--accent); padding:14px 36px; border-radius:var(--radius); font-size:15px; font-weight:600; transition:all .2s; display:inline-block; }
+.btn-white:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.15); }
+
+/* ─── FOOTER ─── */
+.footer { border-top:1px solid var(--border); padding:48px 24px 24px; }
+.footer-inner { max-width:var(--max-width); margin:0 auto; display:grid; grid-template-columns:1.5fr repeat(3,1fr); gap:40px; }
+@media (max-width:700px) { .footer-inner { grid-template-columns:1fr 1fr; } }
+.footer-brand { font-family:var(--font-display); font-size:20px; font-weight:800; margin-bottom:8px; }
+.footer-desc { font-size:13px; color:var(--text-muted); line-height:1.6; }
+.footer-col h4 { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-bottom:14px; }
+.footer-link { display:block; font-size:14px; color:var(--text-secondary); margin-bottom:8px; cursor:pointer; transition:color .2s; background:none; border:none; padding:0; text-align:left; }
+.footer-link:hover { color:var(--accent); }
+.footer-bottom { max-width:var(--max-width); margin:36px auto 0; padding-top:20px; border-top:1px solid var(--border-light); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+.footer-copy { font-size:13px; color:var(--text-muted); }
+.footer-admin { font-size:12px; color:var(--text-muted); background:var(--bg-secondary); border:1px solid var(--border); padding:6px 14px; border-radius:6px; text-decoration:none; transition:all .2s; }
+.footer-admin:hover { border-color:var(--text-muted); }
+
+/* ─── TOAST ─── */
+.toast { position:fixed; top:24px; right:24px; z-index:9999; padding:14px 24px; border-radius:var(--radius); font-size:14px; font-weight:600; color:#fff; animation:slideDown .35s ease; box-shadow:var(--shadow-lg); }
+.toast-success { background:var(--accent); }
+.toast-error { background:#d63031; }
+
+/* ─── CONFIRM ─── */
+.confirm-page { text-align:center; padding:100px 24px; max-width:480px; margin:0 auto; }
+.confirm-check { width:72px; height:72px; border-radius:50%; background:var(--accent-light); display:flex; align-items:center; justify-content:center; margin:0 auto 24px; animation:checkPop .5s ease; }
+
+.spinner { width:18px; height:18px; border:2.5px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; display:inline-block; vertical-align:middle; margin-right:8px; }
+
+/* ─── PAGES ─── */
+.page { display:none; }
+.page.active { display:block; }
+
+/* ─── INQUIRY TYPE ─── */
+@media (max-width:500px) {
+  .inquiry-type-selector { grid-template-columns:1fr; }
+  .booking-mode-toggle { flex-direction:column; align-items:center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo" id="logoBtn">
+      <div class="nav-logo-icon">🔧</div>
+      <div>
+        <div class="nav-logo-text">{{COMPANY_SHORT}}</div>
+        <div class="nav-logo-sub">{{COMPANY_TYPE}}</div>
+      </div>
+    </div>
+    <div class="nav-desktop" id="navDesktop"></div>
+    <button class="nav-hamburger" id="hamburgerBtn">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+  </div>
+  <div class="nav-mobile" id="navMobile"></div>
+</nav>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-badge fade-up"><span class="hero-badge-dot"></span> Available 24/7 — Emergency Service</div>
+      <h1 class="fade-up fade-up-1">{{INDUSTRY_TITLE}} Done<br><em>Right, Every Time.</em></h1>
+      <p class="fade-up fade-up-2">Licensed professionals delivering quality {{INDUSTRY}} services across {{SERVICE_AREA}}. Fast response, fair pricing, guaranteed work.</p>
+      <div class="hero-actions fade-up fade-up-3">
+        <button class="btn-primary" onclick="showPage('booking')">Schedule Service →</button>
+        <button class="btn-secondary" onclick="document.getElementById('inquirySection').scrollIntoView({behavior:'smooth'})">Ask a Question</button>
+      </div>
+    </div>
+    <div class="stats fade-up fade-up-4">
+      <div class="stat"><div class="stat-value" id="statYears">18+</div><div class="stat-label">Years Exp.</div></div>
+      <div class="stat"><div class="stat-value" id="statJobs">4,500+</div><div class="stat-label">Jobs Done</div></div>
+      <div class="stat"><div class="stat-value" id="statSatisfaction">99%</div><div class="stat-label">Satisfaction</div></div>
+      <div class="stat"><div class="stat-value" id="statTeam">12</div><div class="stat-label">Team Size</div></div>
+    </div>
+  </section>
+
+  <!-- ═══ HOMEPAGE INQUIRY WIDGET ═══ -->
+  <div class="inquiry-section" id="inquirySection">
+    <div class="inquiry-card fade-up">
+      <h3>How Can We Help?</h3>
+      <p class="subtitle">Tell us what you need — we'll get back to you fast.</p>
+
+      <div class="inquiry-type-selector" id="inquiryTypeSelector">
+        <button class="inquiry-type-btn selected" data-type="question">
+          <div class="iq-icon">❓</div>
+          <div class="iq-label">Ask a Question</div>
+          <div class="iq-desc">General inquiry</div>
+        </button>
+        <button class="inquiry-type-btn" data-type="quote">
+          <div class="iq-icon">💰</div>
+          <div class="iq-label">Get a Quote</div>
+          <div class="iq-desc">Free estimate</div>
+        </button>
+        <button class="inquiry-type-btn" data-type="callback">
+          <div class="iq-icon">📞</div>
+          <div class="iq-label">Request Callback</div>
+          <div class="iq-desc">We'll call you</div>
+        </button>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-row">
+          <div class="form-group"><label>Name *</label><input id="iqName" placeholder="Your name"></div>
+          <div class="form-group"><label>Phone *</label><input id="iqPhone" type="tel" placeholder="{{BUSINESS_PHONE}}"></div>
+        </div>
+        <div class="form-group"><label>Email *</label><input id="iqEmail" type="email" placeholder="you@email.com"></div>
+        <div class="form-group" id="iqServiceGroup" style="display:none;">
+          <label>Service Needed</label>
+          <select id="iqService"><option value="">Select a service...</option></select>
+        </div>
+        <div class="form-group" id="iqMessageGroup">
+          <label id="iqMessageLabel">Your Question *</label>
+          <textarea id="iqMessage" placeholder="How can we help?"></textarea>
+        </div>
+        <button class="btn-primary" style="width:100%;justify-content:center;" id="btnSubmitInquiry">Submit →</button>
+      </div>
+    </div>
+  </div>
+
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div class="section-header"><h2>{{SECTION_WHAT_WE_DO}}</h2><p>{{SERVICES_SUBTEXT}}</p></div>
+      <div class="services-grid" id="homeServicesGrid"></div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="section-inner">
+      <div class="cta-banner">
+        <h2>Ready to Fix It?</h2>
+        <p>Book online in 60 seconds. We'll confirm within the hour.</p>
+        <button class="btn-white" onclick="showPage('booking')">Book Appointment →</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- SERVICES -->
+<div id="page-services" class="page">
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-header"><h2>{{SECTION_OUR_SERVICES}}</h2><p>{{SERVICES_SUBTEXT_2}}</p></div>
+      <div class="services-grid" id="servicesGrid"></div>
+    </div>
+  </section>
+</div>
+
+<!-- BOOKING (unified: service appointment OR quote request) -->
+<div id="page-booking" class="page">
+  <section class="section">
+    <div class="booking-container">
+      <div class="section-header"><h2 id="bookingPageTitle">Book an Appointment</h2><p id="bookingPageDesc">Select your service, pick a time, and we'll handle the rest.</p></div>
+
+      <!-- Mode toggle: Book vs Quote -->
+      <div class="booking-mode-toggle">
+        <button class="booking-mode-btn active" data-mode="book" id="modeBook">📅 Book Service</button>
+        <button class="booking-mode-btn" data-mode="quote" id="modeQuote">💰 Request Quote</button>
+      </div>
+
+      <div class="booking-steps" id="bookingSteps"></div>
+
+      <!-- Step 1: Service -->
+      <div id="bookingStep1">
+        <div class="service-select-grid" id="serviceSelectGrid"></div>
+        <div class="booking-nav" style="justify-content:flex-end;">
+          <button class="btn-next" id="btnStep1Next" disabled onclick="goBookingStep(2)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 2: Date & Time (only for "book" mode) -->
+      <div id="bookingStep2" style="display:none;">
+        <div class="cal-grid">
+          <div class="cal-panel">
+            <div class="cal-nav">
+              <button onclick="calPrev()">‹</button>
+              <span id="calMonthLabel"></span>
+              <button onclick="calNext()">›</button>
+            </div>
+            <div class="cal-weekdays"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
+            <div class="cal-days" id="calDays"></div>
+          </div>
+          <div class="cal-panel">
+            <h3 style="font-size:16px;font-weight:600;margin-bottom:14px;" id="timeSlotsLabel">Select a date first</h3>
+            <div class="time-slots" id="timeSlots"></div>
+            <div id="calSourceBadge"></div>
+          </div>
+        </div>
+        <div class="booking-nav">
+          <button class="btn-back" onclick="goBookingStep(1)">← Back</button>
+          <button class="btn-next" id="btnStep2Next" disabled onclick="goBookingStep(3)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- Step 3 (book) / Step 2 (quote): Your Info -->
+      <div id="bookingStep3" style="display:none;">
+        <div class="booking-summary" id="bookingSummary"></div>
+
+        <!-- Deposit notice — shown only in "book" mode -->
+        <div id="depositNotice" style="display:none;background:{{COLOR_ACCENT_LIGHT}};border:1px solid {{COLOR_ACCENT_BORDER}};border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:flex-start;gap:12px;">
+          <span style="font-size:22px;flex-shrink:0;">🔒</span>
+          <div>
+            <div style="font-weight:700;font-size:14px;color:{{COLOR_ACCENT}};margin-bottom:3px;">${{DEPOSIT_AMOUNT}} Deposit Required at Booking</div>
+            <div style="font-size:13px;color:#2d7a52;line-height:1.5;">This covers our travel &amp; inspection time. It is <strong>not</strong> deducted from the job total — the final invoice is billed separately after we complete the work. Secure payment via Stripe.</div>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group"><label>Full Name *</label><input type="text" id="bkName" placeholder="John Smith"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Email *</label><input type="email" id="bkEmail" placeholder="john@email.com"></div>
+            <div class="form-group"><label>Phone *</label><input type="tel" id="bkPhone" placeholder="{{BUSINESS_PHONE}}"></div>
+          </div>
+          <div class="form-group"><label>Service Address</label><input type="text" id="bkAddress" placeholder="123 Main St, Fort Lauderdale, FL"></div>
+          <div class="form-group"><label id="bkNotesLabel">Describe the Issue</label><textarea id="bkNotes" placeholder="Tell us about the problem..."></textarea></div>
+        </div>
+        <div class="booking-nav">
+          <button class="btn-back" id="btnStep3Back" onclick="goBookingStep(bookingMode==='quote'?1:2)">← Back</button>
+          <button class="btn-next" id="btnSubmitBooking" onclick="submitBooking()">Confirm Booking ✓</button>
+        </div>
+      </div>
+
+      <!-- Confirmation -->
+      <div id="bookingConfirm" style="display:none;">
+        <div class="confirm-page">
+          <div class="confirm-check">
+            <svg width="32" height="32" fill="none" stroke="var(--accent)" stroke-width="3"><path d="M8 16l6 6 12-12"/></svg>
+          </div>
+          <h2 id="confirmTitle" style="font-family:var(--font-display);font-size:32px;font-weight:800;margin-bottom:12px;">You're Booked!</h2>
+          <p id="confirmDesc" style="color:var(--text-secondary);font-size:16px;line-height:1.7;margin-bottom:12px;">We've received your appointment. You'll get a confirmation call within the hour.</p>
+          <p id="confirmEmail" style="color:var(--text-muted);font-size:14px;margin-bottom:32px;"></p>
+          <button class="btn-primary" onclick="resetBookingAndGoHome()">Back to Home</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ABOUT -->
+<div id="page-about" class="page">
+  <section class="hero" style="padding:60px 24px 40px;">
+    <div class="hero-inner">
+      <h1 class="fade-up" style="font-size:clamp(30px,4vw,52px);" id="aboutHeadline">{{ABOUT_HEADLINE}}</h1>
+      <p class="fade-up fade-up-1" id="aboutSubheadline">Family-owned and serving {{SERVICE_AREA}} since {{YEAR_FOUNDED}}</p>
+    </div>
+  </section>
+  <section class="section section-alt">
+    <div class="section-inner" style="max-width:780px;">
+      <div class="section-header"><h2>Our Story</h2></div>
+      <p style="font-size:16px;color:var(--text-secondary);line-height:1.8;margin-bottom:20px;" id="aboutStory">Loading...</p>
+      <p style="font-size:15px;font-style:italic;color:var(--accent);font-weight:600;" id="aboutMission"></p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-header"><h2>Meet the Team</h2><p>Licensed, experienced, and passionate about quality work.</p></div>
+      <div class="team-grid" id="teamGrid"></div>
+    </div>
+  </section>
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div class="section-header"><h2>Our Guarantees</h2></div>
+      <div class="guarantees-grid" id="guaranteesGrid"></div>
+    </div>
+  </section>
+</div>
+
+<!-- REVIEWS -->
+<div id="page-reviews" class="page">
+  <section class="section section-alt">
+    <div class="section-inner">
+      <div class="section-header"><h2>Customer Reviews</h2><p>Hear from the homeowners and businesses we've helped.</p></div>
+      <div class="reviews-grid" id="reviewsGrid"><div style="text-align:center;padding:40px;color:var(--text-muted);">Loading reviews...</div></div>
+    </div>
+  </section>
+</div>
+
+<!-- CONTACT -->
+<div id="page-contact" class="page">
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-header"><h2>Get in Touch</h2></div>
+      <div class="contact-grid">
+        <div>
+          <div class="contact-info-item"><div class="contact-info-icon">📞</div><div><div class="contact-info-label">Phone</div><div class="contact-info-value">{{BUSINESS_PHONE}}</div><div class="contact-info-sub">{{PHONE_HOURS}}</div></div></div>
+          <div class="contact-info-item"><div class="contact-info-icon">✉️</div><div><div class="contact-info-label">Email</div><div class="contact-info-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7811161e17381e14170f0811081d561e110c">[email&#160;protected]</a></div><div class="contact-info-sub">Response within 2 hours</div></div></div>
+          <div class="contact-info-item"><div class="contact-info-icon">📍</div><div><div class="contact-info-label">Location</div><div class="contact-info-value">Fort Lauderdale, FL</div><div class="contact-info-sub">Serving all of Broward County</div></div></div>
+          <div class="contact-info-item"><div class="contact-info-icon">🕐</div><div><div class="contact-info-label">Hours</div><div class="contact-info-value">Mon–Sat: 7am–8pm</div><div class="contact-info-sub">Sunday: Emergency only</div></div></div>
+        </div>
+        <div style="background:var(--bg-primary);border:1px solid var(--border-light);border-radius:var(--radius-lg);padding:32px;">
+          <h3 style="font-size:20px;font-weight:700;margin-bottom:24px;">Send a Message</h3>
+          <div class="form-grid">
+            <div class="form-group"><label>Name *</label><input id="ctName" placeholder="Your name"></div>
+            <div class="form-group"><label>Email *</label><input id="ctEmail" placeholder="you@email.com"></div>
+            <div class="form-group"><label>Message *</label><textarea id="ctMessage" placeholder="How can we help?"></textarea></div>
+            <button class="btn-primary" style="width:100%;justify-content:center;" id="btnContact" onclick="submitContact()">Send Message →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">{{COMPANY_SHORT}}</div>
+      <p class="footer-desc">{{FOOTER_DESC}}</p>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <button class="footer-link" onclick="showPage('services')">Emergency Repair</button>
+      <button class="footer-link" onclick="showPage('services')">Drain Cleaning</button>
+      <button class="footer-link" onclick="showPage('services')">Water Heater</button>
+      <button class="footer-link" onclick="showPage('services')">Pipe Installation</button>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <button class="footer-link" onclick="showPage('about')">About Us</button>
+      <button class="footer-link" onclick="showPage('reviews')">Reviews</button>
+      <button class="footer-link" onclick="showPage('contact')">Contact</button>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <span class="footer-link">{{BUSINESS_PHONE}}</span>
+      <span class="footer-link"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d0b9beb6bf90b6bcbfa7a0b9a0b5feb6b9a4">[email&#160;protected]</a></span>
+      <span class="footer-link">Fort Lauderdale, FL</span>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">&copy; {{COPYRIGHT_YEAR}} {{COMPANY_NAME}} All rights reserved.</span>
+    <a class="footer-admin" href="admin.html">Admin Portal →</a>
+  </div>
+</footer>
+
+<script>
+/* ═══════════════════════════════════════
+   CONFIG
+   ═══════════════════════════════════════ */
+const GAS_URL = '{{GAS_WORKER_URL}}';
+
+// ── Stripe Worker URL ── set after deploying stripe-worker.js to Cloudflare
+const STRIPE_WORKER_URL = localStorage.getItem('{{COMPANY_SLUG}}_stripe_worker') || '{{STRIPE_WORKER_URL}}';
+
+// ── Dynamic data — loaded from GAS sheets ──
+let SERVICES  = [];  // populated by loadSiteData()
+let REVIEWS   = [];
+let ABOUT_DATA = {};
+
+// Fallback services used while GAS is loading or if fetch fails
+const SERVICES_FALLBACK = [
+  { ID:'s1', Name:'Emergency Repair', Icon:'🔧', Price:'From $89', Description:'24/7 emergency {{INDUSTRY}} repairs for burst pipes, major leaks, and flooding.', Duration:60, Active:true },
+  { ID:'s2', Name:'Drain Cleaning',   Icon:'🚿', Price:'From $65', Description:'Professional drain unclogging for kitchens, bathrooms, and main lines.',    Duration:45, Active:true },
+  { ID:'s3', Name:'Water Heater',     Icon:'🔥', Price:'From $120', Description:'Installation, repair, and maintenance of all water heater types.',           Duration:90, Active:true },
+  { ID:'s4', Name:'Pipe Installation',Icon:'🔩', Price:'From $150', Description:'New pipe installation, repiping, and pipe replacement services.',            Duration:120,Active:true },
+  { ID:'s5', Name:'Fixture Install',  Icon:'🚰', Price:'From $75', Description:'Faucet, toilet, shower, and sink installation and replacement.',             Duration:60, Active:true },
+  { ID:'s6', Name:'Inspection',       Icon:'🔍', Price:'From $49', Description:'Comprehensive {{INDUSTRY}} inspection with camera and detailed report.',          Duration:45, Active:true },
+  { ID:'s7', Name:'Sewer Line',       Icon:'🏗️', Price:'From $200', Description:'Sewer line repair, replacement, and trenchless solutions.',                  Duration:180,Active:true },
+  { ID:'s8', Name:'Gas Line',         Icon:'⚡', Price:'From $175', Description:'Gas line installation, repair, and leak detection services.',                Duration:90, Active:true },
+];
+
+const NAV_ITEMS = [
+  { id:'home', label:'Home' },
+  { id:'services', label:'Services' },
+  { id:'booking', label:'Book' },
+  { id:'about', label:'About' },
+  { id:'reviews', label:'Reviews' },
+  { id:'contact', label:'Contact' },
+];
+
+/* ═══════════════════════════════════════
+   NAVIGATION
+   ═══════════════════════════════════════ */
+let currentPage = 'home';
+
+function buildNav() {
+  const desktop = document.getElementById('navDesktop');
+  const mobile = document.getElementById('navMobile');
+  let dHTML = '', mHTML = '';
+  NAV_ITEMS.forEach(item => {
+    const ac = item.id === currentPage ? ' active' : '';
+    dHTML += `<button class="nav-link${ac}" data-nav="${item.id}">${item.label}</button>`;
+    mHTML += `<button data-nav="${item.id}">${item.label}</button>`;
+  });
+  dHTML += `<button class="nav-cta" data-nav="booking">📅 Book Now</button>`;
+  desktop.innerHTML = dHTML;
+  mobile.innerHTML = mHTML;
+  desktop.querySelectorAll('[data-nav]').forEach(btn => {
+    btn.addEventListener('click', () => showPage(btn.dataset.nav));
+  });
+  mobile.querySelectorAll('[data-nav]').forEach(btn => {
+    btn.addEventListener('click', () => showPage(btn.dataset.nav));
+  });
+}
+
+// Full showPage — replaces the early head stub once the main script loads
+function showPage(id) {
+  currentPage = id;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + id);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.nav-desktop .nav-link').forEach(l => {
+    l.classList.toggle('active', l.dataset.nav === id);
+  });
+  document.getElementById('navMobile').classList.remove('open');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window._showPageFull = showPage; // expose for early stub
+
+document.getElementById('logoBtn').addEventListener('click', () => showPage('home'));
+document.getElementById('hamburgerBtn').addEventListener('click', () => {
+  document.getElementById('navMobile').classList.toggle('open');
+});
+
+/* ═══════════════════════════════════════
+   RENDER STATIC CONTENT
+   ═══════════════════════════════════════ */
+function renderServiceCards(containerId) {
+  const active = SERVICES.filter(s => s.Active !== false);
+  document.getElementById(containerId).innerHTML = active.map(s => `
+    <div class="service-card">
+      <div class="service-card-icon">${s.Icon || s.icon || '🔧'}</div>
+      <h3>${s.Name || s.name}</h3>
+      <p>${s.Description || s.desc}</p>
+      <div class="service-card-price">${s.Price || s.price}</div>
+      <div class="service-card-duration">~${s.Duration || s.duration} min</div>
+    </div>
+  `).join('') || '<p style="color:var(--text-muted);text-align:center;padding:24px;">No services available.</p>';
+}
+
+function renderServiceSelectGrid() {
+  const active = SERVICES.filter(s => s.Active !== false);
+  const el = document.getElementById('serviceSelectGrid');
+  el.innerHTML = active.map(s => `
+    <button class="service-select-btn" data-sid="${s.ID || s.id}">
+      <div class="s-icon">${s.Icon || s.icon || '🔧'}</div>
+      <div class="s-name">${s.Name || s.name}</div>
+      <div class="s-price">${s.Price || s.price}</div>
+    </button>
+  `).join('');
+  el.querySelectorAll('.service-select-btn').forEach(btn => {
+    btn.addEventListener('click', () => selectService(btn.dataset.sid));
+  });
+}
+
+function renderInquiryServiceOptions() {
+  const el = document.getElementById('iqService');
+  SERVICES.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.name;
+    opt.textContent = s.name;
+    el.appendChild(opt);
+  });
+}
+
+function renderReviews() {
+  const published = REVIEWS.filter(r => !r.Status || r.Status === 'Published');
+  const el = document.getElementById('reviewsGrid');
+  if (!published.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No reviews yet. Be the first!</div>';
+    return;
+  }
+  el.innerHTML = published.map(r => {
+    const name = r.Name || r.name || 'Anonymous';
+    const rating = parseInt(r.Rating || r.rating) || 5;
+    const text = r.ReviewText || r.text || '';
+    const ts = r.Timestamp || r.date || '';
+    const date = ts ? new Date(ts).toLocaleDateString('en-US', {month:'short', year:'numeric'}) : '';
+    return `
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-author">
+            <div class="review-avatar">${name[0].toUpperCase()}</div>
+            <div><div class="review-name">${name}</div><div class="review-meta">${date}</div></div>
+          </div>
+          <div class="review-stars">${'★'.repeat(rating)}${'☆'.repeat(Math.max(0, 5-rating))}</div>
+        </div>
+        <p class="review-text">"${text}"</p>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTeam() {
+  const a = ABOUT_DATA;
+  // Build team members from about data keys: teamMember1Name, teamMember1Role etc.
+  const members = [];
+  for (let i = 1; i <= 10; i++) {
+    const n = a['teamMember'+i+'Name'];
+    if (!n) break;
+    members.push({
+      name: n,
+      role: a['teamMember'+i+'Role'] || '',
+      years: a['teamMember'+i+'Years'] || '',
+      cert: a['teamMember'+i+'Cert'] || '',
+    });
+  }
+  const TEAM_ICONS = ['👨‍🔧','👩‍🔧','🧑‍🔧','👷','🔧'];
+  document.getElementById('teamGrid').innerHTML = members.map((t, i) => `
+    <div class="team-card">
+      <div class="team-avatar">${TEAM_ICONS[i % TEAM_ICONS.length]}</div>
+      <div class="team-name">${t.name}</div>
+      <div class="team-role">${t.role}</div>
+      <div class="team-detail">${t.years ? t.years+' yrs experience' : ''}${t.years && t.cert ? ' · ' : ''}${t.cert}</div>
+    </div>
+  `).join('') || '<p style="color:var(--text-muted);text-align:center;">No team members added yet.</p>';
+
+  const guarantees = [];
+  const GUARANTEE_ICONS = ['🛡️','✅','⏰','💰','🏆','🔒'];
+  for (let i = 1; i <= 8; i++) {
+    const t = a['guarantee'+i+'Title'];
+    if (!t) break;
+    guarantees.push({ icon: GUARANTEE_ICONS[i-1] || '✅', title: t, desc: a['guarantee'+i+'Desc'] || '' });
+  }
+  document.getElementById('guaranteesGrid').innerHTML = guarantees.map(g => `
+    <div class="guarantee-card">
+      <div style="font-size:22px;">${g.icon}</div>
+      <h4>${g.title}</h4>
+      <p>${g.desc}</p>
+    </div>
+  `).join('') || '';
+}
+
+/* ═══════════════════════════════════════
+   HOMEPAGE INQUIRY WIDGET
+   ═══════════════════════════════════════ */
+let inquiryType = 'question';
+
+function initInquiry() {
+  const selector = document.getElementById('inquiryTypeSelector');
+  selector.querySelectorAll('.inquiry-type-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      inquiryType = btn.dataset.type;
+      selector.querySelectorAll('.inquiry-type-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      updateInquiryForm();
+    });
+  });
+  document.getElementById('btnSubmitInquiry').addEventListener('click', submitInquiry);
+  updateInquiryForm();
+}
+
+function updateInquiryForm() {
+  const svcGroup = document.getElementById('iqServiceGroup');
+  const msgGroup = document.getElementById('iqMessageGroup');
+  const msgLabel = document.getElementById('iqMessageLabel');
+  const msgField = document.getElementById('iqMessage');
+
+  if (inquiryType === 'quote') {
+    svcGroup.style.display = 'block';
+    msgLabel.textContent = 'Project Details *';
+    msgField.placeholder = 'Describe the work you need done...';
+  } else if (inquiryType === 'callback') {
+    svcGroup.style.display = 'none';
+    msgLabel.textContent = 'What is this about? (optional)';
+    msgField.placeholder = 'Brief description so we can prepare...';
+  } else {
+    svcGroup.style.display = 'none';
+    msgLabel.textContent = 'Your Question *';
+    msgField.placeholder = 'How can we help?';
+  }
+}
+
+async function submitInquiry() {
+  const name = document.getElementById('iqName').value.trim();
+  const email = document.getElementById('iqEmail').value.trim();
+  const phone = document.getElementById('iqPhone').value.trim();
+  const message = document.getElementById('iqMessage').value.trim();
+
+  if (!name || !email || !phone) { showToast('Please fill name, email, and phone.', 'error'); return; }
+  if (inquiryType !== 'callback' && !message) { showToast('Please fill in the message.', 'error'); return; }
+
+  const btn = document.getElementById('btnSubmitInquiry');
+  setLoading(btn, true);
+  try {
+    const result = await postToGAS({
+      action: 'inquiry',
+      type: inquiryType,
+      name, email, phone, message,
+      service: inquiryType === 'quote' ? document.getElementById('iqService').value : '',
+      timestamp: new Date().toISOString()
+    });
+    console.log('Inquiry GAS response:', result);
+    if (result && result.email) {
+      console.log('Auto-reply email status:', result.email);
+      if (!result.email.sent) console.warn('Email not sent:', result.email);
+    }
+    const msgs = {
+      question: 'Question submitted! We\'ll respond within 2 hours.',
+      quote: 'Quote request submitted! We\'ll get back to you soon.',
+      callback: 'Callback requested! We\'ll call you shortly.'
+    };
+    showToast(msgs[inquiryType] || 'Submitted!');
+    ['iqName','iqEmail','iqPhone','iqMessage'].forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('iqService').selectedIndex = 0;
+  } catch (e) {
+    showToast('Something went wrong. Please try again.', 'error');
+  }
+  setLoading(btn, false);
+}
+
+/* ═══════════════════════════════════════
+   BOOKING FLOW (Book Service / Request Quote)
+   ═══════════════════════════════════════ */
+let bookingMode = 'book'; // 'book' or 'quote'
+let bkService = null, bkDate = null, bkTime = null;
+let calMonth, calYear;
+let availabilityCache = {};
+
+function initBooking() {
+  const now = new Date();
+  calMonth = now.getMonth();
+  calYear = now.getFullYear();
+  renderCalendar();
+  renderBookingSteps(1);
+
+  // Mode toggle
+  document.querySelectorAll('.booking-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      bookingMode = btn.dataset.mode;
+      document.querySelectorAll('.booking-mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateBookingMode();
+      resetBookingSteps();
+    });
+  });
+}
+
+function updateBookingMode() {
+  const isQuote = bookingMode === 'quote';
+  document.getElementById('bookingPageTitle').textContent = isQuote ? 'Request a Quote' : 'Book an Appointment';
+  document.getElementById('bookingPageDesc').textContent = isQuote
+    ? 'Select the service and tell us about your project. No commitment.'
+    : 'Select your service, pick a time, and confirm with a ${{DEPOSIT_AMOUNT}} deposit.';
+  document.getElementById('btnSubmitBooking').textContent = isQuote ? 'Submit Quote Request →' : 'Pay ${{DEPOSIT_AMOUNT}} Deposit & Book →';
+  document.getElementById('bkNotesLabel').textContent = isQuote ? 'Describe Your Project *' : 'Describe the Issue';
+  document.getElementById('bkNotes').placeholder = isQuote ? 'Details about the work needed...' : 'Tell us about the problem...';
+  // Show deposit notice only in book mode
+  const notice = document.getElementById('depositNotice');
+  if (notice) notice.style.display = isQuote ? 'none' : 'flex';
+}
+
+function resetBookingSteps() {
+  bkService = null; bkDate = null; bkTime = null;
+  document.getElementById('bookingConfirm').style.display = 'none';
+  document.getElementById('bookingSteps').style.display = 'flex';
+  ['bookingStep1','bookingStep2','bookingStep3'].forEach(id => document.getElementById(id).style.display = 'none');
+  document.getElementById('bookingStep1').style.display = 'block';
+  document.getElementById('btnStep1Next').disabled = true;
+  document.getElementById('btnStep2Next').disabled = true;
+  document.querySelectorAll('.service-select-btn').forEach(b => b.classList.remove('selected'));
+  ['bkName','bkEmail','bkPhone','bkAddress','bkNotes'].forEach(id => { document.getElementById(id).value = ''; });
+  renderBookingSteps(1);
+}
+
+function renderBookingSteps(step) {
+  const isQuote = bookingMode === 'quote';
+  const labels = isQuote ? ['Service', 'Your Info'] : ['Service', 'Date & Time', 'Your Info'];
+  const totalSteps = labels.length;
+
+  document.getElementById('bookingSteps').innerHTML = labels.map((l, i) => {
+    const num = i + 1;
+    return `
+      <div class="booking-step">
+        <div class="booking-step-num ${step > num ? 'done' : step === num ? 'active' : ''}">${step > num ? '✓' : num}</div>
+        <span class="booking-step-label ${step === num ? 'active' : ''}">${l}</span>
+      </div>
+      ${i < totalSteps - 1 ? `<div class="booking-step-line ${step > num ? 'done' : ''}"></div>` : ''}
+    `;
+  }).join('');
+}
+
+function goBookingStep(step) {
+  const isQuote = bookingMode === 'quote';
+
+  ['bookingStep1','bookingStep2','bookingStep3'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+
+  if (isQuote) {
+    // Quote: Step 1 = service, Step 2 = info (stored in bookingStep3)
+    if (step === 1) {
+      document.getElementById('bookingStep1').style.display = 'block';
+      renderBookingSteps(1);
+    } else {
+      document.getElementById('bookingStep3').style.display = 'block';
+      renderBookingSteps(2);
+      renderBookingSummary();
+    }
+  } else {
+    // Book: Step 1 = service, Step 2 = date/time, Step 3 = info
+    document.getElementById('bookingStep' + step).style.display = 'block';
+    renderBookingSteps(step);
+    if (step === 3) renderBookingSummary();
+  }
+}
+
+function selectService(id) {
+  bkService = SERVICES.find(s => (s.ID || s.id) === id);
+  // Normalise to consistent shape for booking logic
+  if (bkService) {
+    bkService = {
+      id:       bkService.ID       || bkService.id,
+      name:     bkService.Name     || bkService.name,
+      icon:     bkService.Icon     || bkService.icon,
+      price:    bkService.Price    || bkService.price,
+      desc:     bkService.Description || bkService.desc,
+      duration: parseInt(bkService.Duration || bkService.duration) || 60,
+    };
+  }
+  document.querySelectorAll('.service-select-btn').forEach(b => {
+    b.classList.toggle('selected', b.dataset.sid === id);
+  });
+  document.getElementById('btnStep1Next').disabled = false;
+
+  // In quote mode, step 1 next goes to step 3 (info form)
+  const btn = document.getElementById('btnStep1Next');
+  if (bookingMode === 'quote') {
+    btn.onclick = function() { goBookingStep(2); };
+  } else {
+    btn.onclick = function() { goBookingStep(2); };
+  }
+}
+
+/* ─── CALENDAR ─── */
+function renderCalendar() {
+  const d = new Date(calYear, calMonth, 1);
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const firstDay = d.getDay();
+  const today = new Date();
+
+  document.getElementById('calMonthLabel').textContent = d.toLocaleDateString('en-US', { month:'long', year:'numeric' });
+
+  let html = '';
+  for (let i = 0; i < firstDay; i++) html += '<div></div>';
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dt = new Date(calYear, calMonth, day);
+    const isPast = dt < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const isSun = dt.getDay() === 0;
+    const disabled = isPast || isSun;
+    const isToday = dt.toDateString() === today.toDateString();
+    const isSelected = bkDate && new Date(bkDate).toDateString() === dt.toDateString();
+    html += `<button class="cal-day${isToday ? ' today' : ''}${isSelected ? ' selected' : ''}" ${disabled ? 'disabled' : ''} data-iso="${dt.toISOString()}">${day}</button>`;
+  }
+  const container = document.getElementById('calDays');
+  container.innerHTML = html;
+  container.querySelectorAll('.cal-day:not(:disabled)').forEach(btn => {
+    btn.addEventListener('click', () => selectDate(btn.dataset.iso));
+  });
+}
+
+function calPrev() { if (calMonth === 0) { calMonth = 11; calYear--; } else calMonth--; renderCalendar(); }
+function calNext() { if (calMonth === 11) { calMonth = 0; calYear++; } else calMonth++; renderCalendar(); }
+
+function selectDate(iso) {
+  bkDate = iso;
+  bkTime = null;
+  renderCalendar();
+  document.getElementById('btnStep2Next').disabled = true;
+  fetchAvailability(iso);
+}
+
+/* ─── AVAILABILITY (Google Calendar integration) ─── */
+async function fetchAvailability(iso) {
+  const d = new Date(iso);
+  const dateKey = d.toISOString().slice(0, 10);
+  const duration = bkService ? bkService.duration : 60;
+
+  // Show loading state
+  document.getElementById('timeSlotsLabel').textContent = 'Checking availability...';
+  const container = document.getElementById('timeSlots');
+  let loadingHTML = '';
+  for (let i = 0; i < 10; i++) {
+    loadingHTML += '<div class="time-slot loading-slot">Loading</div>';
+  }
+  container.innerHTML = loadingHTML;
+  document.getElementById('calSourceBadge').innerHTML = '';
+
+  // Check cache
+  const cacheKey = dateKey + '_' + duration;
+  if (availabilityCache[cacheKey]) {
+    renderAvailableSlots(availabilityCache[cacheKey]);
+    return;
+  }
+
+  try {
+    const res = await fetch(GAS_URL + '?action=getAvailability&date=' + encodeURIComponent(dateKey) + '&duration=' + duration);
+    const data = await res.json();
+
+    if (data.error) {
+      // Fallback to default slots
+      renderDefaultTimeSlots();
+      return;
+    }
+
+    availabilityCache[cacheKey] = data;
+    renderAvailableSlots(data);
+  } catch (e) {
+    console.log('Availability fetch failed, using defaults:', e);
+    renderDefaultTimeSlots();
+  }
+}
+
+function renderAvailableSlots(data) {
+  if (!bkDate) return;
+  const d = new Date(bkDate);
+  document.getElementById('timeSlotsLabel').textContent = 'Available — ' + d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+
+  const slots = data.slots || [];
+  if (!slots.length) {
+    document.getElementById('timeSlots').innerHTML = '<div class="slots-loading-msg">No available slots for this date.</div>';
+    document.getElementById('calSourceBadge').innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  slots.forEach(slot => {
+    const sel = bkTime && bkTime.h === slot.hour && bkTime.m === slot.minute;
+    if (slot.available) {
+      html += `<button class="time-slot${sel ? ' selected' : ''}" data-h="${slot.hour}" data-m="${slot.minute}">${slot.label}</button>`;
+    } else {
+      html += `<div class="time-slot unavailable">${slot.label}</div>`;
+    }
+  });
+
+  const container = document.getElementById('timeSlots');
+  container.innerHTML = html;
+  container.querySelectorAll('.time-slot:not(.unavailable)').forEach(btn => {
+    btn.addEventListener('click', () => {
+      bkTime = { h: parseInt(btn.dataset.h), m: parseInt(btn.dataset.m) };
+      renderAvailableSlots(data);
+      document.getElementById('btnStep2Next').disabled = false;
+    });
+  });
+
+  // Show source badge
+  const badge = document.getElementById('calSourceBadge');
+  if (data.source === 'calendar') {
+    badge.innerHTML = '<div class="cal-source-badge live">📅 Live availability from Google Calendar</div>';
+  } else {
+    badge.innerHTML = '<div class="cal-source-badge">Standard business hours</div>';
+  }
+}
+
+function renderDefaultTimeSlots() {
+  if (!bkDate) return;
+  const d = new Date(bkDate);
+  document.getElementById('timeSlotsLabel').textContent = 'Available — ' + d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+
+  let html = '';
+  for (let h = 8; h <= 17; h++) {
+    for (const m of [0, 30]) {
+      if (h === 17 && m === 30) continue;
+      const label = fmtTime(h, m);
+      const sel = bkTime && bkTime.h === h && bkTime.m === m;
+      html += `<button class="time-slot${sel ? ' selected' : ''}" data-h="${h}" data-m="${m}">${label}</button>`;
+    }
+  }
+  const container = document.getElementById('timeSlots');
+  container.innerHTML = html;
+  container.querySelectorAll('.time-slot').forEach(btn => {
+    btn.addEventListener('click', () => {
+      bkTime = { h: parseInt(btn.dataset.h), m: parseInt(btn.dataset.m) };
+      renderDefaultTimeSlots();
+      document.getElementById('btnStep2Next').disabled = false;
+    });
+  });
+
+  document.getElementById('calSourceBadge').innerHTML = '<div class="cal-source-badge">Standard business hours</div>';
+}
+
+function fmtTime(h, m) { const ampm = h >= 12 ? 'PM' : 'AM'; return (h % 12 || 12) + ':' + String(m).padStart(2,'0') + ' ' + ampm; }
+function fmtDate(iso) { return new Date(iso).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); }
+
+function renderBookingSummary() {
+  const isQuote = bookingMode === 'quote';
+  let html = `<div><div class="booking-summary-label">Type</div><div class="booking-summary-value">${isQuote ? 'Quote Request' : 'Appointment'}</div></div>`;
+  html += `<div><div class="booking-summary-label">Service</div><div class="booking-summary-value">${bkService ? bkService.name : '—'}</div></div>`;
+  if (!isQuote) {
+    html += `<div><div class="booking-summary-label">Date</div><div class="booking-summary-value">${bkDate ? fmtDate(bkDate) : '—'}</div></div>`;
+    html += `<div><div class="booking-summary-label">Time</div><div class="booking-summary-value">${bkTime ? fmtTime(bkTime.h, bkTime.m) : '—'}</div></div>`;
+  }
+  document.getElementById('bookingSummary').innerHTML = html;
+}
+
+function resetBookingAndGoHome() {
+  bookingMode = 'book';
+  document.querySelectorAll('.booking-mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('modeBook').classList.add('active');
+  updateBookingMode();
+  resetBookingSteps();
+  showPage('home');
+}
+
+/* ═══════════════════════════════════════
+   FORM SUBMISSIONS
+   ═══════════════════════════════════════ */
+function showToast(msg, type) {
+  type = type || 'success';
+  const el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(function(){ el.remove(); }, 3500);
+}
+
+function setLoading(btn, loading) {
+  if (loading) {
+    btn.dataset.originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span> Sending...';
+    btn.disabled = true;
+  } else {
+    btn.innerHTML = btn.dataset.originalText;
+    btn.disabled = false;
+  }
+}
+
+async function postToGAS(payload) {
+  const res = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload)
+  });
+  return await res.json();
+}
+
+async function submitBooking() {
+  const name = document.getElementById('bkName').value.trim();
+  const email = document.getElementById('bkEmail').value.trim();
+  const phone = document.getElementById('bkPhone').value.trim();
+  if (!name || !email || !phone) { showToast('Please fill all required fields.', 'error'); return; }
+
+  const isQuote = bookingMode === 'quote';
+  if (isQuote) {
+    const notes = document.getElementById('bkNotes').value.trim();
+    if (!notes) { showToast('Please describe your project.', 'error'); return; }
+  }
+
+  const btn = document.getElementById('btnSubmitBooking');
+  setLoading(btn, true);
+
+  try {
+    if (isQuote) {
+      // ── QUOTE: log directly to GAS, no payment ──
+      const result = await postToGAS({
+        action: 'quote',
+        name, email, phone,
+        desc: document.getElementById('bkNotes').value.trim(),
+        service: bkService ? bkService.name : '',
+        address: document.getElementById('bkAddress').value.trim(),
+        contactMethod: 'phone',
+        timestamp: new Date().toISOString()
+      });
+      document.getElementById('confirmTitle').textContent = 'Quote Request Sent!';
+      document.getElementById('confirmDesc').textContent = 'We\'ve received your request and will get back to you within 2 hours with a free estimate.';
+      if (result && result.email && result.email.sent) {
+        document.getElementById('confirmEmail').textContent = 'A confirmation email has been sent to ' + email;
+      } else {
+        document.getElementById('confirmEmail').textContent = '';
+      }
+      ['bookingStep1','bookingStep2','bookingStep3'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+      document.getElementById('bookingSteps').style.display = 'none';
+      document.querySelector('.booking-mode-toggle').style.display = 'none';
+      document.getElementById('bookingConfirm').style.display = 'block';
+      showToast('Quote request submitted!');
+
+    } else {
+      // ── BOOK: first log to GAS, then redirect to Stripe Checkout ──
+      const appointmentId = 'APPT-' + Date.now();
+
+      // Log to Google Sheet (even before payment — status will be "Pending Payment")
+      // Wrapped in try/catch: GAS failure must not block the Stripe redirect.
+      // If GAS is down, booking-success.html will still confirm the payment
+      // but the appointment row may be missing — the console.error flags this.
+      try {
+        const gasResult = await postToGAS({
+          action: 'appointment',
+          name, email, phone,
+          address: document.getElementById('bkAddress').value.trim(),
+          notes: document.getElementById('bkNotes').value.trim(),
+          service: bkService ? bkService.name : '',
+          date: bkDate ? fmtDate(bkDate) : '',
+          time: bkTime ? fmtTime(bkTime.h, bkTime.m) : '',
+          duration: bkService ? bkService.duration : 60,
+          appointmentId,
+          status: 'Pending Payment',
+          timestamp: new Date().toISOString()
+        });
+        if (!gasResult || !gasResult.success) {
+          console.error('GAS failed to log appointment before Stripe redirect:', gasResult);
+        }
+      } catch (gasErr) {
+        console.error('GAS unreachable before Stripe redirect:', gasErr);
+        // Still proceed to Stripe — payment is more important than pre-logging
+      }
+
+      // Check if worker is configured
+      if (!STRIPE_WORKER_URL || STRIPE_WORKER_URL.startsWith('YOUR_')) {
+        // Fallback: no Stripe configured — just confirm
+        showToast('Booked! (Stripe not configured — no deposit collected)', 'info');
+        document.getElementById('confirmTitle').textContent = 'You\'re Booked!';
+        document.getElementById('confirmDesc').textContent = 'We\'ve received your appointment. You\'ll get a confirmation call within the hour.';
+        document.getElementById('confirmEmail').textContent = '';
+        ['bookingStep1','bookingStep2','bookingStep3'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+        document.getElementById('bookingSteps').style.display = 'none';
+        document.querySelector('.booking-mode-toggle').style.display = 'none';
+        document.getElementById('bookingConfirm').style.display = 'block';
+        setLoading(btn, false);
+        return;
+      }
+
+      // Create Stripe Checkout session
+      const res = await fetch(STRIPE_WORKER_URL + '/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName: name,
+          customerEmail: email,
+          service: bkService ? bkService.name : '{{INDUSTRY_TITLE}} Service',
+          appointmentDate: bkDate ? fmtDate(bkDate) : '',
+          appointmentTime: bkTime ? fmtTime(bkTime.h, bkTime.m) : '',
+          appointmentId,
+        })
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url;
+      } else {
+        showToast('Payment setup failed: ' + (data.error || 'Unknown error'), 'error');
+        setLoading(btn, false);
+      }
+    }
+  } catch (e) {
+    showToast('Something went wrong. Please try again.', 'error');
+    setLoading(btn, false);
+  }
+
+  if (bookingMode === 'quote') setLoading(btn, false);
+}
+
+async function submitContact() {
+  const name = document.getElementById('ctName').value.trim();
+  const email = document.getElementById('ctEmail').value.trim();
+  const message = document.getElementById('ctMessage').value.trim();
+  if (!name || !email || !message) { showToast('Please fill all fields.', 'error'); return; }
+
+  const btn = document.getElementById('btnContact');
+  setLoading(btn, true);
+  try {
+    await postToGAS({ action: 'contact', name, email, message, timestamp: new Date().toISOString() });
+    showToast('Message sent! A confirmation has been emailed to you.');
+    ['ctName','ctEmail','ctMessage'].forEach(id => { document.getElementById(id).value = ''; });
+  } catch (e) {
+    showToast('Something went wrong.', 'error');
+  }
+  setLoading(btn, false);
+}
+
+/* ═══════════════════════════════════════
+   ABOUT PAGE RENDERER
+   ═══════════════════════════════════════ */
+function renderAbout() {
+  const a = ABOUT_DATA;
+  const hl = document.getElementById('aboutHeadline');
+  const sl = document.getElementById('aboutSubheadline');
+  const st = document.getElementById('aboutStory');
+  const ms = document.getElementById('aboutMission');
+  if (hl && a.headline)    hl.textContent = a.headline;
+  if (sl && a.subheadline) sl.textContent = a.subheadline;
+  if (st && a.story)       st.textContent = a.story;
+  if (ms && a.mission)     ms.textContent = '"' + a.mission + '"';
+  // Stats
+  if (a.yearsInBusiness)  { const el = document.getElementById('statYears');        if(el) el.textContent = a.yearsInBusiness; }
+  if (a.jobsCompleted)    { const el = document.getElementById('statJobs');         if(el) el.textContent = a.jobsCompleted; }
+  if (a.satisfactionRate) { const el = document.getElementById('statSatisfaction'); if(el) el.textContent = a.satisfactionRate; }
+  if (a.teamSize)         { const el = document.getElementById('statTeam');         if(el) el.textContent = a.teamSize; }
+  renderTeam();
+}
+
+/* ═══════════════════════════════════════
+   LOAD SITE DATA FROM GAS
+   ═══════════════════════════════════════ */
+async function loadSiteData() {
+  // Load all three in parallel
+  const [svcRes, revRes, aboutRes] = await Promise.allSettled([
+    fetch(GAS_URL + '?action=getServices'),
+    fetch(GAS_URL + '?action=getReviews'),
+    fetch(GAS_URL + '?action=getAbout'),
+  ]);
+
+  // Services
+  try {
+    const svcData = await svcRes.value.json();
+    if (Array.isArray(svcData) && svcData.length) {
+      SERVICES = svcData.filter(s => s.Active !== false && s.Active !== 'FALSE');
+    } else {
+      SERVICES = SERVICES_FALLBACK;
+    }
+  } catch(e) {
+    SERVICES = SERVICES_FALLBACK;
+  }
+
+  // Reviews
+  try {
+    const revData = await revRes.value.json();
+    REVIEWS = Array.isArray(revData) ? revData : [];
+  } catch(e) { REVIEWS = []; }
+
+  // About
+  try {
+    const aboutData = await aboutRes.value.json();
+    if (aboutData && typeof aboutData === 'object' && !aboutData.error) {
+      ABOUT_DATA = aboutData;
+    }
+  } catch(e) {}
+
+  // Re-render everything that depends on dynamic data
+  renderServiceCards('homeServicesGrid');
+  renderServiceCards('servicesGrid');
+  renderServiceSelectGrid();
+  renderInquiryServiceOptions();
+  renderReviews();
+  renderAbout();
+}
+
+/* ═══════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════ */
+(function init() {
+  // Render with fallback data immediately so the page isn't blank
+  SERVICES = SERVICES_FALLBACK;
+  buildNav();
+  renderServiceCards('homeServicesGrid');
+  renderServiceCards('servicesGrid');
+  renderInquiryServiceOptions();
+  renderTeam();
+  initInquiry();
+  initBooking();
+  renderServiceSelectGrid();
+
+  // Then fetch live data from sheets and re-render
+  loadSiteData().catch(e => console.warn('loadSiteData failed:', e));
+
+  // Populate service dropdowns
+  const svcSelects = document.querySelectorAll('#iqService');
+  svcSelects.forEach(sel => {
+    SERVICES.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.Name || s.name;
+      opt.textContent = s.Name || s.name;
+      sel.appendChild(opt);
+    });
+  });
+
+  // Check for Stripe success redirect
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('stripe') === 'success') {
+    const appt = params.get('appt') || '';
+    document.getElementById('confirmTitle').textContent = 'Payment Received! 🎉';
+    document.getElementById('confirmDesc').textContent =
+      'Your ${{DEPOSIT_AMOUNT}} deposit was processed and your appointment is confirmed. We\'ll call you within the hour.';
+    document.getElementById('confirmEmail').textContent =
+      appt ? 'Booking reference: ' + appt : '';
+    ['bookingStep1','bookingStep2','bookingStep3'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.style.display = 'none';
+    });
+    const steps = document.getElementById('bookingSteps');
+    const toggl = document.querySelector('.booking-mode-toggle');
+    if (steps)  steps.style.display = 'none';
+    if (toggl)  toggl.style.display = 'none';
+    document.getElementById('bookingConfirm').style.display = 'block';
+    showPage('booking');
+  }
+})();
+</script>
+</body>
+</html>
