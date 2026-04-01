@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Configurator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0e10;--bg-card:#161618;--bg-input:#1c1c1f;--border:#2a2a2e;--border-focus:#5b8eff;--text:#f0f0f0;--text-muted:#888;--text-dim:#555;--accent:#5b8eff;--accent-bg:rgba(91,142,255,.1);--green:#34d399;--green-bg:rgba(52,211,153,.1);--amber:#fbbf24;--amber-bg:rgba(251,191,36,.1);--red:#f87171;--font-mono:'DM Mono',monospace;--font-body:'DM Sans',sans-serif;--font-display:'Syne',sans-serif;--radius:8px;--radius-lg:12px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+.header{padding:24px 36px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.header-brand{display:flex;align-items:center;gap:14px;}
+.header-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.header-title{font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-.5px;}
+.header-sub{font-size:11px;color:var(--text-muted);margin-top:1px;font-family:var(--font-mono);}
+.header-badge{font-family:var(--font-mono);font-size:11px;background:var(--green-bg);color:var(--green);padding:5px 12px;border-radius:100px;border:1px solid rgba(52,211,153,.2);}
+.layout{display:grid;grid-template-columns:252px 1fr;min-height:calc(100vh - 89px);}
+.sidebar{border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:calc(100vh - 89px);overflow-y:auto;}
+.sidebar-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);padding:0 20px 8px;}
+.tab-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 20px;font-size:13.5px;font-weight:500;color:var(--text-muted);background:none;border:none;cursor:pointer;text-align:left;transition:all .15s;border-left:3px solid transparent;font-family:inherit;}
+.tab-btn:hover{color:var(--text);background:rgba(255,255,255,.03);}
+.tab-btn.active{color:var(--accent);background:var(--accent-bg);border-left-color:var(--accent);}
+.tab-btn-icon{font-size:15px;width:20px;text-align:center;}
+.tab-btn-count{margin-left:auto;font-family:var(--font-mono);font-size:10px;background:rgba(255,255,255,.06);padding:2px 6px;border-radius:4px;}
+.sidebar-divider{height:1px;background:var(--border);margin:14px 0;}
+.main{padding:36px 44px;overflow-y:auto;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.panel-header{margin-bottom:28px;}
+.panel-title{font-family:var(--font-display);font-size:24px;font-weight:800;margin-bottom:6px;}
+.panel-desc{font-size:14px;color:var(--text-muted);line-height:1.6;}
+.field-group{margin-bottom:26px;}
+.field-group-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.field-group-title::before{content:'';width:3px;height:11px;background:var(--accent);border-radius:2px;}
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fields-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.fields-full{grid-column:1/-1;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:11.5px;font-weight:600;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.field-token{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);background:rgba(255,255,255,.04);padding:2px 6px;border-radius:4px;white-space:nowrap;}
+.field input[type=text],.field input[type=tel],.field input[type=email],.field input[type=number],.field select,.field textarea{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;color:var(--text);outline:none;transition:border-color .15s;font-family:inherit;width:100%;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--border-focus);}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-dim);}
+.field input[readonly]{opacity:.45;cursor:not-allowed;}
+.field textarea{min-height:68px;resize:vertical;line-height:1.5;}
+.color-row{display:flex;align-items:center;gap:8px;}
+.color-swatch{width:36px;height:36px;border-radius:7px;border:1.5px solid var(--border);cursor:pointer;flex-shrink:0;padding:3px;background:none;}
+.color-hex{flex:1;}
+.url-preview{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:6px;padding:7px 11px;margin-top:6px;word-break:break-all;}
+.url-preview span{color:var(--accent);}
+.generate-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:var(--radius-lg);font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:inherit;margin-bottom:10px;}
+.generate-btn-primary{background:var(--accent);color:#fff;}
+.generate-btn-primary:hover{opacity:.88;transform:translateY(-1px);}
+.generate-btn-secondary{background:var(--bg-card);color:var(--text);border:1px solid var(--border);}
+.generate-btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+.output-block{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px;margin-bottom:14px;}
+.output-block-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.output-block-title{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--accent);}
+.copy-btn{font-family:var(--font-mono);font-size:11px;padding:4px 10px;border-radius:5px;background:rgba(91,142,255,.12);border:1px solid rgba(91,142,255,.25);color:var(--accent);cursor:pointer;transition:all .15s;}
+.copy-btn:hover{background:rgba(91,142,255,.22);}
+.output-pre{font-family:var(--font-mono);font-size:11.5px;color:var(--text);white-space:pre-wrap;line-height:1.7;max-height:280px;overflow-y:auto;}
+.val-chip{font-size:11px;font-weight:600;padding:4px 10px;border-radius:100px;display:inline-flex;align-items:center;gap:5px;margin:0 4px 6px 0;}
+.val-chip.ok{background:var(--green-bg);color:var(--green);}
+.val-chip.warn{background:var(--amber-bg);color:var(--amber);}
+.val-chip.err{background:rgba(248,113,113,.1);color:var(--red);}
+.progress-wrap{margin-bottom:20px;}
+.progress-label{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted);margin-bottom:6px;}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s;}
+.download-section{background:linear-gradient(135deg,rgba(91,142,255,.08),rgba(91,142,255,.02));border:1px solid rgba(91,142,255,.18);border-radius:var(--radius-lg);padding:24px;margin-top:20px;}
+.download-title{font-family:var(--font-display);font-size:18px;font-weight:800;margin-bottom:6px;}
+.download-desc{font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.55;}
+.download-files{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;margin-bottom:18px;}
+.file-chip{background:var(--bg-card);border:1px solid var(--border);border-radius:7px;padding:9px 12px;display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);}
+.dns-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:11px;}
+.dns-table th{text-align:left;padding:7px 9px;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);border-bottom:1px solid var(--border);font-family:var(--font-body);}
+.dns-table td{padding:7px 9px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text-muted);vertical-align:top;}
+.dns-table td:first-child{color:var(--amber);}
+.dns-table td:last-child{color:var(--text);word-break:break-all;}
+.load-status{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-bottom:16px;padding:8px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;}
+@media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);padding:8px 0;display:flex;overflow-x:auto;white-space:nowrap;}.tab-btn{padding:9px 16px;border-left:none;border-bottom:3px solid transparent;white-space:nowrap;}.tab-btn.active{border-left-color:transparent;border-bottom-color:var(--accent);}.main{padding:24px 18px;}.fields-grid,.fields-grid-3{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">
+    <div class="header-icon">⚙️</div>
+    <div>
+      <div class="header-title">Site Configurator</div>
+      <div class="header-sub">v1.0 · Template Builder</div>
+    </div>
+  </div>
+  <div class="header-badge">7 files · 40+ tokens</div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-label">Configure</div>
+    <button class="tab-btn active" onclick="switchTab('identity')"><span class="tab-btn-icon">🏢</span> Business Identity <span class="tab-btn-count">12</span></button>
+    <button class="tab-btn" onclick="switchTab('infra')"><span class="tab-btn-icon">🔌</span> Infrastructure <span class="tab-btn-count">8</span></button>
+    <button class="tab-btn" onclick="switchTab('theme')"><span class="tab-btn-icon">🎨</span> Colors &amp; Fonts <span class="tab-btn-count">9</span></button>
+    <button class="tab-btn" onclick="switchTab('content')"><span class="tab-btn-icon">✏️</span> Copy &amp; Content <span class="tab-btn-count">12</span></button>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-label">Output</div>
+    <button class="tab-btn" onclick="switchTab('generate')"><span class="tab-btn-icon">📦</span> Generate Files</button>
+  </aside>
+
+  <main class="main">
+
+    <!-- ══ IDENTITY ══ -->
+    <div class="tab-panel active" id="panel-identity">
+      <div class="panel-header">
+        <div class="panel-title">Business Identity</div>
+        <div class="panel-desc">Core company info that appears throughout all 7 output files.</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Company Name</div>
+        <div class="fields-grid">
+          <div class="field"><label>Full Company Name <span class="field-token">COMPANY_NAME</span></label><input type="text" id="COMPANY_NAME" placeholder="Acme Plumbing Co." oninput="onFieldChange()"></div>
+          <div class="field"><label>Short Name (nav/logo) <span class="field-token">COMPANY_SHORT</span></label><input type="text" id="COMPANY_SHORT" placeholder="Acme" oninput="onFieldChange()"></div>
+          <div class="field"><label>URL Slug (lowercase, no spaces) <span class="field-token">COMPANY_SLUG</span></label><input type="text" id="COMPANY_SLUG" placeholder="acme" oninput="onFieldChange()"></div>
+          <div class="field"><label>Company Type Suffix <span class="field-token">COMPANY_TYPE</span></label><input type="text" id="COMPANY_TYPE" placeholder="Plumbing Co." oninput="onFieldChange()"></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Industry</div>
+        <div class="fields-grid">
+          <div class="field"><label>Industry Keyword (lowercase) <span class="field-token">INDUSTRY</span></label><input type="text" id="INDUSTRY" placeholder="plumbing" oninput="onFieldChange()"></div>
+          <div class="field"><label>Industry (Title Case) <span class="field-token">INDUSTRY_TITLE</span></label><input type="text" id="INDUSTRY_TITLE" placeholder="Plumbing" oninput="onFieldChange()"></div>
+          <div class="field"><label>Logo Emoji <span class="field-token">LOGO_EMOJI</span></label><input type="text" id="LOGO_EMOJI" placeholder="🔧" maxlength="4" oninput="onFieldChange()"></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Contact</div>
+        <div class="fields-grid">
+          <div class="field"><label>Business Phone <span class="field-token">BUSINESS_PHONE</span></label><input type="tel" id="BUSINESS_PHONE" placeholder="(555) 000-0000" oninput="onFieldChange()"></div>
+          <div class="field"><label>Phone Hours Blurb <span class="field-token">PHONE_HOURS</span></label><input type="text" id="PHONE_HOURS" placeholder="Available 24/7 for emergencies" oninput="onFieldChange()"></div>
+          <div class="field"><label>Domain (no https://) <span class="field-token">DOMAIN</span></label><input type="text" id="DOMAIN" placeholder="yourbusiness.com" oninput="onDomainChange()"></div>
+          <div class="field"><label>Service Area <span class="field-token">SERVICE_AREA</span></label><input type="text" id="SERVICE_AREA" placeholder="South Florida" oninput="onFieldChange()"></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Dates</div>
+        <div class="fields-grid">
+          <div class="field"><label>Year Founded <span class="field-token">YEAR_FOUNDED</span></label><input type="text" id="YEAR_FOUNDED" placeholder="2010" oninput="onFieldChange()"></div>
+          <div class="field"><label>Copyright Year <span class="field-token">COPYRIGHT_YEAR</span></label><input type="text" id="COPYRIGHT_YEAR" placeholder="2026" oninput="onFieldChange()"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ INFRASTRUCTURE ══ -->
+    <div class="tab-panel" id="panel-infra">
+      <div class="panel-header">
+        <div class="panel-title">Infrastructure</div>
+        <div class="panel-desc">Enter your Cloudflare username — all 3 worker URLs auto-fill. Override any manually.</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Cloudflare / GitHub</div>
+        <div class="fields-grid">
+          <div class="field"><label>CF Username <span class="field-token">CF_USERNAME</span></label><input type="text" id="CF_USERNAME" placeholder="yourname" oninput="updateWorkerURLs()"></div>
+          <div class="field"><label>GitHub Username <span class="field-token">GITHUB_USERNAME</span></label><input type="text" id="GITHUB_USERNAME" placeholder="yourname" oninput="onFieldChange()"></div>
+        </div>
+        <div style="margin-top:12px" class="field"><label>GAS Proxy Worker URL <span class="field-token">GAS_WORKER_URL</span></label><input type="text" id="GAS_WORKER_URL" placeholder="https://google-sheets-script.yourname.workers.dev" oninput="onFieldChange()"><div class="url-preview" id="gasUrlPreview">Enter CF username above</div></div>
+        <div style="margin-top:12px" class="field"><label>Email Worker URL <span class="field-token">EMAIL_WORKER_URL</span></label><input type="text" id="EMAIL_WORKER_URL" placeholder="https://email.yourname.workers.dev" oninput="onFieldChange()"><div class="url-preview" id="emailUrlPreview">Enter CF username above</div></div>
+        <div style="margin-top:12px" class="field"><label>Stripe Worker URL <span class="field-token">STRIPE_WORKER_URL</span></label><input type="text" id="STRIPE_WORKER_URL" placeholder="https://stripe.yourname.workers.dev" oninput="onFieldChange()"><div class="url-preview" id="stripeUrlPreview">Enter CF username above</div></div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Email Addresses</div>
+        <div class="fields-grid-3">
+          <div class="field"><label>Office <span class="field-token">EMAIL_OFFICE</span></label><input type="email" id="EMAIL_OFFICE" placeholder="office@domain.com" oninput="onFieldChange()"></div>
+          <div class="field"><label>Support <span class="field-token">EMAIL_SUPPORT</span></label><input type="email" id="EMAIL_SUPPORT" placeholder="support@domain.com" oninput="onFieldChange()"></div>
+          <div class="field"><label>Billing <span class="field-token">EMAIL_BILLING</span></label><input type="email" id="EMAIL_BILLING" placeholder="billing@domain.com" oninput="onFieldChange()"></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Stripe</div>
+        <div class="fields-grid">
+          <div class="field"><label>Deposit Amount ($) <span class="field-token">DEPOSIT_AMOUNT</span></label><input type="number" id="DEPOSIT_AMOUNT" placeholder="100" value="100" oninput="updateDepositCents()"></div>
+          <div class="field"><label>Deposit in Cents (auto) <span class="field-token">DEPOSIT_CENTS</span></label><input type="text" id="DEPOSIT_CENTS" placeholder="10000" value="10000" readonly></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ THEME ══ -->
+    <div class="tab-panel" id="panel-theme">
+      <div class="panel-header">
+        <div class="panel-title">Colors &amp; Fonts</div>
+        <div class="panel-desc">All CSS variables. Color pickers sync with hex inputs.</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Brand Colors</div>
+        <div class="fields-grid">
+          <div class="field"><label>Accent (primary) <span class="field-token">COLOR_ACCENT</span></label><div class="color-row"><input type="color" class="color-swatch" id="COLOR_ACCENT_picker" value="#1a5c3a" oninput="syncColor('COLOR_ACCENT')"><input type="text" id="COLOR_ACCENT" class="color-hex" value="#1a5c3a" oninput="syncColorReverse('COLOR_ACCENT')"></div></div>
+          <div class="field"><label>Accent Light (bg tints) <span class="field-token">COLOR_ACCENT_LIGHT</span></label><div class="color-row"><input type="color" class="color-swatch" id="COLOR_ACCENT_LIGHT_picker" value="#e8f5ee" oninput="syncColor('COLOR_ACCENT_LIGHT')"><input type="text" id="COLOR_ACCENT_LIGHT" class="color-hex" value="#e8f5ee" oninput="syncColorReverse('COLOR_ACCENT_LIGHT')"></div></div>
+          <div class="field"><label>Accent Hover (darker) <span class="field-token">COLOR_ACCENT_HOVER</span></label><div class="color-row"><input type="color" class="color-swatch" id="COLOR_ACCENT_HOVER_picker" value="#14472d" oninput="syncColor('COLOR_ACCENT_HOVER')"><input type="text" id="COLOR_ACCENT_HOVER" class="color-hex" value="#14472d" oninput="syncColorReverse('COLOR_ACCENT_HOVER')"></div></div>
+          <div class="field"><label>Accent Border <span class="field-token">COLOR_ACCENT_BORDER</span></label><div class="color-row"><input type="color" class="color-swatch" id="COLOR_ACCENT_BORDER_picker" value="#a7d7bc" oninput="syncColor('COLOR_ACCENT_BORDER')"><input type="text" id="COLOR_ACCENT_BORDER" class="color-hex" value="#a7d7bc" oninput="syncColorReverse('COLOR_ACCENT_BORDER')"></div></div>
+          <div class="field"><label>Stars / Rating <span class="field-token">COLOR_STARS</span></label><div class="color-row"><input type="color" class="color-swatch" id="COLOR_STARS_picker" value="#e8a838" oninput="syncColor('COLOR_STARS')"><input type="text" id="COLOR_STARS" class="color-hex" value="#e8a838" oninput="syncColorReverse('COLOR_STARS')"></div></div>
+        </div>
+        <div id="colorPreview" style="margin-top:14px;padding:14px 18px;border-radius:10px;border:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--bg-card);">
+          <span style="font-size:11px;color:var(--text-dim);">Live preview:</span>
+          <span id="prevBadge" style="padding:5px 13px;border-radius:100px;font-size:12px;font-weight:700;background:#e8f5ee;color:#1a5c3a;">Brand</span>
+          <span id="prevBtn" style="padding:8px 18px;border-radius:7px;font-size:12px;font-weight:700;background:#1a5c3a;color:#fff;">Book Now</span>
+          <span id="prevStars" style="font-size:16px;letter-spacing:1px;color:#e8a838;">★★★★★</span>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Typography</div>
+        <div class="fields-grid">
+          <div class="field"><label>Body Font name <span class="field-token">FONT_BODY</span></label><input type="text" id="FONT_BODY" value="Outfit" oninput="syncFontGoog('BODY')"></div>
+          <div class="field"><label>Body Font (Google URL param) <span class="field-token">FONT_BODY_GOOG</span></label><input type="text" id="FONT_BODY_GOOG" value="Outfit" oninput="onFieldChange()"></div>
+          <div class="field"><label>Display Font name <span class="field-token">FONT_DISPLAY</span></label><input type="text" id="FONT_DISPLAY" value="Fraunces" oninput="syncFontGoog('DISPLAY')"></div>
+          <div class="field"><label>Display Font (Google URL param) <span class="field-token">FONT_DISPLAY_GOOG</span></label><input type="text" id="FONT_DISPLAY_GOOG" value="Fraunces" oninput="onFieldChange()"></div>
+        </div>
+        <p style="font-size:11px;color:var(--text-dim);margin-top:8px;">Spaces → + in URL param (e.g. "DM Sans" → "DM+Sans")</p>
+      </div>
+    </div>
+
+    <!-- ══ CONTENT ══ -->
+    <div class="tab-panel" id="panel-content">
+      <div class="panel-header">
+        <div class="panel-title">Copy &amp; Content</div>
+        <div class="panel-desc">Headlines and section labels for index.html.</div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Hero</div>
+        <div class="fields-grid">
+          <div class="field"><label>H1 Line 1 <span class="field-token">HERO_H1_LINE1</span></label><input type="text" id="HERO_H1_LINE1" placeholder="Plumbing Done" oninput="onFieldChange()"></div>
+          <div class="field"><label>H1 Line 2 (italic/accent) <span class="field-token">HERO_H1_LINE2</span></label><input type="text" id="HERO_H1_LINE2" placeholder="Right, Every Time." oninput="onFieldChange()"></div>
+          <div class="field fields-full"><label>Hero Subtext <span class="field-token">HERO_SUBTEXT</span></label><textarea id="HERO_SUBTEXT" placeholder="Licensed professionals delivering quality services across South Florida..." oninput="onFieldChange()"></textarea></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">About</div>
+        <div class="fields-grid">
+          <div class="field"><label>About Headline <span class="field-token">ABOUT_HEADLINE</span></label><input type="text" id="ABOUT_HEADLINE" placeholder="Trusted Service, Done Right" oninput="onFieldChange()"></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Services Section</div>
+        <div class="fields-grid">
+          <div class="field"><label>"What We Do" label <span class="field-token">SECTION_WHAT_WE_DO</span></label><input type="text" id="SECTION_WHAT_WE_DO" placeholder="What We Do" oninput="onFieldChange()"></div>
+          <div class="field"><label>"Our Services" label <span class="field-token">SECTION_OUR_SERVICES</span></label><input type="text" id="SECTION_OUR_SERVICES" placeholder="Our Services" oninput="onFieldChange()"></div>
+          <div class="field fields-full"><label>Services Subtext 1 <span class="field-token">SERVICES_SUBTEXT</span></label><input type="text" id="SERVICES_SUBTEXT" placeholder="Comprehensive solutions backed by our satisfaction guarantee." oninput="onFieldChange()"></div>
+          <div class="field fields-full"><label>Services Subtext 2 <span class="field-token">SERVICES_SUBTEXT_2</span></label><input type="text" id="SERVICES_SUBTEXT_2" placeholder="Full-spectrum service for residential and commercial properties." oninput="onFieldChange()"></div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Footer</div>
+        <div class="fields-grid">
+          <div class="field fields-full"><label>Footer Description <span class="field-token">FOOTER_DESC</span></label><input type="text" id="FOOTER_DESC" placeholder="Professional services for residential and commercial properties. Licensed, insured, and trusted since 2010." oninput="onFieldChange()"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ GENERATE ══ -->
+    <div class="tab-panel" id="panel-generate">
+      <div class="panel-header">
+        <div class="panel-title">Generate Files</div>
+        <div class="panel-desc">Review config, then download all 7 filled-in files.</div>
+      </div>
+      <div id="loadStatus" class="load-status">Checking for template files...</div>
+      <div id="validationBar" style="margin-bottom:16px;"></div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Fields filled</span><span id="progressPct">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      </div>
+      <button class="generate-btn generate-btn-primary" onclick="generateOutputs()">⚙️ Generate Previews &amp; Download All</button>
+      <div id="outputArea" style="display:none;">
+        <div class="output-block">
+          <div class="output-block-header"><div class="output-block-title">// TOKEN → VALUE MAP</div><button class="copy-btn" onclick="copyBlock('outConfigMap')">Copy</button></div>
+          <pre class="output-pre" id="outConfigMap"></pre>
+        </div>
+        <div class="output-block">
+          <div class="output-block-header"><div class="output-block-title">// CLOUDFLARE WORKER ENV VARS</div><button class="copy-btn" onclick="copyBlock('outCFVars')">Copy</button></div>
+          <pre class="output-pre" id="outCFVars"></pre>
+        </div>
+        <div class="output-block">
+          <div class="output-block-header"><div class="output-block-title">// DNS RECORDS</div><button class="copy-btn" onclick="copyBlock('outDNSText')">Copy</button></div>
+          <div id="outDNSTable"></div>
+          <pre class="output-pre" id="outDNSText" style="display:none;"></pre>
+        </div>
+        <div class="download-section">
+          <div class="download-title">Download Files</div>
+          <div class="download-desc">Place this configurator in the same folder as the template files, then click Download All. Each file will download individually with tokens replaced.</div>
+          <div class="download-files">
+            <div class="file-chip">🌐 index.html</div>
+            <div class="file-chip">🔧 admin.html</div>
+            <div class="file-chip">✅ booking-success.html</div>
+            <div class="file-chip">📊 code.gs</div>
+            <div class="file-chip">📧 email.js</div>
+            <div class="file-chip">🔗 google-sheets-script.js</div>
+            <div class="file-chip">💳 stripe.js</div>
+          </div>
+          <button class="generate-btn generate-btn-primary" onclick="downloadAllFiles()" style="max-width:360px;">📥 Download All 7 Files</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── Tab switcher ──
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`[onclick="switchTab('${id}')"]`).classList.add('active');
+  document.getElementById('panel-'+id).classList.add('active');
+  if(id==='generate') updateProgress();
+}
+
+// ── Color sync ──
+function syncColor(key){
+  const v=document.getElementById(key+'_picker').value;
+  document.getElementById(key).value=v;
+  updateColorPreview(); onFieldChange();
+}
+function syncColorReverse(key){
+  const v=document.getElementById(key).value;
+  if(/^#[0-9a-f]{6}$/i.test(v)){
+    document.getElementById(key+'_picker').value=v;
+    updateColorPreview();
+  }
+  onFieldChange();
+}
+function updateColorPreview(){
+  const a=document.getElementById('COLOR_ACCENT').value||'#1a5c3a';
+  const al=document.getElementById('COLOR_ACCENT_LIGHT').value||'#e8f5ee';
+  const s=document.getElementById('COLOR_STARS').value||'#e8a838';
+  document.getElementById('prevBadge').style.background=al;
+  document.getElementById('prevBadge').style.color=a;
+  document.getElementById('prevBtn').style.background=a;
+  document.getElementById('prevStars').style.color=s;
+}
+
+// ── Worker URL auto-fill ──
+function updateWorkerURLs(){
+  const u=document.getElementById('CF_USERNAME').value.trim();
+  if(!u) return;
+  const urls={
+    GAS_WORKER_URL:`https://google-sheets-script.${u}.workers.dev`,
+    EMAIL_WORKER_URL:`https://email.${u}.workers.dev`,
+    STRIPE_WORKER_URL:`https://stripe.${u}.workers.dev`,
+  };
+  for(const[id,val] of Object.entries(urls)){
+    const el=document.getElementById(id);
+    if(!el.value||el.value.includes('workers.dev')) el.value=val;
+  }
+  document.getElementById('gasUrlPreview').innerHTML=`<span>${urls.GAS_WORKER_URL}</span>`;
+  document.getElementById('emailUrlPreview').innerHTML=`<span>${urls.EMAIL_WORKER_URL}</span>`;
+  document.getElementById('stripeUrlPreview').innerHTML=`<span>${urls.STRIPE_WORKER_URL}</span>`;
+  onFieldChange();
+}
+
+// ── Domain change — auto-fill emails ──
+function onDomainChange(){
+  const d=document.getElementById('DOMAIN').value.trim();
+  if(d){
+    if(!document.getElementById('EMAIL_OFFICE').value)   document.getElementById('EMAIL_OFFICE').value=`office@${d}`;
+    if(!document.getElementById('EMAIL_SUPPORT').value)  document.getElementById('EMAIL_SUPPORT').value=`support@${d}`;
+    if(!document.getElementById('EMAIL_BILLING').value)  document.getElementById('EMAIL_BILLING').value=`billing@${d}`;
+  }
+  onFieldChange();
+}
+
+// ── Font sync ──
+function syncFontGoog(which){
+  const v=document.getElementById('FONT_'+which).value;
+  document.getElementById('FONT_'+which+'_GOOG').value=v.replace(/ /g,'+');
+  onFieldChange();
+}
+
+// ── Deposit cents ──
+function updateDepositCents(){
+  const a=parseFloat(document.getElementById('DEPOSIT_AMOUNT').value)||0;
+  document.getElementById('DEPOSIT_CENTS').value=Math.round(a*100);
+  onFieldChange();
+}
+
+function onFieldChange(){ updateProgress(); }
+
+// ── Tokens list ──
+const ALL_TOKENS=['COMPANY_NAME','COMPANY_SHORT','COMPANY_SLUG','COMPANY_TYPE','INDUSTRY','INDUSTRY_TITLE','LOGO_EMOJI','BUSINESS_PHONE','PHONE_HOURS','DOMAIN','SERVICE_AREA','YEAR_FOUNDED','COPYRIGHT_YEAR','CF_USERNAME','GITHUB_USERNAME','GAS_WORKER_URL','EMAIL_WORKER_URL','STRIPE_WORKER_URL','EMAIL_OFFICE','EMAIL_SUPPORT','EMAIL_BILLING','DEPOSIT_AMOUNT','DEPOSIT_CENTS','COLOR_ACCENT','COLOR_ACCENT_LIGHT','COLOR_ACCENT_HOVER','COLOR_ACCENT_BORDER','COLOR_STARS','FONT_BODY','FONT_BODY_GOOG','FONT_DISPLAY','FONT_DISPLAY_GOOG','HERO_H1_LINE1','HERO_H1_LINE2','HERO_SUBTEXT','ABOUT_HEADLINE','SECTION_WHAT_WE_DO','SECTION_OUR_SERVICES','SERVICES_SUBTEXT','SERVICES_SUBTEXT_2','FOOTER_DESC'];
+const REQUIRED=['COMPANY_NAME','COMPANY_SHORT','COMPANY_SLUG','DOMAIN','GAS_WORKER_URL','STRIPE_WORKER_URL','EMAIL_WORKER_URL','EMAIL_SUPPORT','BUSINESS_PHONE'];
+
+function getValues(){
+  const v={};
+  for(const t of ALL_TOKENS){ const el=document.getElementById(t); v[t]=el?el.value.trim():''; }
+  return v;
+}
+
+function updateProgress(){
+  const v=getValues();
+  const filled=ALL_TOKENS.filter(t=>v[t]).length;
+  const pct=Math.round((filled/ALL_TOKENS.length)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressPct').textContent=pct+'%';
+}
+
+function generateOutputs(){
+  const vals=getValues();
+  // Validation
+  const bar=document.getElementById('validationBar');
+  const missing=REQUIRED.filter(t=>!vals[t]);
+  bar.innerHTML = missing.length===0
+    ? '<span class="val-chip ok">✓ All required fields filled</span>'
+    : `<span class="val-chip warn">⚠ ${missing.length} required empty</span>`+missing.map(m=>`<span class="val-chip err">${m}</span>`).join('');
+
+  // Config map
+  document.getElementById('outConfigMap').textContent=ALL_TOKENS.map(t=>`  {{${t.padEnd(22)}}}  →  "${vals[t]||'(empty)'}"`).join('\n');
+
+  // CF vars
+  const domain=vals.DOMAIN||'yourdomain.com';
+  document.getElementById('outCFVars').textContent=[
+    '=== google-sheets-script Worker ===',
+    'GAS_URL = <your Apps Script /exec URL>',
+    '',
+    '=== stripe Worker ===',
+    'STRIPE_SECRET_KEY = sk_live_xxxxx',
+    'RESEND_API_KEY    = re_xxxxx',
+    `SITE_URL          = https://${domain}`,
+    '',
+    '=== email Worker ===',
+    'RESEND_API_KEY    = re_xxxxx',
+  ].join('\n');
+
+  // DNS table
+  const gh=vals.GITHUB_USERNAME||'yourgithub';
+  const rows=[
+    ['CNAME','www',`${gh}.github.io`],
+    ['TXT','@','v=spf1 include:spf.improvmx.com include:amazonses.com ~all'],
+    ['TXT','_dmarc','v=DMARC1; p=none;'],
+    ['TXT','resend._domainkey','p=(copy from Resend dashboard)'],
+    ['MX','@','mx1.improvmx.com. — priority 10'],
+    ['MX','@','mx2.improvmx.com. — priority 20'],
+    ['MX','send','feedback-smtp.us-east-1.amazonses.com. — priority 10'],
+  ];
+  document.getElementById('outDNSTable').innerHTML=`<table class="dns-table"><thead><tr><th>Type</th><th>Name</th><th>Value</th></tr></thead><tbody>${rows.map(([t,n,v])=>`<tr><td>${t}</td><td>${n}</td><td>${v}</td></tr>`).join('')}</tbody></table>`;
+  document.getElementById('outDNSText').textContent=rows.map(([t,n,v])=>`${t}\t${n}\t${v}`).join('\n');
+
+  document.getElementById('outputArea').style.display='block';
+  document.getElementById('outputArea').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function copyBlock(id){
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
+    const btn=document.querySelector(`[onclick="copyBlock('${id}')"]`);
+    const orig=btn.textContent; btn.textContent='Copied!';
+    setTimeout(()=>btn.textContent=orig,1500);
+  });
+}
+
+// ── Token replacement ──
+function applyTokens(tmpl,vals){
+  let out=tmpl;
+  for(const[k,v] of Object.entries(vals)) out=out.split('{{'+k+'}}').join(v||('{{'+k+'}}'));
+  return out;
+}
+function downloadFile(fname,content){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:'text/plain'}));
+  a.download=fname; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ── Template loading ──
+window.TEMPLATES={};
+const TEMPLATE_FILES=['index.html','admin.html','booking-success.html','code.gs','email.js','google-sheets-script.js','stripe.js'];
+
+async function loadTemplates(){
+  const st=document.getElementById('loadStatus');
+  let loaded=0;
+  for(const fname of TEMPLATE_FILES){
+    try{
+      const r=await fetch(fname);
+      if(r.ok){
+        const txt=await r.text();
+        // Only store if it looks like a template (has tokens) or is a source file
+        window.TEMPLATES[fname]=txt;
+        loaded++;
+      }
+    }catch(e){}
+  }
+  if(loaded>0){
+    st.textContent=`✓ ${loaded}/${TEMPLATE_FILES.length} template files loaded — ready to generate`;
+    st.style.color='var(--green)';
+  } else {
+    st.textContent='⚠ Template files not found in same folder. Place configurator.html alongside template files and reopen.';
+    st.style.color='var(--amber)';
+  }
+}
+
+async function downloadAllFiles(){
+  const vals=getValues();
+  if(!window.TEMPLATES||Object.keys(window.TEMPLATES).length===0){
+    alert('Template files not loaded.\n\nMake sure configurator.html is in the same folder as:\n'+TEMPLATE_FILES.join('\n'));
+    return;
+  }
+  let count=0;
+  for(const[fname,tmpl] of Object.entries(window.TEMPLATES)){
+    const filled=applyTokens(tmpl,vals);
+    // Stagger downloads slightly so browser doesn't block them
+    await new Promise(r=>setTimeout(r,200));
+    downloadFile(fname,filled);
+    count++;
+  }
+  alert(`Downloaded ${count} files. Check your Downloads folder.`);
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('COPYRIGHT_YEAR').value=new Date().getFullYear();
+  updateColorPreview();
+  updateProgress();
+  loadTemplates();
+});
+</script>
+</body>
+</html>
