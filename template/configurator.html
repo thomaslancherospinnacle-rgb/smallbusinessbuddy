@@ -5,20 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Site Configurator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link id="fontLink" href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=Outfit:wght@400;600;700&family=Fraunces:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0e0e10;--bg-card:#161618;--bg-input:#1c1c1f;--border:#2a2a2e;--border-focus:#5b8eff;--text:#f0f0f0;--text-muted:#888;--text-dim:#555;--accent:#5b8eff;--accent-bg:rgba(91,142,255,.1);--green:#34d399;--green-bg:rgba(52,211,153,.1);--amber:#fbbf24;--amber-bg:rgba(251,191,36,.1);--red:#f87171;--font-mono:'DM Mono',monospace;--font-body:'DM Sans',sans-serif;--font-display:'Syne',sans-serif;--radius:8px;--radius-lg:12px;}
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
-.header{padding:24px 36px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.header{padding:22px 36px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .header-brand{display:flex;align-items:center;gap:14px;}
 .header-icon{width:40px;height:40px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;}
 .header-title{font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-.5px;}
 .header-sub{font-size:11px;color:var(--text-muted);margin-top:1px;font-family:var(--font-mono);}
 .header-badge{font-family:var(--font-mono);font-size:11px;background:var(--green-bg);color:var(--green);padding:5px 12px;border-radius:100px;border:1px solid rgba(52,211,153,.2);}
-.layout{display:grid;grid-template-columns:252px 1fr;min-height:calc(100vh - 89px);}
-.sidebar{border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:calc(100vh - 89px);overflow-y:auto;}
+.layout{display:grid;grid-template-columns:248px 1fr;min-height:calc(100vh - 85px);}
+.sidebar{border-right:1px solid var(--border);padding:20px 0;position:sticky;top:0;height:calc(100vh - 85px);overflow-y:auto;}
 .sidebar-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);padding:0 20px 8px;}
 .tab-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 20px;font-size:13.5px;font-weight:500;color:var(--text-muted);background:none;border:none;cursor:pointer;text-align:left;transition:all .15s;border-left:3px solid transparent;font-family:inherit;}
 .tab-btn:hover{color:var(--text);background:rgba(255,255,255,.03);}
@@ -46,11 +46,40 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .field input::placeholder,.field textarea::placeholder{color:var(--text-dim);}
 .field input[readonly]{opacity:.45;cursor:not-allowed;}
 .field textarea{min-height:68px;resize:vertical;line-height:1.5;}
+
+/* ── Domain derived fields ── */
+.derived-block{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;margin-top:14px;}
+.derived-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);margin-bottom:10px;}
+.derived-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px;}
+.derived-row:last-child{border-bottom:none;padding-bottom:0;}
+.derived-label{color:var(--text-muted);font-family:var(--font-mono);font-size:11px;}
+.derived-value{color:var(--accent);font-family:var(--font-mono);font-size:11px;word-break:break-all;text-align:right;}
+
+/* ── Color palettes ── */
+.palette-strip{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.palette-swatch{width:44px;height:44px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .15s;position:relative;flex-shrink:0;}
+.palette-swatch:hover{transform:scale(1.1);border-color:rgba(255,255,255,.3);}
+.palette-swatch.active-palette{border-color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.15);}
+.palette-swatch::after{content:attr(data-name);position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--text-dim);white-space:nowrap;opacity:0;transition:opacity .15s;pointer-events:none;}
+.palette-swatch:hover::after{opacity:1;}
+.palette-group{margin-bottom:20px;}
+.palette-group-label{font-size:11px;color:var(--text-dim);margin-bottom:10px;font-weight:600;}
 .color-row{display:flex;align-items:center;gap:8px;}
 .color-swatch{width:36px;height:36px;border-radius:7px;border:1.5px solid var(--border);cursor:pointer;flex-shrink:0;padding:3px;background:none;}
 .color-hex{flex:1;}
-.url-preview{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:6px;padding:7px 11px;margin-top:6px;word-break:break-all;}
-.url-preview span{color:var(--accent);}
+
+/* ── Font picker ── */
+.font-picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.font-option{padding:12px 14px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--bg-input);cursor:pointer;transition:all .2s;position:relative;}
+.font-option:hover{border-color:rgba(91,142,255,.4);}
+.font-option.selected{border-color:var(--accent);background:var(--accent-bg);}
+.font-option-name{font-size:12px;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-mono);}
+.font-option-sample{font-size:20px;line-height:1.2;color:var(--text);letter-spacing:-.3px;}
+.font-option-check{position:absolute;top:8px;right:8px;width:16px;height:16px;border-radius:50%;background:var(--accent);display:none;align-items:center;justify-content:center;font-size:9px;color:#fff;}
+.font-option.selected .font-option-check{display:flex;}
+.font-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);margin-bottom:10px;}
+
+/* ── Generate / output ── */
 .generate-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:var(--radius-lg);font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;font-family:inherit;margin-bottom:10px;}
 .generate-btn-primary{background:var(--accent);color:#fff;}
 .generate-btn-primary:hover{opacity:.88;transform:translateY(-1px);}
@@ -73,7 +102,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .download-section{background:linear-gradient(135deg,rgba(91,142,255,.08),rgba(91,142,255,.02));border:1px solid rgba(91,142,255,.18);border-radius:var(--radius-lg);padding:24px;margin-top:20px;}
 .download-title{font-family:var(--font-display);font-size:18px;font-weight:800;margin-bottom:6px;}
 .download-desc{font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.55;}
-.download-files{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:7px;margin-bottom:18px;}
+.download-files{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:7px;margin-bottom:18px;}
 .file-chip{background:var(--bg-card);border:1px solid var(--border);border-radius:7px;padding:9px 12px;display:flex;align-items:center;gap:7px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);}
 .dns-table{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:11px;}
 .dns-table th{text-align:left;padding:7px 9px;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--text-dim);border-bottom:1px solid var(--border);font-family:var(--font-body);}
@@ -81,7 +110,9 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .dns-table td:first-child{color:var(--amber);}
 .dns-table td:last-child{color:var(--text);word-break:break-all;}
 .load-status{font-family:var(--font-mono);font-size:12px;color:var(--text-muted);margin-bottom:16px;padding:8px 12px;background:var(--bg-card);border:1px solid var(--border);border-radius:6px;}
-@media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);padding:8px 0;display:flex;overflow-x:auto;white-space:nowrap;}.tab-btn{padding:9px 16px;border-left:none;border-bottom:3px solid transparent;white-space:nowrap;}.tab-btn.active{border-left-color:transparent;border-bottom-color:var(--accent);}.main{padding:24px 18px;}.fields-grid,.fields-grid-3{grid-template-columns:1fr;}}
+.color-preview-bar{margin-top:14px;padding:14px 18px;border-radius:10px;border:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--bg-card);}
+
+@media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);padding:8px 0;display:flex;overflow-x:auto;white-space:nowrap;}.tab-btn{padding:9px 16px;border-left:none;border-bottom:3px solid transparent;white-space:nowrap;}.tab-btn.active{border-left-color:transparent;border-bottom-color:var(--accent);}.main{padding:24px 18px;}.fields-grid,.fields-grid-3,.font-picker-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -91,7 +122,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
     <div class="header-icon">⚙️</div>
     <div>
       <div class="header-title">Site Configurator</div>
-      <div class="header-sub">v1.0 · Template Builder</div>
+      <div class="header-sub">v2.0 · Template Builder</div>
     </div>
   </div>
   <div class="header-badge">7 files · 40+ tokens</div>
@@ -142,8 +173,20 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
         <div class="fields-grid">
           <div class="field"><label>Business Phone <span class="field-token">BUSINESS_PHONE</span></label><input type="tel" id="BUSINESS_PHONE" placeholder="(555) 000-0000" oninput="onFieldChange()"></div>
           <div class="field"><label>Phone Hours Blurb <span class="field-token">PHONE_HOURS</span></label><input type="text" id="PHONE_HOURS" placeholder="Available 24/7 for emergencies" oninput="onFieldChange()"></div>
-          <div class="field"><label>Domain (no https://) <span class="field-token">DOMAIN</span></label><input type="text" id="DOMAIN" placeholder="yourbusiness.com" oninput="onDomainChange()"></div>
           <div class="field"><label>Service Area <span class="field-token">SERVICE_AREA</span></label><input type="text" id="SERVICE_AREA" placeholder="South Florida" oninput="onFieldChange()"></div>
+        </div>
+
+        <!-- Single domain field that drives everything -->
+        <div class="field" style="margin-top:14px;">
+          <label>Domain Name <span class="field-token">DOMAIN</span></label>
+          <input type="text" id="DOMAIN" placeholder="yourbusiness.com" oninput="onDomainChange()" style="font-size:14px;padding:10px 14px;">
+        </div>
+        <div class="derived-block" id="derivedBlock" style="display:none;">
+          <div class="derived-title">Auto-generated from domain</div>
+          <div class="derived-row"><span class="derived-label">Site URL (Stripe SITE_URL)</span><span class="derived-value" id="derivedSiteUrl">—</span></div>
+          <div class="derived-row"><span class="derived-label">EMAIL_OFFICE</span><span class="derived-value" id="derivedOffice">—</span></div>
+          <div class="derived-row"><span class="derived-label">EMAIL_SUPPORT</span><span class="derived-value" id="derivedSupport">—</span></div>
+          <div class="derived-row"><span class="derived-label">EMAIL_BILLING</span><span class="derived-value" id="derivedBilling">—</span></div>
         </div>
       </div>
 
@@ -160,7 +203,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
     <div class="tab-panel" id="panel-infra">
       <div class="panel-header">
         <div class="panel-title">Infrastructure</div>
-        <div class="panel-desc">Enter your Cloudflare username — all 3 worker URLs auto-fill. Override any manually.</div>
+        <div class="panel-desc">Enter your Cloudflare username — all 3 worker URLs auto-fill.</div>
       </div>
 
       <div class="field-group">
@@ -169,17 +212,17 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
           <div class="field"><label>CF Username <span class="field-token">CF_USERNAME</span></label><input type="text" id="CF_USERNAME" placeholder="yourname" oninput="updateWorkerURLs()"></div>
           <div class="field"><label>GitHub Username <span class="field-token">GITHUB_USERNAME</span></label><input type="text" id="GITHUB_USERNAME" placeholder="yourname" oninput="onFieldChange()"></div>
         </div>
-        <div style="margin-top:12px" class="field"><label>GAS Proxy Worker URL <span class="field-token">GAS_WORKER_URL</span></label><input type="text" id="GAS_WORKER_URL" placeholder="https://google-sheets-script.yourname.workers.dev" oninput="onFieldChange()"><div class="url-preview" id="gasUrlPreview">Enter CF username above</div></div>
-        <div style="margin-top:12px" class="field"><label>Email Worker URL <span class="field-token">EMAIL_WORKER_URL</span></label><input type="text" id="EMAIL_WORKER_URL" placeholder="https://email.yourname.workers.dev" oninput="onFieldChange()"><div class="url-preview" id="emailUrlPreview">Enter CF username above</div></div>
-        <div style="margin-top:12px" class="field"><label>Stripe Worker URL <span class="field-token">STRIPE_WORKER_URL</span></label><input type="text" id="STRIPE_WORKER_URL" placeholder="https://stripe.yourname.workers.dev" oninput="onFieldChange()"><div class="url-preview" id="stripeUrlPreview">Enter CF username above</div></div>
-      </div>
+        <div style="margin-top:12px" class="field"><label>GAS Proxy Worker URL <span class="field-token">GAS_WORKER_URL</span></label><input type="text" id="GAS_WORKER_URL" placeholder="https://google-sheets-script.yourname.workers.dev" oninput="onFieldChange()"></div>
+        <div style="margin-top:10px" class="field"><label>Email Worker URL <span class="field-token">EMAIL_WORKER_URL</span></label><input type="text" id="EMAIL_WORKER_URL" placeholder="https://email.yourname.workers.dev" oninput="onFieldChange()"></div>
+        <div style="margin-top:10px" class="field"><label>Stripe Worker URL <span class="field-token">STRIPE_WORKER_URL</span></label><input type="text" id="STRIPE_WORKER_URL" placeholder="https://stripe.yourname.workers.dev" oninput="onFieldChange()"></div>
 
-      <div class="field-group">
-        <div class="field-group-title">Email Addresses</div>
-        <div class="fields-grid-3">
-          <div class="field"><label>Office <span class="field-token">EMAIL_OFFICE</span></label><input type="email" id="EMAIL_OFFICE" placeholder="office@domain.com" oninput="onFieldChange()"></div>
-          <div class="field"><label>Support <span class="field-token">EMAIL_SUPPORT</span></label><input type="email" id="EMAIL_SUPPORT" placeholder="support@domain.com" oninput="onFieldChange()"></div>
-          <div class="field"><label>Billing <span class="field-token">EMAIL_BILLING</span></label><input type="email" id="EMAIL_BILLING" placeholder="billing@domain.com" oninput="onFieldChange()"></div>
+        <!-- Live derived preview for infra tab too -->
+        <div class="derived-block" id="infraDerivedBlock" style="margin-top:14px;display:none;">
+          <div class="derived-title">Derived values (from Identity tab)</div>
+          <div class="derived-row"><span class="derived-label">SITE_URL (stripe env var)</span><span class="derived-value" id="infraSiteUrl">—</span></div>
+          <div class="derived-row"><span class="derived-label">EMAIL_OFFICE</span><span class="derived-value" id="infraOffice">—</span></div>
+          <div class="derived-row"><span class="derived-label">EMAIL_SUPPORT</span><span class="derived-value" id="infraSupport">—</span></div>
+          <div class="derived-row"><span class="derived-label">EMAIL_BILLING</span><span class="derived-value" id="infraBilling">—</span></div>
         </div>
       </div>
 
@@ -196,35 +239,77 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
     <div class="tab-panel" id="panel-theme">
       <div class="panel-header">
         <div class="panel-title">Colors &amp; Fonts</div>
-        <div class="panel-desc">All CSS variables. Color pickers sync with hex inputs.</div>
+        <div class="panel-desc">Pick a palette or fine-tune individual colors. Font labels are rendered in their actual typeface.</div>
       </div>
 
       <div class="field-group">
-        <div class="field-group-title">Brand Colors</div>
-        <div class="fields-grid">
+        <div class="field-group-title">Brand Color Palettes — click to apply</div>
+
+        <div class="palette-group">
+          <div class="palette-group-label">🌿 Greens &amp; Naturals</div>
+          <div class="palette-strip" id="paletteStrip">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <div style="margin-top:4px;" class="palette-group">
+          <div class="palette-group-label">🔵 Blues &amp; Professionals</div>
+          <div class="palette-strip" id="paletteStrip2"></div>
+        </div>
+
+        <div style="margin-top:4px;" class="palette-group">
+          <div class="palette-group-label">🔥 Warm &amp; Bold</div>
+          <div class="palette-strip" id="paletteStrip3"></div>
+        </div>
+
+        <div style="margin-top:4px;" class="palette-group">
+          <div class="palette-group-label">🖤 Neutral &amp; Premium</div>
+          <div class="palette-strip" id="paletteStrip4"></div>
+        </div>
+
+        <div class="fields-grid" style="margin-top:20px;">
           <div class="field"><label>Accent (primary) <span class="field-token">COLOR_ACCENT</span></label><div class="color-row"><input type="color" class="color-swatch" id="COLOR_ACCENT_picker" value="#1a5c3a" oninput="syncColor('COLOR_ACCENT')"><input type="text" id="COLOR_ACCENT" class="color-hex" value="#1a5c3a" oninput="syncColorReverse('COLOR_ACCENT')"></div></div>
           <div class="field"><label>Accent Light (bg tints) <span class="field-token">COLOR_ACCENT_LIGHT</span></label><div class="color-row"><input type="color" class="color-swatch" id="COLOR_ACCENT_LIGHT_picker" value="#e8f5ee" oninput="syncColor('COLOR_ACCENT_LIGHT')"><input type="text" id="COLOR_ACCENT_LIGHT" class="color-hex" value="#e8f5ee" oninput="syncColorReverse('COLOR_ACCENT_LIGHT')"></div></div>
           <div class="field"><label>Accent Hover (darker) <span class="field-token">COLOR_ACCENT_HOVER</span></label><div class="color-row"><input type="color" class="color-swatch" id="COLOR_ACCENT_HOVER_picker" value="#14472d" oninput="syncColor('COLOR_ACCENT_HOVER')"><input type="text" id="COLOR_ACCENT_HOVER" class="color-hex" value="#14472d" oninput="syncColorReverse('COLOR_ACCENT_HOVER')"></div></div>
           <div class="field"><label>Accent Border <span class="field-token">COLOR_ACCENT_BORDER</span></label><div class="color-row"><input type="color" class="color-swatch" id="COLOR_ACCENT_BORDER_picker" value="#a7d7bc" oninput="syncColor('COLOR_ACCENT_BORDER')"><input type="text" id="COLOR_ACCENT_BORDER" class="color-hex" value="#a7d7bc" oninput="syncColorReverse('COLOR_ACCENT_BORDER')"></div></div>
           <div class="field"><label>Stars / Rating <span class="field-token">COLOR_STARS</span></label><div class="color-row"><input type="color" class="color-swatch" id="COLOR_STARS_picker" value="#e8a838" oninput="syncColor('COLOR_STARS')"><input type="text" id="COLOR_STARS" class="color-hex" value="#e8a838" oninput="syncColorReverse('COLOR_STARS')"></div></div>
         </div>
-        <div id="colorPreview" style="margin-top:14px;padding:14px 18px;border-radius:10px;border:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--bg-card);">
+
+        <div class="color-preview-bar" id="colorPreviewBar">
           <span style="font-size:11px;color:var(--text-dim);">Live preview:</span>
-          <span id="prevBadge" style="padding:5px 13px;border-radius:100px;font-size:12px;font-weight:700;background:#e8f5ee;color:#1a5c3a;">Brand</span>
+          <span id="prevBadge" style="padding:5px 14px;border-radius:100px;font-size:12px;font-weight:700;background:#e8f5ee;color:#1a5c3a;">Brand Badge</span>
           <span id="prevBtn" style="padding:8px 18px;border-radius:7px;font-size:12px;font-weight:700;background:#1a5c3a;color:#fff;">Book Now</span>
-          <span id="prevStars" style="font-size:16px;letter-spacing:1px;color:#e8a838;">★★★★★</span>
+          <span id="prevBorder" style="padding:5px 14px;border-radius:7px;font-size:12px;font-weight:600;border:1.5px solid #a7d7bc;color:#1a5c3a;">Outline</span>
+          <span id="prevStars" style="font-size:18px;letter-spacing:2px;color:#e8a838;">★★★★★</span>
         </div>
       </div>
 
+      <!-- ── FONTS ── -->
       <div class="field-group">
-        <div class="field-group-title">Typography</div>
-        <div class="fields-grid">
-          <div class="field"><label>Body Font name <span class="field-token">FONT_BODY</span></label><input type="text" id="FONT_BODY" value="Outfit" oninput="syncFontGoog('BODY')"></div>
-          <div class="field"><label>Body Font (Google URL param) <span class="field-token">FONT_BODY_GOOG</span></label><input type="text" id="FONT_BODY_GOOG" value="Outfit" oninput="onFieldChange()"></div>
-          <div class="field"><label>Display Font name <span class="field-token">FONT_DISPLAY</span></label><input type="text" id="FONT_DISPLAY" value="Fraunces" oninput="syncFontGoog('DISPLAY')"></div>
-          <div class="field"><label>Display Font (Google URL param) <span class="field-token">FONT_DISPLAY_GOOG</span></label><input type="text" id="FONT_DISPLAY_GOOG" value="Fraunces" oninput="onFieldChange()"></div>
+        <div class="field-group-title">Body Font — used for paragraphs &amp; UI</div>
+        <div class="font-section-label">Click to select</div>
+        <div class="font-picker-grid" id="bodyFontGrid">
+          <!-- Injected by JS -->
         </div>
-        <p style="font-size:11px;color:var(--text-dim);margin-top:8px;">Spaces → + in URL param (e.g. "DM Sans" → "DM+Sans")</p>
+        <div class="field" style="margin-top:8px;">
+          <label>Custom body font name <span class="field-token">FONT_BODY</span></label>
+          <input type="text" id="FONT_BODY" value="Outfit" placeholder="e.g. DM Sans" oninput="onCustomBodyFont()">
+        </div>
+        <!-- Hidden token fields -->
+        <input type="hidden" id="FONT_BODY_GOOG" value="Outfit">
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Display Font — used for headlines &amp; titles</div>
+        <div class="font-section-label">Click to select</div>
+        <div class="font-picker-grid" id="displayFontGrid">
+          <!-- Injected by JS -->
+        </div>
+        <div class="field" style="margin-top:8px;">
+          <label>Custom display font name <span class="field-token">FONT_DISPLAY</span></label>
+          <input type="text" id="FONT_DISPLAY" value="Fraunces" placeholder="e.g. Playfair Display" oninput="onCustomDisplayFont()">
+        </div>
+        <input type="hidden" id="FONT_DISPLAY_GOOG" value="Fraunces">
       </div>
     </div>
 
@@ -234,7 +319,6 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
         <div class="panel-title">Copy &amp; Content</div>
         <div class="panel-desc">Headlines and section labels for index.html.</div>
       </div>
-
       <div class="field-group">
         <div class="field-group-title">Hero</div>
         <div class="fields-grid">
@@ -243,14 +327,12 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
           <div class="field fields-full"><label>Hero Subtext <span class="field-token">HERO_SUBTEXT</span></label><textarea id="HERO_SUBTEXT" placeholder="Licensed professionals delivering quality services across South Florida..." oninput="onFieldChange()"></textarea></div>
         </div>
       </div>
-
       <div class="field-group">
         <div class="field-group-title">About</div>
         <div class="fields-grid">
           <div class="field"><label>About Headline <span class="field-token">ABOUT_HEADLINE</span></label><input type="text" id="ABOUT_HEADLINE" placeholder="Trusted Service, Done Right" oninput="onFieldChange()"></div>
         </div>
       </div>
-
       <div class="field-group">
         <div class="field-group-title">Services Section</div>
         <div class="fields-grid">
@@ -260,7 +342,6 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
           <div class="field fields-full"><label>Services Subtext 2 <span class="field-token">SERVICES_SUBTEXT_2</span></label><input type="text" id="SERVICES_SUBTEXT_2" placeholder="Full-spectrum service for residential and commercial properties." oninput="onFieldChange()"></div>
         </div>
       </div>
-
       <div class="field-group">
         <div class="field-group-title">Footer</div>
         <div class="fields-grid">
@@ -298,7 +379,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
         </div>
         <div class="download-section">
           <div class="download-title">Download Files</div>
-          <div class="download-desc">Place this configurator in the same folder as the template files, then click Download All. Each file will download individually with tokens replaced.</div>
+          <div class="download-desc">Place configurator.html in the same folder as the template files, then click Download All.</div>
           <div class="download-files">
             <div class="file-chip">🌐 index.html</div>
             <div class="file-chip">🔧 admin.html</div>
@@ -317,7 +398,81 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 </div>
 
 <script>
-// ── Tab switcher ──
+// ══════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════
+
+// Palettes: [accent, light, hover, border, name]
+const PALETTES = {
+  green: [
+    ['#1a5c3a','#e8f5ee','#14472d','#a7d7bc','Forest Green'],
+    ['#16a34a','#dcfce7','#15803d','#86efac','Emerald'],
+    ['#0d9488','#ccfbf1','#0f766e','#5eead4','Teal'],
+    ['#2d6a4f','#d8f3dc','#1b4332','#95d5b2','Deep Forest'],
+    ['#4e7c59','#f0f7f1','#3b5e43','#b7d3bc','Sage'],
+  ],
+  blue: [
+    ['#1d4ed8','#dbeafe','#1e40af','#93c5fd','Royal Blue'],
+    ['#0369a1','#e0f2fe','#075985','#7dd3fc','Sky Blue'],
+    ['#4f46e5','#ede9fe','#4338ca','#c4b5fd','Indigo'],
+    ['#0f766e','#ccfbf1','#134e4a','#5eead4','Dark Teal'],
+    ['#1e3a5f','#e8f0f9','#152d4a','#93b4d5','Navy'],
+  ],
+  warm: [
+    ['#b91c1c','#fee2e2','#991b1b','#fca5a5','Deep Red'],
+    ['#c2410c','#ffedd5','#9a3412','#fdba74','Burnt Orange'],
+    ['#a16207','#fef9c3','#854d0e','#fde047','Gold'],
+    ['#be185d','#fce7f3','#9d174d','#f9a8d4','Raspberry'],
+    ['#7c3aed','#ede9fe','#6d28d9','#c4b5fd','Purple'],
+  ],
+  neutral: [
+    ['#374151','#f3f4f6','#1f2937','#d1d5db','Slate'],
+    ['#0f172a','#f1f5f9','#0d1525','#cbd5e1','Midnight'],
+    ['#292524','#f5f5f4','#1c1917','#d6d3d1','Charcoal'],
+    ['#4b4b4b','#f5f5f5','#333','#c0c0c0','Graphite'],
+    ['#44403c','#fafaf9','#292524','#d6d3d1','Warm Stone'],
+  ],
+};
+
+// Font options: [name, googleParam, sampleText, weights]
+const BODY_FONTS = [
+  {name:'Outfit',    goog:'Outfit',              sample:'The quick brown fox jumps',  weights:'300;400;500;600;700'},
+  {name:'DM Sans',   goog:'DM+Sans',             sample:'The quick brown fox jumps',  weights:'300;400;500;600'},
+  {name:'Inter',     goog:'Inter',               sample:'The quick brown fox jumps',  weights:'300;400;500;600'},
+  {name:'Plus Jakarta Sans', goog:'Plus+Jakarta+Sans', sample:'The quick brown fox',  weights:'400;500;600;700'},
+  {name:'Nunito',    goog:'Nunito',              sample:'The quick brown fox jumps',  weights:'400;500;600;700'},
+  {name:'Lato',      goog:'Lato',                sample:'The quick brown fox jumps',  weights:'300;400;700'},
+  {name:'Raleway',   goog:'Raleway',             sample:'The quick brown fox jumps',  weights:'300;400;500;600'},
+  {name:'Rubik',     goog:'Rubik',               sample:'The quick brown fox jumps',  weights:'300;400;500;600'},
+];
+
+const DISPLAY_FONTS = [
+  {name:'Fraunces',         goog:'Fraunces',              sample:'Service Done Right',   weights:'700;800;900', style:'font-style:italic'},
+  {name:'Playfair Display', goog:'Playfair+Display',       sample:'Service Done Right',   weights:'700;800;900', style:''},
+  {name:'Syne',             goog:'Syne',                  sample:'Service Done Right',   weights:'700;800',     style:''},
+  {name:'DM Serif Display', goog:'DM+Serif+Display',       sample:'Service Done Right',   weights:'400',         style:''},
+  {name:'Cormorant Garamond',goog:'Cormorant+Garamond',   sample:'Service Done Right',   weights:'600;700',     style:'font-style:italic'},
+  {name:'Bebas Neue',       goog:'Bebas+Neue',             sample:'SERVICE DONE RIGHT',   weights:'400',         style:'letter-spacing:1px'},
+  {name:'Josefin Sans',     goog:'Josefin+Sans',           sample:'SERVICE DONE RIGHT',   weights:'600;700',     style:'text-transform:uppercase;letter-spacing:2px'},
+  {name:'Abril Fatface',    goog:'Abril+Fatface',          sample:'Service Done Right',   weights:'400',         style:''},
+];
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('COPYRIGHT_YEAR').value = new Date().getFullYear();
+  buildPalettes();
+  buildFontPickers();
+  loadGoogleFonts(BODY_FONTS.concat(DISPLAY_FONTS));
+  updateColorPreview();
+  updateProgress();
+  loadTemplates();
+});
+
+// ══════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════
 function switchTab(id){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
@@ -326,10 +481,55 @@ function switchTab(id){
   if(id==='generate') updateProgress();
 }
 
-// ── Color sync ──
+// ══════════════════════════════════════
+//  PALETTE BUILDER
+// ══════════════════════════════════════
+function buildPalettes(){
+  const groups=[
+    ['paletteStrip', PALETTES.green],
+    ['paletteStrip2',PALETTES.blue],
+    ['paletteStrip3',PALETTES.warm],
+    ['paletteStrip4',PALETTES.neutral],
+  ];
+  groups.forEach(([id,palettes])=>{
+    const strip=document.getElementById(id);
+    palettes.forEach(([accent,light,hover,border,name])=>{
+      const el=document.createElement('div');
+      el.className='palette-swatch';
+      el.style.background=`linear-gradient(135deg, ${accent} 60%, ${light} 60%)`;
+      el.dataset.name=name;
+      el.title=name;
+      el.onclick=()=>applyPalette(accent,light,hover,border,name,el);
+      // Mark FlowPipe default
+      if(accent==='#1a5c3a') el.classList.add('active-palette');
+      strip.appendChild(el);
+    });
+  });
+}
+
+function applyPalette(accent,light,hover,border,name,el){
+  // Clear active class from all swatches
+  document.querySelectorAll('.palette-swatch').forEach(s=>s.classList.remove('active-palette'));
+  el.classList.add('active-palette');
+  // Apply
+  setColor('COLOR_ACCENT',accent);
+  setColor('COLOR_ACCENT_LIGHT',light);
+  setColor('COLOR_ACCENT_HOVER',hover);
+  setColor('COLOR_ACCENT_BORDER',border);
+  updateColorPreview();
+  onFieldChange();
+}
+
+function setColor(key,val){
+  document.getElementById(key).value=val;
+  document.getElementById(key+'_picker').value=val;
+}
+
+// ══════════════════════════════════════
+//  COLOR SYNC
+// ══════════════════════════════════════
 function syncColor(key){
-  const v=document.getElementById(key+'_picker').value;
-  document.getElementById(key).value=v;
+  document.getElementById(key).value=document.getElementById(key+'_picker').value;
   updateColorPreview(); onFieldChange();
 }
 function syncColorReverse(key){
@@ -343,51 +543,131 @@ function syncColorReverse(key){
 function updateColorPreview(){
   const a=document.getElementById('COLOR_ACCENT').value||'#1a5c3a';
   const al=document.getElementById('COLOR_ACCENT_LIGHT').value||'#e8f5ee';
+  const ab=document.getElementById('COLOR_ACCENT_BORDER').value||'#a7d7bc';
   const s=document.getElementById('COLOR_STARS').value||'#e8a838';
   document.getElementById('prevBadge').style.background=al;
   document.getElementById('prevBadge').style.color=a;
   document.getElementById('prevBtn').style.background=a;
+  document.getElementById('prevBorder').style.borderColor=ab;
+  document.getElementById('prevBorder').style.color=a;
   document.getElementById('prevStars').style.color=s;
 }
 
-// ── Worker URL auto-fill ──
+// ══════════════════════════════════════
+//  FONT PICKER
+// ══════════════════════════════════════
+let selectedBodyFont = 'Outfit';
+let selectedDisplayFont = 'Fraunces';
+
+function loadGoogleFonts(fonts){
+  // Build a combined URL for all preview fonts
+  const families = fonts.map(f=>`family=${f.goog}:wght@${f.weights||'400;700'}`).join('&');
+  const existing = document.getElementById('fontLink');
+  existing.href = `https://fonts.googleapis.com/css2?${families}&display=swap`;
+}
+
+function buildFontPickers(){
+  // Body fonts
+  const bodyGrid = document.getElementById('bodyFontGrid');
+  BODY_FONTS.forEach(f=>{
+    const el=document.createElement('div');
+    el.className='font-option'+(f.name===selectedBodyFont?' selected':'');
+    el.innerHTML=`<div class="font-option-name">${f.name}</div><div class="font-option-sample" style="font-family:'${f.name}',sans-serif">${f.sample}</div><div class="font-option-check">✓</div>`;
+    el.onclick=()=>selectBodyFont(f,el);
+    bodyGrid.appendChild(el);
+  });
+
+  // Display fonts
+  const displayGrid = document.getElementById('displayFontGrid');
+  DISPLAY_FONTS.forEach(f=>{
+    const el=document.createElement('div');
+    el.className='font-option'+(f.name===selectedDisplayFont?' selected':'');
+    el.innerHTML=`<div class="font-option-name">${f.name}</div><div class="font-option-sample" style="font-family:'${f.name}',serif;${f.style||''}">${f.sample}</div><div class="font-option-check">✓</div>`;
+    el.onclick=()=>selectDisplayFont(f,el);
+    displayGrid.appendChild(el);
+  });
+}
+
+function selectBodyFont(f, el){
+  document.querySelectorAll('#bodyFontGrid .font-option').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedBodyFont = f.name;
+  document.getElementById('FONT_BODY').value = f.name;
+  document.getElementById('FONT_BODY_GOOG').value = f.goog;
+  onFieldChange();
+}
+function selectDisplayFont(f, el){
+  document.querySelectorAll('#displayFontGrid .font-option').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedDisplayFont = f.name;
+  document.getElementById('FONT_DISPLAY').value = f.name;
+  document.getElementById('FONT_DISPLAY_GOOG').value = f.goog;
+  onFieldChange();
+}
+function onCustomBodyFont(){
+  // Deselect all and use custom value
+  document.querySelectorAll('#bodyFontGrid .font-option').forEach(e=>e.classList.remove('selected'));
+  const v = document.getElementById('FONT_BODY').value;
+  document.getElementById('FONT_BODY_GOOG').value = v.replace(/ /g,'+');
+  onFieldChange();
+}
+function onCustomDisplayFont(){
+  document.querySelectorAll('#displayFontGrid .font-option').forEach(e=>e.classList.remove('selected'));
+  const v = document.getElementById('FONT_DISPLAY').value;
+  document.getElementById('FONT_DISPLAY_GOOG').value = v.replace(/ /g,'+');
+  onFieldChange();
+}
+
+// ══════════════════════════════════════
+//  DOMAIN — single source of truth
+// ══════════════════════════════════════
+function onDomainChange(){
+  const d = document.getElementById('DOMAIN').value.trim();
+  const siteUrl = d ? `https://www.${d}` : '';
+  const office  = d ? `office@${d}`  : '';
+  const support = d ? `support@${d}` : '';
+  const billing = d ? `billing@${d}` : '';
+
+  // Show derived block
+  const block = document.getElementById('derivedBlock');
+  block.style.display = d ? 'block' : 'none';
+  if(d){
+    document.getElementById('derivedSiteUrl').textContent = siteUrl;
+    document.getElementById('derivedOffice').textContent  = office;
+    document.getElementById('derivedSupport').textContent = support;
+    document.getElementById('derivedBilling').textContent = billing;
+  }
+
+  // Mirror to infra tab
+  const iblock = document.getElementById('infraDerivedBlock');
+  iblock.style.display = d ? 'block' : 'none';
+  if(d){
+    document.getElementById('infraSiteUrl').textContent = siteUrl;
+    document.getElementById('infraOffice').textContent  = office;
+    document.getElementById('infraSupport').textContent = support;
+    document.getElementById('infraBilling').textContent = billing;
+  }
+  onFieldChange();
+}
+
+// ══════════════════════════════════════
+//  INFRA
+// ══════════════════════════════════════
 function updateWorkerURLs(){
-  const u=document.getElementById('CF_USERNAME').value.trim();
+  const u = document.getElementById('CF_USERNAME').value.trim();
   if(!u) return;
-  const urls={
-    GAS_WORKER_URL:`https://google-sheets-script.${u}.workers.dev`,
-    EMAIL_WORKER_URL:`https://email.${u}.workers.dev`,
+  const urls = {
+    GAS_WORKER_URL:   `https://google-sheets-script.${u}.workers.dev`,
+    EMAIL_WORKER_URL: `https://email.${u}.workers.dev`,
     STRIPE_WORKER_URL:`https://stripe.${u}.workers.dev`,
   };
   for(const[id,val] of Object.entries(urls)){
     const el=document.getElementById(id);
     if(!el.value||el.value.includes('workers.dev')) el.value=val;
   }
-  document.getElementById('gasUrlPreview').innerHTML=`<span>${urls.GAS_WORKER_URL}</span>`;
-  document.getElementById('emailUrlPreview').innerHTML=`<span>${urls.EMAIL_WORKER_URL}</span>`;
-  document.getElementById('stripeUrlPreview').innerHTML=`<span>${urls.STRIPE_WORKER_URL}</span>`;
   onFieldChange();
 }
 
-// ── Domain change — auto-fill emails ──
-function onDomainChange(){
-  const d=document.getElementById('DOMAIN').value.trim();
-  if(d){
-    if(!document.getElementById('EMAIL_OFFICE').value)   document.getElementById('EMAIL_OFFICE').value=`office@${d}`;
-    if(!document.getElementById('EMAIL_SUPPORT').value)  document.getElementById('EMAIL_SUPPORT').value=`support@${d}`;
-    if(!document.getElementById('EMAIL_BILLING').value)  document.getElementById('EMAIL_BILLING').value=`billing@${d}`;
-  }
-  onFieldChange();
-}
-
-// ── Font sync ──
-function syncFontGoog(which){
-  const v=document.getElementById('FONT_'+which).value;
-  document.getElementById('FONT_'+which+'_GOOG').value=v.replace(/ /g,'+');
-  onFieldChange();
-}
-
-// ── Deposit cents ──
 function updateDepositCents(){
   const a=parseFloat(document.getElementById('DEPOSIT_AMOUNT').value)||0;
   document.getElementById('DEPOSIT_CENTS').value=Math.round(a*100);
@@ -396,13 +676,27 @@ function updateDepositCents(){
 
 function onFieldChange(){ updateProgress(); }
 
-// ── Tokens list ──
+// ══════════════════════════════════════
+//  TOKENS
+// ══════════════════════════════════════
 const ALL_TOKENS=['COMPANY_NAME','COMPANY_SHORT','COMPANY_SLUG','COMPANY_TYPE','INDUSTRY','INDUSTRY_TITLE','LOGO_EMOJI','BUSINESS_PHONE','PHONE_HOURS','DOMAIN','SERVICE_AREA','YEAR_FOUNDED','COPYRIGHT_YEAR','CF_USERNAME','GITHUB_USERNAME','GAS_WORKER_URL','EMAIL_WORKER_URL','STRIPE_WORKER_URL','EMAIL_OFFICE','EMAIL_SUPPORT','EMAIL_BILLING','DEPOSIT_AMOUNT','DEPOSIT_CENTS','COLOR_ACCENT','COLOR_ACCENT_LIGHT','COLOR_ACCENT_HOVER','COLOR_ACCENT_BORDER','COLOR_STARS','FONT_BODY','FONT_BODY_GOOG','FONT_DISPLAY','FONT_DISPLAY_GOOG','HERO_H1_LINE1','HERO_H1_LINE2','HERO_SUBTEXT','ABOUT_HEADLINE','SECTION_WHAT_WE_DO','SECTION_OUR_SERVICES','SERVICES_SUBTEXT','SERVICES_SUBTEXT_2','FOOTER_DESC'];
-const REQUIRED=['COMPANY_NAME','COMPANY_SHORT','COMPANY_SLUG','DOMAIN','GAS_WORKER_URL','STRIPE_WORKER_URL','EMAIL_WORKER_URL','EMAIL_SUPPORT','BUSINESS_PHONE'];
+const REQUIRED=['COMPANY_NAME','COMPANY_SHORT','COMPANY_SLUG','DOMAIN','GAS_WORKER_URL','STRIPE_WORKER_URL','EMAIL_WORKER_URL','BUSINESS_PHONE'];
 
 function getValues(){
+  const d = document.getElementById('DOMAIN').value.trim();
   const v={};
-  for(const t of ALL_TOKENS){ const el=document.getElementById(t); v[t]=el?el.value.trim():''; }
+  for(const t of ALL_TOKENS){
+    const el=document.getElementById(t);
+    v[t]=el?el.value.trim():'';
+  }
+  // Derived from domain (single source)
+  if(d){
+    v['EMAIL_OFFICE']  = `office@${d}`;
+    v['EMAIL_SUPPORT'] = `support@${d}`;
+    v['EMAIL_BILLING'] = `billing@${d}`;
+    // SITE_URL is used in stripe.js as env var — derived here too
+    v['SITE_URL']      = `https://www.${d}`;
+  }
   return v;
 }
 
@@ -414,20 +708,21 @@ function updateProgress(){
   document.getElementById('progressPct').textContent=pct+'%';
 }
 
+// ══════════════════════════════════════
+//  GENERATE
+// ══════════════════════════════════════
 function generateOutputs(){
   const vals=getValues();
-  // Validation
   const bar=document.getElementById('validationBar');
   const missing=REQUIRED.filter(t=>!vals[t]);
   bar.innerHTML = missing.length===0
     ? '<span class="val-chip ok">✓ All required fields filled</span>'
     : `<span class="val-chip warn">⚠ ${missing.length} required empty</span>`+missing.map(m=>`<span class="val-chip err">${m}</span>`).join('');
 
-  // Config map
   document.getElementById('outConfigMap').textContent=ALL_TOKENS.map(t=>`  {{${t.padEnd(22)}}}  →  "${vals[t]||'(empty)'}"`).join('\n');
 
-  // CF vars
   const domain=vals.DOMAIN||'yourdomain.com';
+  const siteUrl=`https://www.${domain}`;
   document.getElementById('outCFVars').textContent=[
     '=== google-sheets-script Worker ===',
     'GAS_URL = <your Apps Script /exec URL>',
@@ -435,13 +730,12 @@ function generateOutputs(){
     '=== stripe Worker ===',
     'STRIPE_SECRET_KEY = sk_live_xxxxx',
     'RESEND_API_KEY    = re_xxxxx',
-    `SITE_URL          = https://${domain}`,
+    `SITE_URL          = ${siteUrl}`,
     '',
     '=== email Worker ===',
     'RESEND_API_KEY    = re_xxxxx',
   ].join('\n');
 
-  // DNS table
   const gh=vals.GITHUB_USERNAME||'yourgithub';
   const rows=[
     ['CNAME','www',`${gh}.github.io`],
@@ -467,9 +761,12 @@ function copyBlock(id){
   });
 }
 
-// ── Token replacement ──
+// ══════════════════════════════════════
+//  TOKEN REPLACEMENT + FILE DOWNLOAD
+// ══════════════════════════════════════
 function applyTokens(tmpl,vals){
   let out=tmpl;
+  // Also replace SITE_URL token in stripe.js env section
   for(const[k,v] of Object.entries(vals)) out=out.split('{{'+k+'}}').join(v||('{{'+k+'}}'));
   return out;
 }
@@ -479,7 +776,6 @@ function downloadFile(fname,content){
   a.download=fname; a.click(); URL.revokeObjectURL(a.href);
 }
 
-// ── Template loading ──
 window.TEMPLATES={};
 const TEMPLATE_FILES=['index.html','admin.html','booking-success.html','code.gs','email.js','google-sheets-script.js','stripe.js'];
 
@@ -489,19 +785,14 @@ async function loadTemplates(){
   for(const fname of TEMPLATE_FILES){
     try{
       const r=await fetch(fname);
-      if(r.ok){
-        const txt=await r.text();
-        // Only store if it looks like a template (has tokens) or is a source file
-        window.TEMPLATES[fname]=txt;
-        loaded++;
-      }
+      if(r.ok){ window.TEMPLATES[fname]=await r.text(); loaded++; }
     }catch(e){}
   }
   if(loaded>0){
     st.textContent=`✓ ${loaded}/${TEMPLATE_FILES.length} template files loaded — ready to generate`;
     st.style.color='var(--green)';
   } else {
-    st.textContent='⚠ Template files not found in same folder. Place configurator.html alongside template files and reopen.';
+    st.textContent='⚠ Template files not found. Place configurator.html in same folder as template files.';
     st.style.color='var(--amber)';
   }
 }
@@ -515,21 +806,12 @@ async function downloadAllFiles(){
   let count=0;
   for(const[fname,tmpl] of Object.entries(window.TEMPLATES)){
     const filled=applyTokens(tmpl,vals);
-    // Stagger downloads slightly so browser doesn't block them
-    await new Promise(r=>setTimeout(r,200));
+    await new Promise(r=>setTimeout(r,220));
     downloadFile(fname,filled);
     count++;
   }
-  alert(`Downloaded ${count} files. Check your Downloads folder.`);
+  alert(`✓ Downloaded ${count} files. Check your Downloads folder.`);
 }
-
-// ── Init ──
-document.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('COPYRIGHT_YEAR').value=new Date().getFullYear();
-  updateColorPreview();
-  updateProgress();
-  loadTemplates();
-});
 </script>
 </body>
 </html>
