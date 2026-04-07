@@ -149,6 +149,26 @@ input, textarea, select { font-family: inherit; }
   text-shadow: 0 2px 24px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.2);
   line-height: 1.05;
 }
+/* Hero title + optional logo layout */
+.site-hero-title-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+.site-hero-logo {
+  height: clamp(48px, 7vw, 96px);
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  display: none; /* hidden until loaded */
+  filter: drop-shadow(0 2px 12px rgba(0,0,0,0.4));
+  flex-shrink: 0;
+}
+.site-hero-title-wrap.has-logo .site-hero-logo {
+  display: block;
+}
+
 .site-hero-wrap.hero-missing {
   height: 0;
   min-height: 0;
@@ -551,7 +571,17 @@ input, textarea, select { font-family: inherit; }
   >
   <div class="site-hero-gradient"></div>
   <div class="site-hero-overlay">
-    <div class="site-hero-title">{{COMPANY_NAME}}</div>
+    <div class="site-hero-title-wrap" id="heroTitleWrap">
+      <div class="site-hero-title">{{COMPANY_NAME}}</div>
+      <img
+        class="site-hero-logo"
+        id="siteHeroLogo"
+        src="logo.png"
+        alt="{{COMPANY_NAME}} logo"
+        onerror="this.style.display='none'"
+        onload="document.getElementById('heroTitleWrap').classList.add('has-logo')"
+      >
+    </div>
   </div>
 </div>
 
