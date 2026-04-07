@@ -66,7 +66,7 @@ input, textarea, select { font-family: inherit; }
 .fade-up-4 { animation-delay:.4s; }
 
 /* ─── NAV ─── */
-.nav { position:sticky; top:0; z-index:100; background:rgba(255,255,255,.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border-light); height:var(--nav-height); }
+.nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(255,255,255,.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border-light); height:var(--nav-height); }
 .nav-inner { max-width:var(--max-width); margin:0 auto; padding:0 24px; height:100%; display:flex; align-items:center; justify-content:space-between; }
 .nav-logo { display:flex; align-items:center; gap:10px; cursor:pointer; }
 .nav-logo-icon { width:38px; height:38px; background:var(--accent); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; }
@@ -86,6 +86,76 @@ input, textarea, select { font-family: inherit; }
 @media (max-width:768px) {
   .nav-desktop { display:none; }
   .nav-hamburger { display:block; }
+}
+
+/* ─── PARALLAX HERO IMAGE ─── */
+.site-hero-wrap {
+  position: relative;
+  height: calc(85vh + var(--nav-height));
+  min-height: calc(480px + var(--nav-height));
+  max-height: calc(900px + var(--nav-height));
+  overflow: hidden;
+  margin-top: calc(-1 * var(--nav-height));
+  z-index: 0;
+}
+.site-hero-img {
+  position: absolute;
+  /* Start the image at the nav bottom, not behind it */
+  top: var(--nav-height);
+  left: 0; right: 0;
+  bottom: -30%;
+  width: 100%;
+  height: 140%;
+  object-fit: cover;
+  object-position: center top;
+  will-change: transform;
+  display: block;
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+.site-hero-img.loaded { opacity: 1; }
+.site-hero-gradient {
+  position: absolute;
+  inset: auto 0 0 0;  /* only covers the bottom, not full height */
+  height: 10%;
+  background: linear-gradient(
+    to top,
+    var(--bg-primary) 0%,
+    var(--bg-primary) 18%,
+    rgba(255,255,255,0.5) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+.site-hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* offset center point down by half the nav height so it looks centered in the visible portion */
+  padding-top: calc(var(--nav-height) * 1.5);
+  pointer-events: none;
+}
+.site-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 6vw, 80px);
+  font-weight: 900;
+  letter-spacing: -2px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.2);
+  line-height: 1.05;
+}
+.site-hero-wrap.hero-missing {
+  height: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+@media (max-width:600px) {
+  .site-hero-wrap { height: calc(42vh + var(--nav-height)); min-height: calc(220px + var(--nav-height)); }
 }
 
 /* ─── HERO ─── */
@@ -291,17 +361,167 @@ input, textarea, select { font-family: inherit; }
 /* ─── PAGES ─── */
 .page { display:none; }
 .page.active { display:block; }
+/* First page after fixed nav — hero section has its own top padding so no extra needed.
+   Non-home pages need padding so content clears the fixed nav. */
+#page-home { padding-top: 0; }
+#page-services, #page-booking, #page-about, #page-reviews, #page-contact { padding-top: var(--nav-height); }
 
 /* ─── INQUIRY TYPE ─── */
 @media (max-width:500px) {
   .inquiry-type-selector { grid-template-columns:1fr; }
   .booking-mode-toggle { flex-direction:column; align-items:center; }
 }
+
+/* ─── GALLERY SECTION ─── */
+.gallery-section { padding:72px 24px 80px; background:var(--bg-secondary); }
+.gallery-inner { max-width:var(--max-width); margin:0 auto; }
+.gallery-grid {
+  columns: 3 240px;
+  column-gap: 12px;
+  line-height: 0;
+}
+.gallery-item {
+  break-inside: avoid;
+  display: block;
+  margin-bottom: 12px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  line-height: 0;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .45s ease, transform .45s ease, box-shadow .25s ease;
+}
+.gallery-item.visible { opacity: 1; transform: translateY(0); }
+.gallery-item:hover { box-shadow: var(--shadow-lg); }
+.gallery-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform .4s ease;
+  object-fit: cover;
+}
+.gallery-item:hover img { transform: scale(1.04); }
+.gallery-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.22);
+  opacity: 0;
+  transition: opacity .25s ease;
+  border-radius: var(--radius);
+}
+.gallery-item:hover::after { opacity: 1; }
+.gallery-zoom-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(.7);
+  z-index: 2;
+  background: rgba(255,255,255,.9);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  opacity: 0;
+  transition: opacity .25s ease, transform .25s ease;
+  pointer-events: none;
+}
+.gallery-item:hover .gallery-zoom-icon { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.gallery-more-btn {
+  display: block;
+  margin: 28px auto 0;
+  padding: 12px 36px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border);
+  background: var(--bg-primary);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all .2s;
+}
+.gallery-more-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-light); }
+.gallery-more-btn.hidden { display: none; }
+.gallery-item.gallery-overflow { display: none; }
+.gallery-item.gallery-overflow.gallery-shown { display: block; }
+.gallery-section.gallery-empty { display: none; }
+
+/* Lightbox */
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  background: rgba(0,0,0,.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s ease;
+  backdrop-filter: blur(8px);
+}
+.gallery-lightbox.open { opacity: 1; pointer-events: all; }
+.gallery-lightbox img {
+  max-width: 92vw;
+  max-height: 88vh;
+  border-radius: var(--radius-lg);
+  object-fit: contain;
+  box-shadow: 0 24px 80px rgba(0,0,0,.6);
+}
+.gallery-lb-close {
+  position: absolute;
+  top: 20px; right: 24px;
+  background: rgba(255,255,255,.14);
+  border: none; color: #fff;
+  font-size: 22px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+  z-index: 9999;
+  line-height: 1;
+}
+.gallery-lb-close:hover { background: rgba(255,255,255,.28); }
+.gallery-lb-prev, .gallery-lb-next {
+  position: absolute; top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,.14);
+  border: none; color: #fff;
+  font-size: 26px;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+  z-index: 9999;
+}
+.gallery-lb-prev { left: 20px; }
+.gallery-lb-next { right: 20px; }
+.gallery-lb-prev:hover, .gallery-lb-next:hover { background: rgba(255,255,255,.28); }
+.gallery-lb-prev.hidden, .gallery-lb-next.hidden { display: none; }
+.gallery-lb-counter {
+  position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.5); color: rgba(255,255,255,.85);
+  font-size: 13px; font-weight: 500;
+  padding: 5px 14px; border-radius: 100px;
+}
+@media (max-width:600px) {
+  .gallery-grid { columns: 2 150px; }
+  .gallery-lb-prev { left: 8px; }
+  .gallery-lb-next { right: 8px; }
+}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
+<!-- NAV — fixed, floats over the parallax image -->
 <nav class="nav">
   <div class="nav-inner">
     <div class="nav-logo" id="logoBtn">
@@ -318,6 +538,22 @@ input, textarea, select { font-family: inherit; }
   </div>
   <div class="nav-mobile" id="navMobile"></div>
 </nav>
+
+<!-- PARALLAX HERO IMAGE — place hero.png in same folder as index.html -->
+<div class="site-hero-wrap" id="siteHeroWrap">
+  <img
+    class="site-hero-img"
+    id="siteHeroImg"
+    src="hero.png"
+    alt="{{COMPANY_NAME}} — {{INDUSTRY_TITLE}} Services"
+    onerror="this.closest('.site-hero-wrap').classList.add('hero-missing')"
+    onload="this.classList.add('loaded')"
+  >
+  <div class="site-hero-gradient"></div>
+  <div class="site-hero-overlay">
+    <div class="site-hero-title">{{COMPANY_NAME}}</div>
+  </div>
+</div>
 
 <!-- HOME -->
 <div id="page-home" class="page active">
@@ -388,6 +624,19 @@ input, textarea, select { font-family: inherit; }
       <div class="services-grid" id="homeServicesGrid"></div>
     </div>
   </section>
+
+  <!-- ═══ GALLERY ═══ -->
+  <section class="gallery-section" id="gallerySection">
+    <div class="gallery-inner">
+      <div class="section-header">
+        <h2>Our Work</h2>
+        <p>A look at recent projects — quality you can see.</p>
+      </div>
+      <div class="gallery-grid" id="galleryGrid"></div>
+      <button class="gallery-more-btn hidden" id="galleryMoreBtn">Show More Photos</button>
+    </div>
+  </section>
+
   <section class="section">
     <div class="section-inner">
       <div class="cta-banner">
@@ -546,7 +795,7 @@ input, textarea, select { font-family: inherit; }
       <div class="contact-grid">
         <div>
           <div class="contact-info-item"><div class="contact-info-icon">📞</div><div><div class="contact-info-label">Phone</div><div class="contact-info-value">{{BUSINESS_PHONE}}</div><div class="contact-info-sub">{{PHONE_HOURS}}</div></div></div>
-          <div class="contact-info-item"><div class="contact-info-icon">✉️</div><div><div class="contact-info-label">Email</div><div class="contact-info-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7811161e17381e14170f0811081d561e110c">[email&#160;protected]</a></div><div class="contact-info-sub">Response within 2 hours</div></div></div>
+          <div class="contact-info-item"><div class="contact-info-icon">✉️</div><div><div class="contact-info-label">Email</div><div class="contact-info-value">{{BUSINESS_EMAIL}}</div><div class="contact-info-sub">Response within 2 hours</div></div></div>
           <div class="contact-info-item"><div class="contact-info-icon">📍</div><div><div class="contact-info-label">Location</div><div class="contact-info-value">Fort Lauderdale, FL</div><div class="contact-info-sub">Serving all of Broward County</div></div></div>
           <div class="contact-info-item"><div class="contact-info-icon">🕐</div><div><div class="contact-info-label">Hours</div><div class="contact-info-value">Mon–Sat: 7am–8pm</div><div class="contact-info-sub">Sunday: Emergency only</div></div></div>
         </div>
@@ -587,7 +836,7 @@ input, textarea, select { font-family: inherit; }
     <div class="footer-col">
       <h4>Contact</h4>
       <span class="footer-link">{{BUSINESS_PHONE}}</span>
-      <span class="footer-link"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d0b9beb6bf90b6bcbfa7a0b9a0b5feb6b9a4">[email&#160;protected]</a></span>
+      <span class="footer-link">{{BUSINESS_EMAIL}}</span>
       <span class="footer-link">Fort Lauderdale, FL</span>
     </div>
   </div>
@@ -596,6 +845,15 @@ input, textarea, select { font-family: inherit; }
     <a class="footer-admin" href="admin.html">Admin Portal →</a>
   </div>
 </footer>
+
+<!-- GALLERY LIGHTBOX (shared, outside page divs) -->
+<div class="gallery-lightbox" id="galleryLightbox" role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <button class="gallery-lb-close" id="galleryLbClose" aria-label="Close">✕</button>
+  <button class="gallery-lb-prev hidden" id="galleryLbPrev" aria-label="Previous photo">‹</button>
+  <img src="" alt="Gallery photo" id="galleryLbImg">
+  <button class="gallery-lb-next hidden" id="galleryLbNext" aria-label="Next photo">›</button>
+  <div class="gallery-lb-counter" id="galleryLbCounter"></div>
+</div>
 
 <script>
 /* ═══════════════════════════════════════
@@ -747,7 +1005,6 @@ function renderReviews() {
 
 function renderTeam() {
   const a = ABOUT_DATA;
-  // Build team members from about data keys: teamMember1Name, teamMember1Role etc.
   const members = [];
   for (let i = 1; i <= 10; i++) {
     const n = a['teamMember'+i+'Name'];
@@ -878,7 +1135,6 @@ function initBooking() {
   renderCalendar();
   renderBookingSteps(1);
 
-  // Mode toggle
   document.querySelectorAll('.booking-mode-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       bookingMode = btn.dataset.mode;
@@ -899,7 +1155,6 @@ function updateBookingMode() {
   document.getElementById('btnSubmitBooking').textContent = isQuote ? 'Submit Quote Request →' : 'Pay ${{DEPOSIT_AMOUNT}} Deposit & Book →';
   document.getElementById('bkNotesLabel').textContent = isQuote ? 'Describe Your Project *' : 'Describe the Issue';
   document.getElementById('bkNotes').placeholder = isQuote ? 'Details about the work needed...' : 'Tell us about the problem...';
-  // Show deposit notice only in book mode
   const notice = document.getElementById('depositNotice');
   if (notice) notice.style.display = isQuote ? 'none' : 'flex';
 }
@@ -942,7 +1197,6 @@ function goBookingStep(step) {
   });
 
   if (isQuote) {
-    // Quote: Step 1 = service, Step 2 = info (stored in bookingStep3)
     if (step === 1) {
       document.getElementById('bookingStep1').style.display = 'block';
       renderBookingSteps(1);
@@ -952,7 +1206,6 @@ function goBookingStep(step) {
       renderBookingSummary();
     }
   } else {
-    // Book: Step 1 = service, Step 2 = date/time, Step 3 = info
     document.getElementById('bookingStep' + step).style.display = 'block';
     renderBookingSteps(step);
     if (step === 3) renderBookingSummary();
@@ -961,7 +1214,6 @@ function goBookingStep(step) {
 
 function selectService(id) {
   bkService = SERVICES.find(s => (s.ID || s.id) === id);
-  // Normalise to consistent shape for booking logic
   if (bkService) {
     bkService = {
       id:       bkService.ID       || bkService.id,
@@ -977,13 +1229,8 @@ function selectService(id) {
   });
   document.getElementById('btnStep1Next').disabled = false;
 
-  // In quote mode, step 1 next goes to step 3 (info form)
   const btn = document.getElementById('btnStep1Next');
-  if (bookingMode === 'quote') {
-    btn.onclick = function() { goBookingStep(2); };
-  } else {
-    btn.onclick = function() { goBookingStep(2); };
-  }
+  btn.onclick = function() { goBookingStep(2); };
 }
 
 /* ─── CALENDAR ─── */
@@ -1024,23 +1271,19 @@ function selectDate(iso) {
   fetchAvailability(iso);
 }
 
-/* ─── AVAILABILITY (Google Calendar integration) ─── */
+/* ─── AVAILABILITY ─── */
 async function fetchAvailability(iso) {
   const d = new Date(iso);
   const dateKey = d.toISOString().slice(0, 10);
   const duration = bkService ? bkService.duration : 60;
 
-  // Show loading state
   document.getElementById('timeSlotsLabel').textContent = 'Checking availability...';
   const container = document.getElementById('timeSlots');
   let loadingHTML = '';
-  for (let i = 0; i < 10; i++) {
-    loadingHTML += '<div class="time-slot loading-slot">Loading</div>';
-  }
+  for (let i = 0; i < 10; i++) loadingHTML += '<div class="time-slot loading-slot">Loading</div>';
   container.innerHTML = loadingHTML;
   document.getElementById('calSourceBadge').innerHTML = '';
 
-  // Check cache
   const cacheKey = dateKey + '_' + duration;
   if (availabilityCache[cacheKey]) {
     renderAvailableSlots(availabilityCache[cacheKey]);
@@ -1050,13 +1293,7 @@ async function fetchAvailability(iso) {
   try {
     const res = await fetch(GAS_URL + '?action=getAvailability&date=' + encodeURIComponent(dateKey) + '&duration=' + duration);
     const data = await res.json();
-
-    if (data.error) {
-      // Fallback to default slots
-      renderDefaultTimeSlots();
-      return;
-    }
-
+    if (data.error) { renderDefaultTimeSlots(); return; }
     availabilityCache[cacheKey] = data;
     renderAvailableSlots(data);
   } catch (e) {
@@ -1097,7 +1334,6 @@ function renderAvailableSlots(data) {
     });
   });
 
-  // Show source badge
   const badge = document.getElementById('calSourceBadge');
   if (data.source === 'calendar') {
     badge.innerHTML = '<div class="cal-source-badge live">📅 Live availability from Google Calendar</div>';
@@ -1205,7 +1441,6 @@ async function submitBooking() {
 
   try {
     if (isQuote) {
-      // ── QUOTE: log directly to GAS, no payment ──
       const result = await postToGAS({
         action: 'quote',
         name, email, phone,
@@ -1229,13 +1464,8 @@ async function submitBooking() {
       showToast('Quote request submitted!');
 
     } else {
-      // ── BOOK: first log to GAS, then redirect to Stripe Checkout ──
       const appointmentId = 'APPT-' + Date.now();
 
-      // Log to Google Sheet (even before payment — status will be "Pending Payment")
-      // Wrapped in try/catch: GAS failure must not block the Stripe redirect.
-      // If GAS is down, booking-success.html will still confirm the payment
-      // but the appointment row may be missing — the console.error flags this.
       try {
         const gasResult = await postToGAS({
           action: 'appointment',
@@ -1255,12 +1485,9 @@ async function submitBooking() {
         }
       } catch (gasErr) {
         console.error('GAS unreachable before Stripe redirect:', gasErr);
-        // Still proceed to Stripe — payment is more important than pre-logging
       }
 
-      // Check if worker is configured
       if (!STRIPE_WORKER_URL || STRIPE_WORKER_URL.startsWith('YOUR_')) {
-        // Fallback: no Stripe configured — just confirm
         showToast('Booked! (Stripe not configured — no deposit collected)', 'info');
         document.getElementById('confirmTitle').textContent = 'You\'re Booked!';
         document.getElementById('confirmDesc').textContent = 'We\'ve received your appointment. You\'ll get a confirmation call within the hour.';
@@ -1273,7 +1500,6 @@ async function submitBooking() {
         return;
       }
 
-      // Create Stripe Checkout session
       const res = await fetch(STRIPE_WORKER_URL + '/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1289,7 +1515,6 @@ async function submitBooking() {
 
       const data = await res.json();
       if (data.url) {
-        // Redirect to Stripe Checkout
         window.location.href = data.url;
       } else {
         showToast('Payment setup failed: ' + (data.error || 'Unknown error'), 'error');
@@ -1335,7 +1560,6 @@ function renderAbout() {
   if (sl && a.subheadline) sl.textContent = a.subheadline;
   if (st && a.story)       st.textContent = a.story;
   if (ms && a.mission)     ms.textContent = '"' + a.mission + '"';
-  // Stats
   if (a.yearsInBusiness)  { const el = document.getElementById('statYears');        if(el) el.textContent = a.yearsInBusiness; }
   if (a.jobsCompleted)    { const el = document.getElementById('statJobs');         if(el) el.textContent = a.jobsCompleted; }
   if (a.satisfactionRate) { const el = document.getElementById('statSatisfaction'); if(el) el.textContent = a.satisfactionRate; }
@@ -1347,14 +1571,12 @@ function renderAbout() {
    LOAD SITE DATA FROM GAS
    ═══════════════════════════════════════ */
 async function loadSiteData() {
-  // Load all three in parallel
   const [svcRes, revRes, aboutRes] = await Promise.allSettled([
     fetch(GAS_URL + '?action=getServices'),
     fetch(GAS_URL + '?action=getReviews'),
     fetch(GAS_URL + '?action=getAbout'),
   ]);
 
-  // Services
   try {
     const svcData = await svcRes.value.json();
     if (Array.isArray(svcData) && svcData.length) {
@@ -1366,13 +1588,11 @@ async function loadSiteData() {
     SERVICES = SERVICES_FALLBACK;
   }
 
-  // Reviews
   try {
     const revData = await revRes.value.json();
     REVIEWS = Array.isArray(revData) ? revData : [];
   } catch(e) { REVIEWS = []; }
 
-  // About
   try {
     const aboutData = await aboutRes.value.json();
     if (aboutData && typeof aboutData === 'object' && !aboutData.error) {
@@ -1380,7 +1600,6 @@ async function loadSiteData() {
     }
   } catch(e) {}
 
-  // Re-render everything that depends on dynamic data
   renderServiceCards('homeServicesGrid');
   renderServiceCards('servicesGrid');
   renderServiceSelectGrid();
@@ -1390,10 +1609,167 @@ async function loadSiteData() {
 }
 
 /* ═══════════════════════════════════════
+   PARALLAX HERO IMAGE
+   ═══════════════════════════════════════ */
+(function initParallax() {
+  var img = document.getElementById('siteHeroImg');
+  if (!img) return;
+
+  function onScroll() {
+    var wrap = document.getElementById('siteHeroWrap');
+    if (!wrap || wrap.classList.contains('hero-missing')) return;
+    // Hero wrap starts visually at y=0 (behind the nav via negative margin).
+    // scrollY=0 means we're at the top; as user scrolls down the image moves up slower.
+    img.style.transform = 'translateY(' + (window.pageYOffset * 0.38) + 'px)';
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+
+/* ═══════════════════════════════════════
+   GALLERY — PROCEDURAL IMAGE LOADER
+   Works on GitHub Pages (pure client-side)
+   image1.png, image2.png, image3.png ...
+   Stops silently on first 404, no errors thrown.
+   Shows first 5, "Show More" for additional.
+   ═══════════════════════════════════════ */
+(function initGallery() {
+  var INITIAL_VISIBLE = 5;
+  var loadedSrcs      = [];
+  var lbIndex         = 0;
+
+  function probeImages(index, onDone) {
+    var src = 'image' + index + '.png';
+    var testImg = new Image();
+    testImg.onload  = function() { loadedSrcs.push(src); probeImages(index + 1, onDone); };
+    testImg.onerror = function() { onDone(); };
+    testImg.src = src;
+  }
+
+  function buildGrid() {
+    var grid    = document.getElementById('galleryGrid');
+    var section = document.getElementById('gallerySection');
+    var moreBtn = document.getElementById('galleryMoreBtn');
+    if (!grid) return;
+
+    if (loadedSrcs.length === 0) {
+      if (section) section.classList.add('gallery-empty');
+      return;
+    }
+
+    loadedSrcs.forEach(function(src, i) {
+      var item = document.createElement('div');
+      item.className = 'gallery-item' + (i >= INITIAL_VISIBLE ? ' gallery-overflow' : '');
+      item.setAttribute('data-index', i);
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('role', 'button');
+      item.setAttribute('aria-label', 'View photo ' + (i + 1));
+
+      var img = document.createElement('img');
+      img.src      = src;
+      img.alt      = 'Work photo ' + (i + 1);
+      img.loading  = 'lazy';
+      img.decoding = 'async';
+
+      var zoomIcon = document.createElement('div');
+      zoomIcon.className   = 'gallery-zoom-icon';
+      zoomIcon.textContent = '🔍';
+
+      item.appendChild(img);
+      item.appendChild(zoomIcon);
+      grid.appendChild(item);
+
+      item.addEventListener('click', function() { openLightbox(i); });
+      item.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(i); }
+      });
+    });
+
+    if (loadedSrcs.length > INITIAL_VISIBLE && moreBtn) {
+      moreBtn.classList.remove('hidden');
+      moreBtn.textContent = 'Show More Photos (' + (loadedSrcs.length - INITIAL_VISIBLE) + ' more)';
+      moreBtn.addEventListener('click', function() {
+        grid.querySelectorAll('.gallery-overflow').forEach(function(el) {
+          el.classList.add('gallery-shown');
+        });
+        moreBtn.classList.add('hidden');
+        setTimeout(revealVisible, 50);
+      });
+    }
+
+    revealVisible();
+  }
+
+  function revealVisible() {
+    var items = document.querySelectorAll(
+      '.gallery-item:not(.gallery-overflow), .gallery-item.gallery-shown'
+    );
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.06 });
+      items.forEach(function(el) {
+        if (!el.classList.contains('visible')) io.observe(el);
+      });
+    } else {
+      items.forEach(function(el) { el.classList.add('visible'); });
+    }
+  }
+
+  /* ── Lightbox ── */
+  function openLightbox(index) {
+    lbIndex = index;
+    updateLightbox();
+    document.getElementById('galleryLightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    document.getElementById('galleryLightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function updateLightbox() {
+    var lbImg     = document.getElementById('galleryLbImg');
+    var lbCounter = document.getElementById('galleryLbCounter');
+    var lbPrev    = document.getElementById('galleryLbPrev');
+    var lbNext    = document.getElementById('galleryLbNext');
+    if (lbImg)     lbImg.src = loadedSrcs[lbIndex];
+    if (lbCounter) lbCounter.textContent = (lbIndex + 1) + ' / ' + loadedSrcs.length;
+    if (lbPrev)    lbPrev.classList.toggle('hidden', lbIndex === 0);
+    if (lbNext)    lbNext.classList.toggle('hidden', lbIndex === loadedSrcs.length - 1);
+  }
+
+  var lbClose = document.getElementById('galleryLbClose');
+  var lbPrev  = document.getElementById('galleryLbPrev');
+  var lbNext  = document.getElementById('galleryLbNext');
+  var lbBox   = document.getElementById('galleryLightbox');
+
+  if (lbClose) lbClose.addEventListener('click', closeLightbox);
+  if (lbBox)   lbBox.addEventListener('click', function(e) { if (e.target === lbBox) closeLightbox(); });
+  if (lbPrev)  lbPrev.addEventListener('click', function() { if (lbIndex > 0) { lbIndex--; updateLightbox(); } });
+  if (lbNext)  lbNext.addEventListener('click', function() { if (lbIndex < loadedSrcs.length - 1) { lbIndex++; updateLightbox(); } });
+
+  document.addEventListener('keydown', function(e) {
+    if (!document.getElementById('galleryLightbox').classList.contains('open')) return;
+    if (e.key === 'Escape')     closeLightbox();
+    if (e.key === 'ArrowLeft'  && lbIndex > 0)                       { lbIndex--; updateLightbox(); }
+    if (e.key === 'ArrowRight' && lbIndex < loadedSrcs.length - 1)   { lbIndex++; updateLightbox(); }
+  });
+
+  probeImages(1, buildGrid);
+})();
+
+/* ═══════════════════════════════════════
    INIT
    ═══════════════════════════════════════ */
 (function init() {
-  // Render with fallback data immediately so the page isn't blank
   SERVICES = SERVICES_FALLBACK;
   buildNav();
   renderServiceCards('homeServicesGrid');
@@ -1404,10 +1780,8 @@ async function loadSiteData() {
   initBooking();
   renderServiceSelectGrid();
 
-  // Then fetch live data from sheets and re-render
   loadSiteData().catch(e => console.warn('loadSiteData failed:', e));
 
-  // Populate service dropdowns
   const svcSelects = document.querySelectorAll('#iqService');
   svcSelects.forEach(sel => {
     SERVICES.forEach(s => {
@@ -1418,7 +1792,6 @@ async function loadSiteData() {
     });
   });
 
-  // Check for Stripe success redirect
   const params = new URLSearchParams(window.location.search);
   if (params.get('stripe') === 'success') {
     const appt = params.get('appt') || '';
