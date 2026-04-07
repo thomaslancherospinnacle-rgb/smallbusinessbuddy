@@ -589,9 +589,9 @@ input, textarea, select { font-family: inherit; }
 <div id="page-home" class="page active">
   <section class="hero">
     <div class="hero-inner">
-      <div class="hero-badge fade-up"><span class="hero-badge-dot"></span> Available 24/7 — Emergency Service</div>
-      <h1 class="fade-up fade-up-1">{{INDUSTRY_TITLE}} Done<br><em>Right, Every Time.</em></h1>
-      <p class="fade-up fade-up-2">Licensed professionals delivering quality {{INDUSTRY}} services across {{SERVICE_AREA}}. Fast response, fair pricing, guaranteed work.</p>
+      <div class="hero-badge fade-up"><span class="hero-badge-dot"></span> {{HERO_BADGE}}</div>
+      <h1 class="fade-up fade-up-1">{{HERO_H1_LINE1}}<br><em>{{HERO_H1_LINE2}}</em></h1>
+      <p class="fade-up fade-up-2">{{HERO_SUBTEXT}}</p>
       <div class="hero-actions fade-up fade-up-3">
         <button class="btn-primary" onclick="showPage('booking')">Schedule Service →</button>
         <button class="btn-secondary" onclick="document.getElementById('inquirySection').scrollIntoView({behavior:'smooth'})">Ask a Question</button>
@@ -1601,6 +1601,11 @@ function renderAbout() {
    LOAD SITE DATA FROM GAS
    ═══════════════════════════════════════ */
 async function loadSiteData() {
+  // Skip GAS fetch entirely if the worker URL is still a placeholder or not configured
+  if (!GAS_URL || GAS_URL.startsWith('{{') || !GAS_URL.startsWith('http')) {
+    SERVICES = SERVICES_FALLBACK;
+    return;
+  }
   const [svcRes, revRes, aboutRes] = await Promise.allSettled([
     fetch(GAS_URL + '?action=getServices'),
     fetch(GAS_URL + '?action=getReviews'),
