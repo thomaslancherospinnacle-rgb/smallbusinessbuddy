@@ -113,6 +113,14 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
 .color-preview-bar{margin-top:14px;padding:14px 18px;border-radius:10px;border:1px solid var(--border);display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--bg-card);}
 
 @media(max-width:860px){.layout{grid-template-columns:1fr;}.sidebar{position:static;height:auto;border-right:none;border-bottom:1px solid var(--border);padding:8px 0;display:flex;overflow-x:auto;white-space:nowrap;}.tab-btn{padding:9px 16px;border-left:none;border-bottom:3px solid transparent;white-space:nowrap;}.tab-btn.active{border-left-color:transparent;border-bottom-color:var(--accent);}.main{padding:24px 18px;}.fields-grid,.fields-grid-3,.font-picker-grid{grid-template-columns:1fr;}}
+
+/* ── Service editor ── */
+.svc-row{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:10px;display:grid;grid-template-columns:44px 1fr 1fr;gap:10px;align-items:start;}
+.svc-row-fields{grid-column:2/-1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.svc-row-desc{grid-column:1/-1;}
+.svc-icon-btn{font-size:22px;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;width:44px;height:44px;cursor:pointer;text-align:center;padding:0;}
+.svc-delete{font-size:12px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--red);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;white-space:nowrap;}
+.svc-row-num{font-family:var(--font-mono);font-size:10px;color:var(--text-dim);padding-top:4px;text-align:center;}
 </style>
 </head>
 <body>
@@ -125,7 +133,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
       <div class="header-sub">v2.0 · Template Builder</div>
     </div>
   </div>
-  <div class="header-badge">7 files · 40+ tokens</div>
+  <div class="header-badge">7 files · 45+ tokens</div>
 </div>
 
 <div class="layout">
@@ -134,7 +142,8 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
     <button class="tab-btn active" onclick="switchTab('identity')"><span class="tab-btn-icon">🏢</span> Business Identity <span class="tab-btn-count">12</span></button>
     <button class="tab-btn" onclick="switchTab('infra')"><span class="tab-btn-icon">🔌</span> Infrastructure <span class="tab-btn-count">8</span></button>
     <button class="tab-btn" onclick="switchTab('theme')"><span class="tab-btn-icon">🎨</span> Colors &amp; Fonts <span class="tab-btn-count">9</span></button>
-    <button class="tab-btn" onclick="switchTab('content')"><span class="tab-btn-icon">✏️</span> Copy &amp; Content <span class="tab-btn-count">12</span></button>
+    <button class="tab-btn" onclick="switchTab('content')"><span class="tab-btn-icon">✏️</span> Copy &amp; Content <span class="tab-btn-count">13</span></button>
+    <button class="tab-btn" onclick="switchTab('services')"><span class="tab-btn-icon">🛠️</span> Default Services <span class="tab-btn-count">8</span></button>
     <div class="sidebar-divider"></div>
     <div class="sidebar-label">Output</div>
     <button class="tab-btn" onclick="switchTab('generate')"><span class="tab-btn-icon">📦</span> Generate Files</button>
@@ -172,6 +181,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
         <div class="field-group-title">Contact</div>
         <div class="fields-grid">
           <div class="field"><label>Business Phone <span class="field-token">BUSINESS_PHONE</span></label><input type="tel" id="BUSINESS_PHONE" placeholder="(555) 000-0000" oninput="onFieldChange()"></div>
+          <div class="field"><label>Business Email <span class="field-token">BUSINESS_EMAIL</span></label><input type="email" id="BUSINESS_EMAIL" placeholder="info@yourbusiness.com" oninput="onFieldChange()"></div>
           <div class="field"><label>Phone Hours Blurb <span class="field-token">PHONE_HOURS</span></label><input type="text" id="PHONE_HOURS" placeholder="Available 24/7 for emergencies" oninput="onFieldChange()"></div>
           <div class="field"><label>Service Area <span class="field-token">SERVICE_AREA</span></label><input type="text" id="SERVICE_AREA" placeholder="South Florida" oninput="onFieldChange()"></div>
         </div>
@@ -322,6 +332,7 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
       <div class="field-group">
         <div class="field-group-title">Hero</div>
         <div class="fields-grid">
+          <div class="field fields-full"><label>Hero Badge Text <span class="field-token">HERO_BADGE</span></label><input type="text" id="HERO_BADGE" placeholder="Available 24/7 — Emergency Service" oninput="onFieldChange()"></div>
           <div class="field"><label>H1 Line 1 <span class="field-token">HERO_H1_LINE1</span></label><input type="text" id="HERO_H1_LINE1" placeholder="Plumbing Done" oninput="onFieldChange()"></div>
           <div class="field"><label>H1 Line 2 (italic/accent) <span class="field-token">HERO_H1_LINE2</span></label><input type="text" id="HERO_H1_LINE2" placeholder="Right, Every Time." oninput="onFieldChange()"></div>
           <div class="field fields-full"><label>Hero Subtext <span class="field-token">HERO_SUBTEXT</span></label><textarea id="HERO_SUBTEXT" placeholder="Licensed professionals delivering quality services across South Florida..." oninput="onFieldChange()"></textarea></div>
@@ -350,11 +361,21 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
       </div>
     </div>
 
+    <!-- ══ SERVICES ══ -->
+    <div class="tab-panel" id="panel-services">
+      <div class="panel-header">
+        <div class="panel-title">Default Services</div>
+        <div class="panel-desc">These are the fallback services shown before Google Sheets loads. They're baked directly into <code style="font-family:var(--font-mono);background:var(--bg-input);padding:2px 6px;border-radius:4px;font-size:12px;">index.html</code> as <code style="font-family:var(--font-mono);background:var(--bg-input);padding:2px 6px;border-radius:4px;font-size:12px;">SERVICES_FALLBACK</code>.</div>
+      </div>
+      <div id="servicesEditorList"></div>
+      <button class="generate-btn generate-btn-secondary" onclick="addService()" style="max-width:200px;margin-top:4px;">+ Add Service</button>
+    </div>
+
     <!-- ══ GENERATE ══ -->
     <div class="tab-panel" id="panel-generate">
       <div class="panel-header">
         <div class="panel-title">Generate Files</div>
-        <div class="panel-desc">Review config, then download all 7 filled-in files.</div>
+        <div class="panel-desc">Review config, then download all 7 filled-in files. <strong style="color:var(--green);">Empty fields automatically use placeholder defaults</strong> — no blanks will appear in the output.</div>
       </div>
       <div id="loadStatus" class="load-status">Checking for template files...</div>
       <div id="validationBar" style="margin-bottom:16px;"></div>
@@ -468,6 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateColorPreview();
   updateProgress();
   loadTemplates();
+  renderServicesEditor();
 });
 
 // ══════════════════════════════════════
@@ -679,22 +701,62 @@ function onFieldChange(){ updateProgress(); }
 // ══════════════════════════════════════
 //  TOKENS
 // ══════════════════════════════════════
-const ALL_TOKENS=['COMPANY_NAME','COMPANY_SHORT','COMPANY_SLUG','COMPANY_TYPE','INDUSTRY','INDUSTRY_TITLE','LOGO_EMOJI','BUSINESS_PHONE','PHONE_HOURS','DOMAIN','SERVICE_AREA','YEAR_FOUNDED','COPYRIGHT_YEAR','CF_USERNAME','GITHUB_USERNAME','GAS_WORKER_URL','EMAIL_WORKER_URL','STRIPE_WORKER_URL','EMAIL_OFFICE','EMAIL_SUPPORT','EMAIL_BILLING','DEPOSIT_AMOUNT','DEPOSIT_CENTS','COLOR_ACCENT','COLOR_ACCENT_LIGHT','COLOR_ACCENT_HOVER','COLOR_ACCENT_BORDER','COLOR_STARS','FONT_BODY','FONT_BODY_GOOG','FONT_DISPLAY','FONT_DISPLAY_GOOG','HERO_H1_LINE1','HERO_H1_LINE2','HERO_SUBTEXT','ABOUT_HEADLINE','SECTION_WHAT_WE_DO','SECTION_OUR_SERVICES','SERVICES_SUBTEXT','SERVICES_SUBTEXT_2','FOOTER_DESC'];
+const ALL_TOKENS=['COMPANY_NAME','COMPANY_SHORT','COMPANY_SLUG','COMPANY_TYPE','INDUSTRY','INDUSTRY_TITLE','LOGO_EMOJI','BUSINESS_PHONE','BUSINESS_EMAIL','PHONE_HOURS','DOMAIN','SERVICE_AREA','YEAR_FOUNDED','COPYRIGHT_YEAR','CF_USERNAME','GITHUB_USERNAME','GAS_WORKER_URL','EMAIL_WORKER_URL','STRIPE_WORKER_URL','EMAIL_OFFICE','EMAIL_SUPPORT','EMAIL_BILLING','DEPOSIT_AMOUNT','DEPOSIT_CENTS','COLOR_ACCENT','COLOR_ACCENT_LIGHT','COLOR_ACCENT_HOVER','COLOR_ACCENT_BORDER','COLOR_STARS','FONT_BODY','FONT_BODY_GOOG','FONT_DISPLAY','FONT_DISPLAY_GOOG','HERO_BADGE','HERO_H1_LINE1','HERO_H1_LINE2','HERO_SUBTEXT','ABOUT_HEADLINE','SECTION_WHAT_WE_DO','SECTION_OUR_SERVICES','SERVICES_SUBTEXT','SERVICES_SUBTEXT_2','FOOTER_DESC'];
 const REQUIRED=['COMPANY_NAME','COMPANY_SHORT','COMPANY_SLUG','DOMAIN','GAS_WORKER_URL','STRIPE_WORKER_URL','EMAIL_WORKER_URL','BUSINESS_PHONE'];
+
+// Defaults used when a field is left blank
+const DEFAULTS = {
+  COMPANY_NAME:       'Acme Plumbing Co.',
+  COMPANY_SHORT:      'Acme',
+  COMPANY_SLUG:       'acme',
+  COMPANY_TYPE:       'Plumbing Co.',
+  INDUSTRY:           'plumbing',
+  INDUSTRY_TITLE:     'Plumbing',
+  LOGO_EMOJI:         '🔧',
+  BUSINESS_PHONE:     '(555) 000-0000',
+  BUSINESS_EMAIL:     'info@yourbusiness.com',
+  PHONE_HOURS:        'Available 24/7 for emergencies',
+  SERVICE_AREA:       'South Florida',
+  YEAR_FOUNDED:       '2010',
+  COPYRIGHT_YEAR:     String(new Date().getFullYear()),
+  DEPOSIT_AMOUNT:     '100',
+  DEPOSIT_CENTS:      '10000',
+  HERO_BADGE:         'Available 24/7 — Emergency Service',
+  HERO_H1_LINE1:      'Plumbing Done',
+  HERO_H1_LINE2:      'Right, Every Time.',
+  HERO_SUBTEXT:       'Licensed professionals delivering quality plumbing services across South Florida. Fast response, fair pricing, guaranteed work.',
+  ABOUT_HEADLINE:     'Trusted Service, Done Right',
+  SECTION_WHAT_WE_DO: 'What We Do',
+  SECTION_OUR_SERVICES:'Our Services',
+  SERVICES_SUBTEXT:   'Comprehensive solutions backed by our satisfaction guarantee.',
+  SERVICES_SUBTEXT_2: 'Full-spectrum service for residential and commercial properties.',
+  FOOTER_DESC:        'Professional plumbing services for residential and commercial properties. Licensed, insured, and trusted since 2010.',
+  COLOR_ACCENT:       '#1a5c3a',
+  COLOR_ACCENT_LIGHT: '#e8f5ee',
+  COLOR_ACCENT_HOVER: '#14472d',
+  COLOR_ACCENT_BORDER:'#a7d7bc',
+  COLOR_STARS:        '#e8a838',
+  FONT_BODY:          'Outfit',
+  FONT_BODY_GOOG:     'Outfit',
+  FONT_DISPLAY:       'Fraunces',
+  FONT_DISPLAY_GOOG:  'Fraunces',
+};
 
 function getValues(){
   const d = document.getElementById('DOMAIN').value.trim();
   const v={};
   for(const t of ALL_TOKENS){
     const el=document.getElementById(t);
-    v[t]=el?el.value.trim():'';
+    const raw = el ? el.value.trim() : '';
+    // Fall back to default if field is empty
+    v[t] = raw || DEFAULTS[t] || '';
   }
   // Derived from domain (single source)
   if(d){
     v['EMAIL_OFFICE']  = `office@${d}`;
     v['EMAIL_SUPPORT'] = `support@${d}`;
     v['EMAIL_BILLING'] = `billing@${d}`;
-    // SITE_URL is used in stripe.js as env var — derived here too
+    v['BUSINESS_EMAIL'] = v['BUSINESS_EMAIL'] || `info@${d}`;
     v['SITE_URL']      = `https://www.${d}`;
   }
   return v;
@@ -719,7 +781,12 @@ function generateOutputs(){
     ? '<span class="val-chip ok">✓ All required fields filled</span>'
     : `<span class="val-chip warn">⚠ ${missing.length} required empty</span>`+missing.map(m=>`<span class="val-chip err">${m}</span>`).join('');
 
-  document.getElementById('outConfigMap').textContent=ALL_TOKENS.map(t=>`  {{${t.padEnd(22)}}}  →  "${vals[t]||'(empty)'}"`).join('\n');
+  document.getElementById('outConfigMap').textContent=ALL_TOKENS.map(t=>{
+    const raw = document.getElementById(t) ? document.getElementById(t).value.trim() : '';
+    const used = vals[t] || '';
+    const isDefault = !raw && used && DEFAULTS[t];
+    return `  {{${t.padEnd(24)}}}  →  "${used||'(empty)'}"${isDefault?' [default]':''}`;
+  }).join('\n');
 
   const domain=vals.DOMAIN||'yourdomain.com';
   const siteUrl=`https://www.${domain}`;
@@ -762,12 +829,72 @@ function copyBlock(id){
 }
 
 // ══════════════════════════════════════
+//  SERVICES EDITOR
+// ══════════════════════════════════════
+let SERVICES_DATA = [
+  { name:'Emergency Repair',  icon:'🔧', price:'From $89',  desc:'24/7 emergency repairs for burst pipes, major leaks, and flooding.',           duration:60  },
+  { name:'Drain Cleaning',    icon:'🚿', price:'From $65',  desc:'Professional drain unclogging for kitchens, bathrooms, and main lines.',       duration:45  },
+  { name:'Water Heater',      icon:'🔥', price:'From $120', desc:'Installation, repair, and maintenance of all water heater types.',              duration:90  },
+  { name:'Pipe Installation', icon:'🔩', price:'From $150', desc:'New pipe installation, repiping, and pipe replacement services.',               duration:120 },
+  { name:'Fixture Install',   icon:'🚰', price:'From $75',  desc:'Faucet, toilet, shower, and sink installation and replacement.',                duration:60  },
+  { name:'Inspection',        icon:'🔍', price:'From $49',  desc:'Comprehensive inspection with camera and detailed report.',                      duration:45  },
+  { name:'Sewer Line',        icon:'🏗️', price:'From $200', desc:'Sewer line repair, replacement, and trenchless solutions.',                     duration:180 },
+  { name:'Gas Line',          icon:'⚡', price:'From $175', desc:'Gas line installation, repair, and leak detection services.',                   duration:90  },
+];
+
+function renderServicesEditor(){
+  const list = document.getElementById('servicesEditorList');
+  if(!list) return;
+  list.innerHTML = '';
+  SERVICES_DATA.forEach((s,i)=>{
+    const div = document.createElement('div');
+    div.className = 'svc-row';
+    div.innerHTML = `
+      <div>
+        <div class="svc-row-num">#${i+1}</div>
+        <input type="text" maxlength="4" value="${s.icon}" title="Emoji icon"
+          oninput="SERVICES_DATA[${i}].icon=this.value;onFieldChange()"
+          style="font-size:22px;font-family:inherit;text-align:center;background:var(--bg-input);border:1px solid var(--border);border-radius:8px;width:44px;height:44px;padding:0;color:var(--text);cursor:pointer;">
+      </div>
+      <div class="svc-row-fields">
+        <div class="field"><label style="font-size:11px;font-weight:600;color:var(--text-muted);">Name</label><input type="text" value="${s.name.replace(/"/g,'&quot;')}" oninput="SERVICES_DATA[${i}].name=this.value;onFieldChange()"></div>
+        <div class="field"><label style="font-size:11px;font-weight:600;color:var(--text-muted);">Price</label><input type="text" value="${s.price}" placeholder="From $89" oninput="SERVICES_DATA[${i}].price=this.value;onFieldChange()"></div>
+        <div class="field"><label style="font-size:11px;font-weight:600;color:var(--text-muted);">Duration (min)</label><input type="number" value="${s.duration}" oninput="SERVICES_DATA[${i}].duration=parseInt(this.value)||60;onFieldChange()"></div>
+        <div class="field svc-row-desc"><label style="font-size:11px;font-weight:600;color:var(--text-muted);">Description</label><input type="text" value="${s.desc.replace(/"/g,'&quot;')}" oninput="SERVICES_DATA[${i}].desc=this.value;onFieldChange()"></div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:2px;"><button class="svc-delete" onclick="deleteService(${i})">✕ Remove</button></div>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+function addService(){
+  const n = SERVICES_DATA.length+1;
+  SERVICES_DATA.push({name:`New Service ${n}`,icon:'⭐',price:'From $99',desc:'Describe this service.',duration:60});
+  renderServicesEditor();
+}
+function deleteService(i){
+  SERVICES_DATA.splice(i,1);
+  renderServicesEditor();
+}
+
+function buildServicesFallbackJS(){
+  const lines = SERVICES_DATA.map((s,idx)=>
+    `  { ID:'s${idx+1}', Name:${JSON.stringify(s.name)}, Icon:${JSON.stringify(s.icon)}, Price:${JSON.stringify(s.price)}, Description:${JSON.stringify(s.desc)}, Duration:${s.duration}, Active:true }`
+  );
+  return `const SERVICES_FALLBACK = [\n${lines.join(',\n')}\n];`;
+}
+
+// ══════════════════════════════════════
 //  TOKEN REPLACEMENT + FILE DOWNLOAD
 // ══════════════════════════════════════
 function applyTokens(tmpl,vals){
   let out=tmpl;
-  // Also replace SITE_URL token in stripe.js env section
-  for(const[k,v] of Object.entries(vals)) out=out.split('{{'+k+'}}').join(v||('{{'+k+'}}'));
+  // 1. Inject configured services first (so their text gets token-replaced below)
+  out=out.replace(/const SERVICES_FALLBACK\s*=\s*\[[\s\S]*?\];/, buildServicesFallbackJS());
+  // 2. Replace all {{TOKEN}} with user values (or defaults)
+  for(const[k,v] of Object.entries(vals)) out=out.split('{{'+k+'}}').join(v||DEFAULTS[k]||('{{'+k+'}}'));
+  // 3. Second pass: catch any remaining {{TOKEN}} and fill with hardcoded defaults
+  for(const[k,dv] of Object.entries(DEFAULTS)) out=out.split('{{'+k+'}}').join(dv);
   return out;
 }
 function downloadFile(fname,content){
