@@ -133,16 +133,16 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
       <div class="header-sub">v2.0 · Template Builder</div>
     </div>
   </div>
-  <div class="header-badge">7 files · 45+ tokens</div>
+  <div class="header-badge">7 files · 54 tokens</div>
 </div>
 
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-label">Configure</div>
     <button class="tab-btn active" onclick="switchTab('identity')"><span class="tab-btn-icon">🏢</span> Business Identity <span class="tab-btn-count">12</span></button>
-    <button class="tab-btn" onclick="switchTab('infra')"><span class="tab-btn-icon">🔌</span> Infrastructure <span class="tab-btn-count">8</span></button>
+    <button class="tab-btn" onclick="switchTab('infra')"><span class="tab-btn-icon">🔌</span> Infrastructure <span class="tab-btn-count">10</span></button>
     <button class="tab-btn" onclick="switchTab('theme')"><span class="tab-btn-icon">🎨</span> Colors &amp; Fonts <span class="tab-btn-count">9</span></button>
-    <button class="tab-btn" onclick="switchTab('content')"><span class="tab-btn-icon">✏️</span> Copy &amp; Content <span class="tab-btn-count">13</span></button>
+    <button class="tab-btn" onclick="switchTab('content')"><span class="tab-btn-icon">✏️</span> Copy &amp; Content <span class="tab-btn-count">22</span></button>
     <button class="tab-btn" onclick="switchTab('services')"><span class="tab-btn-icon">🛠️</span> Default Services <span class="tab-btn-count">8</span></button>
     <div class="sidebar-divider"></div>
     <div class="sidebar-label">Output</div>
@@ -225,6 +225,16 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
         <div style="margin-top:12px" class="field"><label>GAS Proxy Worker URL <span class="field-token">GAS_WORKER_URL</span></label><input type="text" id="GAS_WORKER_URL" placeholder="https://google-sheets-script.yourname.workers.dev" oninput="onFieldChange()"></div>
         <div style="margin-top:10px" class="field"><label>Email Worker URL <span class="field-token">EMAIL_WORKER_URL</span></label><input type="text" id="EMAIL_WORKER_URL" placeholder="https://email.yourname.workers.dev" oninput="onFieldChange()"></div>
         <div style="margin-top:10px" class="field"><label>Stripe Worker URL <span class="field-token">STRIPE_WORKER_URL</span></label><input type="text" id="STRIPE_WORKER_URL" placeholder="https://stripe.yourname.workers.dev" oninput="onFieldChange()"></div>
+      </div>
+
+      <div class="field-group">
+        <div class="field-group-title">Google Reviews (optional)</div>
+        <div class="fields-grid">
+          <div class="field fields-full"><label>Google Place ID <span class="field-token">GOOGLE_PLACE_ID</span></label><input type="text" id="GOOGLE_PLACE_ID" placeholder="ChIJN1t_tDeuEmsRUsoyG83frY4" oninput="onFieldChange()"></div>
+          <div class="field fields-full"><label>Google Maps API Key <span class="field-token">GOOGLE_MAPS_API_KEY</span></label><input type="text" id="GOOGLE_MAPS_API_KEY" placeholder="AIzaSy..." oninput="onFieldChange()"></div>
+        </div>
+        <p style="font-size:11px;color:var(--text-dim);margin-top:8px;">💡 Leave blank to hide the reviews strip. Find your Place ID at <a href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder" target="_blank" style="color:var(--accent);">Google's Place ID Finder</a>. API key needs <strong>Places library</strong> enabled. Note: Places API returns max 5 reviews.</p>
+      </div>
 
         <!-- Live derived preview for infra tab too -->
         <div class="derived-block" id="infraDerivedBlock" style="margin-top:14px;display:none;">
@@ -347,11 +357,35 @@ body{font-family:var(--font-body);background:var(--bg);color:var(--text);min-hei
       <div class="field-group">
         <div class="field-group-title">Services Section</div>
         <div class="fields-grid">
-          <div class="field"><label>"What We Do" label <span class="field-token">SECTION_WHAT_WE_DO</span></label><input type="text" id="SECTION_WHAT_WE_DO" placeholder="What We Do" oninput="onFieldChange()"></div>
-          <div class="field"><label>"Our Services" label <span class="field-token">SECTION_OUR_SERVICES</span></label><input type="text" id="SECTION_OUR_SERVICES" placeholder="Our Services" oninput="onFieldChange()"></div>
+          <div class="field"><label>Eyebrow (above headline) <span class="field-token">SERVICES_EYEBROW</span></label><input type="text" id="SERVICES_EYEBROW" placeholder="OUR SERVICES" oninput="onFieldChange()"></div>
+          <div class="field"><label>"What We Do" headline <span class="field-token">SECTION_WHAT_WE_DO</span></label><input type="text" id="SECTION_WHAT_WE_DO" placeholder="Complete Solutions For Every Home" oninput="onFieldChange()"></div>
+          <div class="field"><label>"Our Services" page label <span class="field-token">SECTION_OUR_SERVICES</span></label><input type="text" id="SECTION_OUR_SERVICES" placeholder="Our Services" oninput="onFieldChange()"></div>
           <div class="field fields-full"><label>Services Subtext 1 <span class="field-token">SERVICES_SUBTEXT</span></label><input type="text" id="SERVICES_SUBTEXT" placeholder="Comprehensive solutions backed by our satisfaction guarantee." oninput="onFieldChange()"></div>
           <div class="field fields-full"><label>Services Subtext 2 <span class="field-token">SERVICES_SUBTEXT_2</span></label><input type="text" id="SERVICES_SUBTEXT_2" placeholder="Full-spectrum service for residential and commercial properties." oninput="onFieldChange()"></div>
         </div>
+      </div>
+      <div class="field-group">
+        <div class="field-group-title">Why Choose Us</div>
+        <div class="fields-grid">
+          <div class="field fields-full"><label>Subtitle <span class="field-token">WHY_CHOOSE_SUBTITLE</span></label><input type="text" id="WHY_CHOOSE_SUBTITLE" placeholder="Peace of mind, zero chaos. Managed with business-level precision." oninput="onFieldChange()"></div>
+        </div>
+        <p style="font-size:11px;color:var(--text-dim);margin-top:8px;">💡 The 4 pillars pull from <strong>guarantee1–4</strong> in your GAS About sheet. Fill those in to override the defaults.</p>
+      </div>
+      <div class="field-group">
+        <div class="field-group-title">Video Testimonials</div>
+        <div class="fields-grid">
+          <div class="field fields-full"><label>Section Headline <span class="field-token">TESTIMONIALS_HEADLINE</span></label><input type="text" id="TESTIMONIALS_HEADLINE" placeholder="Different Industry, Same Concept." oninput="onFieldChange()"></div>
+          <div class="field"><label>Accent Line 1 <span class="field-token">TESTIMONIALS_LINE1</span></label><input type="text" id="TESTIMONIALS_LINE1" placeholder="Fast Delivery," oninput="onFieldChange()"></div>
+          <div class="field"><label>Accent Line 2 <span class="field-token">TESTIMONIALS_LINE2</span></label><input type="text" id="TESTIMONIALS_LINE2" placeholder="Clear Communication," oninput="onFieldChange()"></div>
+          <div class="field"><label>Accent Line 3 <span class="field-token">TESTIMONIALS_LINE3</span></label><input type="text" id="TESTIMONIALS_LINE3" placeholder="Zero Headaches." oninput="onFieldChange()"></div>
+          <div class="field fields-full"><label>Subtext <span class="field-token">TESTIMONIALS_SUB</span></label><input type="text" id="TESTIMONIALS_SUB" placeholder="Listen to the voices of those who've worked with us." oninput="onFieldChange()"></div>
+          <div class="field"><label>Badge on videos <span class="field-token">TESTIMONIALS_BADGE</span></label><input type="text" id="TESTIMONIALS_BADGE" placeholder="30+ Testimonials" oninput="onFieldChange()"></div>
+        </div>
+        <div class="field" style="margin-top:12px;">
+          <label>Per-video metadata <span class="field-token">TESTIMONIALS_META</span><br><span style="font-size:10px;color:var(--text-dim);font-weight:400;">One video per line — format: Location|Score|Quote</span></label>
+          <textarea id="TESTIMONIALS_META" placeholder="Miami, FL|10/10|Best contractor I've ever hired&#10;Fort Lauderdale, FL|10/10|Showed up on time, amazing work" oninput="onFieldChange()" style="min-height:100px;"></textarea>
+        </div>
+        <p style="font-size:11px;color:var(--text-dim);margin-top:8px;">💡 Drop <strong>testimonial1.mp4</strong>, <strong>testimonial2.mp4</strong> … in the same folder as index.html. They load automatically — no config needed.</p>
       </div>
       <div class="field-group">
         <div class="field-group-title">Footer</div>
@@ -701,7 +735,7 @@ function onFieldChange(){ updateProgress(); }
 // ══════════════════════════════════════
 //  TOKENS
 // ══════════════════════════════════════
-const ALL_TOKENS=['COMPANY_NAME','COMPANY_SHORT','COMPANY_SLUG','COMPANY_TYPE','INDUSTRY','INDUSTRY_TITLE','LOGO_EMOJI','BUSINESS_PHONE','BUSINESS_EMAIL','PHONE_HOURS','DOMAIN','SERVICE_AREA','YEAR_FOUNDED','COPYRIGHT_YEAR','CF_USERNAME','GITHUB_USERNAME','GAS_WORKER_URL','EMAIL_WORKER_URL','STRIPE_WORKER_URL','EMAIL_OFFICE','EMAIL_SUPPORT','EMAIL_BILLING','DEPOSIT_AMOUNT','DEPOSIT_CENTS','COLOR_ACCENT','COLOR_ACCENT_LIGHT','COLOR_ACCENT_HOVER','COLOR_ACCENT_BORDER','COLOR_STARS','FONT_BODY','FONT_BODY_GOOG','FONT_DISPLAY','FONT_DISPLAY_GOOG','HERO_BADGE','HERO_H1_LINE1','HERO_H1_LINE2','HERO_SUBTEXT','ABOUT_HEADLINE','SECTION_WHAT_WE_DO','SECTION_OUR_SERVICES','SERVICES_SUBTEXT','SERVICES_SUBTEXT_2','FOOTER_DESC'];
+const ALL_TOKENS=['COMPANY_NAME','COMPANY_SHORT','COMPANY_SLUG','COMPANY_TYPE','INDUSTRY','INDUSTRY_TITLE','LOGO_EMOJI','BUSINESS_PHONE','BUSINESS_EMAIL','PHONE_HOURS','DOMAIN','SERVICE_AREA','YEAR_FOUNDED','COPYRIGHT_YEAR','CF_USERNAME','GITHUB_USERNAME','GAS_WORKER_URL','EMAIL_WORKER_URL','STRIPE_WORKER_URL','GOOGLE_PLACE_ID','GOOGLE_MAPS_API_KEY','EMAIL_OFFICE','EMAIL_SUPPORT','EMAIL_BILLING','DEPOSIT_AMOUNT','DEPOSIT_CENTS','COLOR_ACCENT','COLOR_ACCENT_LIGHT','COLOR_ACCENT_HOVER','COLOR_ACCENT_BORDER','COLOR_STARS','FONT_BODY','FONT_BODY_GOOG','FONT_DISPLAY','FONT_DISPLAY_GOOG','HERO_BADGE','HERO_H1_LINE1','HERO_H1_LINE2','HERO_SUBTEXT','ABOUT_HEADLINE','SERVICES_EYEBROW','SECTION_WHAT_WE_DO','SECTION_OUR_SERVICES','SERVICES_SUBTEXT','SERVICES_SUBTEXT_2','WHY_CHOOSE_SUBTITLE','TESTIMONIALS_HEADLINE','TESTIMONIALS_LINE1','TESTIMONIALS_LINE2','TESTIMONIALS_LINE3','TESTIMONIALS_SUB','TESTIMONIALS_BADGE','TESTIMONIALS_META','FOOTER_DESC'];
 const REQUIRED=['COMPANY_NAME','COMPANY_SHORT','COMPANY_SLUG','DOMAIN','GAS_WORKER_URL','STRIPE_WORKER_URL','EMAIL_WORKER_URL','BUSINESS_PHONE'];
 
 // Defaults used when a field is left blank
@@ -740,6 +774,15 @@ const DEFAULTS = {
   FONT_BODY_GOOG:     'Outfit',
   FONT_DISPLAY:       'Fraunces',
   FONT_DISPLAY_GOOG:  'Fraunces',
+  SERVICES_EYEBROW:   'OUR SERVICES',
+  WHY_CHOOSE_SUBTITLE:'Peace of mind, zero chaos. Managed with business-level precision and backed by proven systems.',
+  TESTIMONIALS_HEADLINE:'Different Industry, Same Concept.',
+  TESTIMONIALS_LINE1: 'Fast Delivery,',
+  TESTIMONIALS_LINE2: 'Clear Communication,',
+  TESTIMONIALS_LINE3: 'Zero Headaches.',
+  TESTIMONIALS_SUB:   'Listen to the voices of those who\'ve worked with us.',
+  TESTIMONIALS_BADGE: '30+ Testimonials',
+  TESTIMONIALS_META:  '',
 };
 
 function getValues(){
