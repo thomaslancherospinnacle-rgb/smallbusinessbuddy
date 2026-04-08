@@ -66,7 +66,7 @@ input, textarea, select { font-family: inherit; }
 .fade-up-4 { animation-delay:.4s; }
 
 /* ─── NAV ─── */
-.nav { position:fixed; top:0; left:0; right:0; z-index:100; background:rgba(255,255,255,.92); backdrop-filter:blur(16px); border-bottom:1px solid var(--border-light); height:var(--nav-height); }
+.nav { position:sticky; top:0; left:0; right:0; z-index:100; background:rgba(255,255,255,.96); backdrop-filter:blur(16px); border-bottom:1px solid var(--border-light); height:var(--nav-height); }
 .nav-inner { max-width:var(--max-width); margin:0 auto; padding:0 24px; height:100%; display:flex; align-items:center; justify-content:space-between; }
 .nav-logo { display:flex; align-items:center; gap:10px; cursor:pointer; }
 .nav-logo-icon { width:38px; height:38px; background:var(--accent); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:18px; }
@@ -88,46 +88,62 @@ input, textarea, select { font-family: inherit; }
   .nav-hamburger { display:block; }
 }
 
+/* ─── TOP CONTACT BAR ─── */
+.top-bar {
+  background: #1a1a1a;
+  color: rgba(255,255,255,.8);
+  font-size: 13px;
+  padding: 8px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.top-bar-left { display:flex; align-items:center; gap:6px; }
+.top-bar-right { display:flex; align-items:center; gap:20px; }
+.top-bar-item { display:flex; align-items:center; gap:6px; color:rgba(255,255,255,.85); }
+.top-bar-item svg { opacity:.7; flex-shrink:0; }
+@media (max-width:640px) { .top-bar-right { gap:12px; } .top-bar { font-size:12px; } }
+
 /* ─── PARALLAX HERO IMAGE ─── */
 .site-hero-wrap {
   position: relative;
-  height: calc(85vh + var(--nav-height));
-  min-height: calc(480px + var(--nav-height));
-  max-height: calc(900px + var(--nav-height));
+  height: calc(92vh);
+  min-height: 560px;
+  max-height: 860px;
   overflow: hidden;
-  margin-top: calc(-1 * var(--nav-height));
   z-index: 0;
+  /* hero sits below the nav bar, which is now position:sticky not fixed */
 }
 .site-hero-img {
   position: absolute;
-  /* Start the image at the nav bottom, not behind it */
-  top: var(--nav-height);
-  left: 0; right: 0;
+  top: 0; left: 0; right: 0;
   bottom: -30%;
   width: 100%;
   height: 140%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center center;
   will-change: transform;
   display: block;
   opacity: 0;
   transition: opacity .6s ease;
 }
 .site-hero-img.loaded { opacity: 1; }
+/* Dark overlay for readability */
 .site-hero-gradient {
   position: absolute;
-  inset: auto 0 0 0;  /* only covers the bottom, not full height */
-  height: 10%;
+  inset: 0;
   background: linear-gradient(
-    to top,
-    var(--bg-primary) 0%,
-    var(--bg-primary) 18%,
-    rgba(255,255,255,0.5) 60%,
-    transparent 100%
+    105deg,
+    rgba(0,0,0,0.72) 0%,
+    rgba(0,0,0,0.55) 50%,
+    rgba(0,0,0,0.25) 100%
   );
   pointer-events: none;
   z-index: 1;
 }
+/* Main hero content: left headline + right form */
 .site-hero-overlay {
   position: absolute;
   inset: 0;
@@ -135,47 +151,119 @@ input, textarea, select { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: center;
-  /* offset center point down by half the nav height so it looks centered in the visible portion */
-  padding-top: calc(var(--nav-height) * 1.5);
+  padding: 40px 24px;
   pointer-events: none;
 }
-.site-hero-title {
-  font-family: var(--font-display);
-  font-size: clamp(36px, 6vw, 80px);
-  font-weight: 900;
-  letter-spacing: -2px;
-  color: #fff;
-  text-align: center;
-  text-shadow: 0 2px 24px rgba(0,0,0,0.35), 0 1px 4px rgba(0,0,0,0.2);
-  line-height: 1.05;
-}
-/* Hero title + optional logo layout */
-.site-hero-title-wrap {
-  display: flex;
+.site-hero-split {
+  max-width: var(--max-width);
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 48px;
   align-items: center;
-  justify-content: center;
-  gap: 20px;
+  pointer-events: auto;
 }
-.site-hero-logo {
-  height: clamp(48px, 7vw, 96px);
-  width: auto;
-  max-width: 180px;
-  object-fit: contain;
-  display: none; /* hidden until loaded */
-  filter: drop-shadow(0 2px 12px rgba(0,0,0,0.4));
-  flex-shrink: 0;
+/* Left: headline block */
+.hero-left-text { color: #fff; }
+.hero-left-text .hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600; letter-spacing: .5px;
+  color: var(--accent); text-transform: uppercase;
+  background: rgba(255,255,255,.1); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.15);
+  padding: 6px 14px; border-radius: 100px;
+  margin-bottom: 22px;
 }
-.site-hero-title-wrap.has-logo .site-hero-logo {
-  display: block;
+.hero-left-text h1 {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 4.5vw, 62px);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -1.5px;
+  color: #fff;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 20px rgba(0,0,0,.3);
 }
-
-.site-hero-wrap.hero-missing {
-  height: 0;
-  min-height: 0;
+.hero-left-text h1 em { font-style: normal; color: var(--accent); }
+.hero-left-text .hero-sub {
+  font-size: 16px;
+  color: rgba(255,255,255,.82);
+  line-height: 1.7;
+  margin-bottom: 32px;
+  max-width: 440px;
+}
+.hero-trust-items { display:flex; flex-direction:column; gap:10px; margin-bottom:32px; }
+.hero-trust-item { display:flex; align-items:center; gap:10px; font-size:14px; color:rgba(255,255,255,.9); font-weight:500; }
+.hero-trust-check { width:20px; height:20px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.hero-trust-check svg { color:#fff; }
+.hero-social-proof { display:flex; align-items:center; gap:14px; }
+.hero-avatars { display:flex; }
+.hero-avatars img, .hero-avatar-placeholder {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,.8);
+  margin-left: -10px; background: var(--accent-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--accent);
   overflow: hidden;
 }
-@media (max-width:600px) {
-  .site-hero-wrap { height: calc(42vh + var(--nav-height)); min-height: calc(220px + var(--nav-height)); }
+.hero-avatars .hero-avatar-placeholder:first-child { margin-left: 0; }
+.hero-proof-text { font-size: 13px; color: rgba(255,255,255,.85); line-height: 1.4; }
+.hero-proof-text strong { color: #fff; }
+/* Right: lead capture form */
+.hero-lead-form {
+  background: #fff;
+  border-radius: 20px;
+  padding: 36px 32px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.25);
+}
+.hero-lead-form .form-title {
+  font-size: 16px; color: var(--text-secondary);
+  text-align: center; margin-bottom: 24px; font-weight: 500;
+}
+.hero-lead-form .form-group { margin-bottom: 14px; }
+.hero-lead-form .form-group label {
+  display: block; font-size: 13px; font-weight: 600;
+  color: var(--text-secondary); margin-bottom: 6px;
+}
+.hero-lead-form .form-group input {
+  width: 100%; padding: 13px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius); font-size: 15px;
+  color: var(--text-primary); background: #fafaf9;
+  outline: none; transition: border-color .2s;
+}
+.hero-lead-form .form-group input:focus { border-color: var(--accent); background: #fff; }
+.hero-lead-form .form-group input::placeholder { color: var(--text-muted); }
+.hero-consent { display:flex; align-items:flex-start; gap:10px; margin-bottom:18px; }
+.hero-consent input[type=checkbox] { margin-top:2px; accent-color:var(--accent); flex-shrink:0; }
+.hero-consent label { font-size:12px; color:var(--text-muted); line-height:1.5; }
+.hero-form-btn {
+  width: 100%; padding: 15px;
+  background: var(--accent); color: #fff;
+  border: none; border-radius: var(--radius);
+  font-size: 16px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+  font-family: inherit;
+}
+.hero-form-btn:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+
+.site-hero-wrap.hero-missing {
+  height: 0; min-height: 0; overflow: hidden;
+}
+.site-hero-title-wrap { display: none; } /* legacy, not used in new layout */
+.site-hero-logo { display: none; }
+
+@media (max-width: 900px) {
+  .site-hero-split { grid-template-columns: 1fr; }
+  .hero-lead-form { max-width: 480px; margin: 0 auto; }
+  .site-hero-wrap { height: auto; min-height: 0; max-height: none; }
+  .site-hero-overlay { position: relative; padding: 60px 24px; }
+  .site-hero-img { position: fixed; opacity: 0; } /* hide on mobile, use bg color */
+  .site-hero-wrap { background: #2a2a2a; }
+}
+@media (max-width: 600px) {
+  .hero-left-text h1 { font-size: clamp(28px, 8vw, 40px); }
+  .hero-lead-form { padding: 28px 20px; border-radius: 14px; }
 }
 
 /* ─── HERO ─── */
@@ -209,7 +297,94 @@ input, textarea, select { font-family: inherit; }
 .section-header h2 { font-family:var(--font-display); font-size:36px; font-weight:800; margin-bottom:12px; letter-spacing:-.5px; }
 .section-header p { font-size:16px; color:var(--text-secondary); max-width:480px; margin:0 auto; line-height:1.6; }
 
-/* ─── SERVICE CARDS ─── */
+/* ─── SERVICE CARDS (homepage — image style) ─── */
+.services-eyebrow { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--accent); margin-bottom:14px; }
+.services-big-headline { font-family:var(--font-display); font-size:clamp(32px,4vw,56px); font-weight:900; letter-spacing:-1.5px; line-height:1.05; text-transform:uppercase; margin-bottom:16px; }
+.services-img-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:24px; margin-top:8px; }
+.svc-img-card { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius-lg); overflow:hidden; display:flex; flex-direction:column; transition:all .3s; }
+.svc-img-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-lg); }
+.svc-img-thumb {
+  width:100%; aspect-ratio:16/9; object-fit:cover; display:block;
+  background:var(--bg-tertiary);
+}
+.svc-img-thumb-placeholder {
+  width:100%; aspect-ratio:16/9; background:var(--bg-tertiary);
+  display:flex; align-items:center; justify-content:center; font-size:48px;
+}
+.svc-img-body { padding:24px 28px 28px; flex:1; display:flex; flex-direction:column; }
+.svc-img-body h3 { font-size:19px; font-weight:800; margin-bottom:10px; text-align:center; }
+.svc-img-body > p { font-size:14px; color:var(--text-secondary); line-height:1.6; text-align:center; margin-bottom:16px; }
+.svc-img-bullets { list-style:none; display:flex; flex-direction:column; gap:8px; margin-bottom:24px; flex:1; }
+.svc-img-bullets li { display:flex; align-items:flex-start; gap:10px; font-size:13.5px; color:var(--text-secondary); line-height:1.4; }
+.svc-img-bullets li::before { content:'✓'; color:var(--accent); font-weight:700; font-size:14px; flex-shrink:0; margin-top:1px; }
+.svc-img-cta { display:block; width:100%; padding:12px; border-radius:var(--radius); background:var(--accent); color:#fff; font-size:14px; font-weight:700; text-align:center; border:none; cursor:pointer; font-family:inherit; transition:all .2s; }
+.svc-img-cta:hover { background:var(--accent-hover); transform:translateY(-1px); }
+
+/* ─── VIDEO TESTIMONIALS ─── */
+.testimonials-section { padding:80px 24px; background:var(--bg-secondary); }
+.testimonials-inner { max-width:var(--max-width); margin:0 auto; }
+.testimonials-headline { font-family:var(--font-display); font-size:clamp(28px,4vw,48px); font-weight:900; letter-spacing:-1px; text-align:center; margin-bottom:8px; }
+.testimonials-accent-lines { text-align:center; margin-bottom:12px; }
+.testimonials-accent-lines span { display:block; font-family:var(--font-display); font-size:clamp(20px,3vw,34px); font-weight:800; color:var(--accent); line-height:1.3; }
+.testimonials-sub { text-align:center; font-size:15px; font-weight:600; color:var(--text-primary); margin-bottom:8px; }
+.testimonials-video-label { display:inline-flex; align-items:center; gap:6px; font-size:13px; color:var(--accent); font-weight:600; margin-bottom:40px; }
+.testimonials-video-label::before { content:'▶'; font-size:10px; }
+.testimonials-header-center { display:flex; flex-direction:column; align-items:center; }
+.testimonials-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:20px; }
+.tst-card { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius-lg); overflow:hidden; transition:all .3s; }
+.tst-card:hover { box-shadow:var(--shadow-lg); transform:translateY(-3px); }
+.tst-video-wrap {
+  position:relative; width:100%; aspect-ratio:16/9;
+  background:#111; overflow:hidden; cursor:pointer;
+}
+.tst-video-wrap video {
+  width:100%; height:100%; object-fit:cover; display:block;
+  pointer-events:none;
+}
+.tst-play-overlay {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(0,0,0,.3);
+  transition:opacity .25s;
+}
+.tst-play-overlay.hidden { opacity:0; pointer-events:none; }
+.tst-play-btn {
+  width:58px; height:58px; border-radius:50%;
+  background:rgba(255,0,0,.92);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+  transition:transform .2s;
+  flex-shrink:0;
+}
+.tst-play-btn svg { margin-left:3px; }
+.tst-video-wrap:hover .tst-play-btn { transform:scale(1.1); }
+.tst-badge {
+  position:absolute; top:12px; right:12px;
+  background:rgba(0,0,0,.75); backdrop-filter:blur(4px);
+  color:#fff; font-size:11px; font-weight:600;
+  padding:4px 10px; border-radius:100px;
+  display:flex; align-items:center; gap:5px;
+}
+.tst-badge::before { content:'👥'; font-size:10px; }
+.tst-body { padding:16px 18px; }
+.tst-stars { color:var(--accent); font-size:14px; letter-spacing:1px; margin-bottom:4px; }
+.tst-score { font-size:18px; font-weight:800; margin-bottom:2px; }
+.tst-location { font-size:12px; color:var(--accent); font-weight:600; margin-bottom:8px; }
+.tst-quote { font-size:13px; color:var(--text-secondary); line-height:1.55; font-style:italic; }
+.testimonials-more-btn {
+  display:block; margin:32px auto 0;
+  padding:12px 36px; border-radius:var(--radius);
+  border:1.5px solid var(--border); background:var(--bg-primary);
+  font-size:14px; font-weight:600; color:var(--text-secondary);
+  cursor:pointer; transition:all .2s; font-family:inherit;
+}
+.testimonials-more-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-light); }
+.testimonials-more-btn.hidden { display:none; }
+.tst-card.tst-overflow { display:none; }
+.tst-card.tst-overflow.tst-shown { display:block; }
+.testimonials-section.tst-empty { display:none; }
+
+/* ─── SERVICE CARDS (original icon style — still used on /services page) ─── */
 .services-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
 .service-card { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:28px; transition:all .3s; }
 .service-card:hover { border-color:var(--accent); transform:translateY(-4px); box-shadow:var(--shadow-lg); }
@@ -331,7 +506,27 @@ input, textarea, select { font-family: inherit; }
 .team-role { font-size:14px; color:var(--accent); font-weight:500; margin-bottom:8px; }
 .team-detail { font-size:12px; color:var(--text-muted); }
 
-.guarantees-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-top:48px; }
+/* ─── WHY CHOOSE US ─── */
+.why-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:32px 24px; text-align:center; margin-top:16px; }
+.why-card { display:flex; flex-direction:column; align-items:center; gap:0; }
+.why-icon-wrap {
+  width:72px; height:72px; border-radius:50%;
+  background:var(--accent-light);
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; margin-bottom:20px;
+  position:relative;
+}
+.why-icon-wrap::after {
+  content:'';
+  position:absolute; inset:-4px;
+  border-radius:50%;
+  border:2px solid var(--accent);
+  opacity:.25;
+}
+.why-card h4 { font-size:17px; font-weight:800; margin-bottom:8px; letter-spacing:-.2px; }
+.why-card p { font-size:14px; color:var(--text-secondary); line-height:1.6; max-width:200px; }
+
+/* ─── GUARANTEES (About page) ─── */
 .guarantee-card { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius); padding:24px; }
 .guarantee-card h4 { font-size:15px; font-weight:600; margin:10px 0 6px; }
 .guarantee-card p { font-size:13px; color:var(--text-secondary); line-height:1.6; }
@@ -381,10 +576,8 @@ input, textarea, select { font-family: inherit; }
 /* ─── PAGES ─── */
 .page { display:none; }
 .page.active { display:block; }
-/* First page after fixed nav — hero section has its own top padding so no extra needed.
-   Non-home pages need padding so content clears the fixed nav. */
 #page-home { padding-top: 0; }
-#page-services, #page-booking, #page-about, #page-reviews, #page-contact { padding-top: var(--nav-height); }
+#page-services, #page-booking, #page-about, #page-reviews, #page-contact { padding-top: 0; }
 
 /* ─── INQUIRY TYPE ─── */
 @media (max-width:500px) {
@@ -541,7 +734,27 @@ input, textarea, select { font-family: inherit; }
 </head>
 <body>
 
-<!-- NAV — fixed, floats over the parallax image -->
+<!-- TOP CONTACT BAR -->
+<div class="top-bar">
+  <div class="top-bar-left">
+    <span class="top-bar-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      {{PHONE_HOURS}}
+    </span>
+  </div>
+  <div class="top-bar-right">
+    <span class="top-bar-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8 19.79 19.79 0 01.14 2.18 2 2 0 012.11 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.09a16 16 0 006 6l.46-.46a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      {{BUSINESS_PHONE}}
+    </span>
+    <span class="top-bar-item">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      {{BUSINESS_EMAIL}}
+    </span>
+  </div>
+</div>
+
+<!-- NAV — sticky, stacks below top bar -->
 <nav class="nav">
   <div class="nav-inner">
     <div class="nav-logo" id="logoBtn">
@@ -571,39 +784,108 @@ input, textarea, select { font-family: inherit; }
   >
   <div class="site-hero-gradient"></div>
   <div class="site-hero-overlay">
-    <div class="site-hero-title-wrap" id="heroTitleWrap">
-      <div class="site-hero-title">{{COMPANY_NAME}}</div>
-      <img
-        class="site-hero-logo"
-        id="siteHeroLogo"
-        src="logo.png"
-        alt="{{COMPANY_NAME}} logo"
-        onerror="this.style.display='none'"
-        onload="document.getElementById('heroTitleWrap').classList.add('has-logo')"
-      >
+    <div class="site-hero-split">
+      <!-- Left: headline & trust signals -->
+      <div class="hero-left-text fade-up">
+        <div class="hero-eyebrow">
+          <span class="hero-badge-dot"></span>
+          {{HERO_BADGE}}
+        </div>
+        <h1>{{HERO_H1_LINE1}}<br><em>{{HERO_H1_LINE2}}</em></h1>
+        <p class="hero-sub">{{HERO_SUBTEXT}}</p>
+        <div class="hero-trust-items">
+          <div class="hero-trust-item">
+            <div class="hero-trust-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span>Serving {{SERVICE_AREA}}</span>
+          </div>
+          <div class="hero-trust-item">
+            <div class="hero-trust-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span>Licensed, Insured &amp; Warranty-Backed Work</span>
+          </div>
+          <div class="hero-trust-item">
+            <div class="hero-trust-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span>100% Satisfaction Guaranteed</span>
+          </div>
+        </div>
+        <div class="hero-social-proof">
+          <div class="hero-avatars">
+            <div class="hero-avatar-placeholder">A</div>
+            <div class="hero-avatar-placeholder">B</div>
+            <div class="hero-avatar-placeholder">C</div>
+            <div class="hero-avatar-placeholder">D</div>
+          </div>
+          <div class="hero-proof-text">
+            <strong id="statJobs2">4,500+</strong> happy customers<br>
+            <span style="color:var(--accent);font-weight:600;">★★★★★</span> <span style="font-size:12px;">5.0 rating</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: lead capture form -->
+      <div class="hero-lead-form fade-up fade-up-2" id="heroLeadForm">
+        <p class="form-title">Let's Build the Home You've Always Wanted</p>
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input id="hlName" type="text" placeholder="e.g. John Doe">
+        </div>
+        <div class="form-group">
+          <label>Phone *</label>
+          <input id="hlPhone" type="tel" placeholder="e.g. (555) 555-5555">
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input id="hlEmail" type="email" placeholder="e.g. john.doe@example.com">
+        </div>
+        <div class="form-group">
+          <label>ZIP Code *</label>
+          <input id="hlZip" type="text" placeholder="e.g. Street Name, City">
+        </div>
+        <div class="hero-consent">
+          <input type="checkbox" id="hlConsent">
+          <label for="hlConsent">By submitting this form you consent to receive communication related to your inquiry via email, call, or text. You can opt out anytime</label>
+        </div>
+        <button class="hero-form-btn" id="btnHeroLead" onclick="submitHeroLead()">Get Free Quote</button>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- HOME -->
 <div id="page-home" class="page active">
-  <section class="hero">
-    <div class="hero-inner">
-      <div class="hero-badge fade-up"><span class="hero-badge-dot"></span> {{HERO_BADGE}}</div>
-      <h1 class="fade-up fade-up-1">{{HERO_H1_LINE1}}<br><em>{{HERO_H1_LINE2}}</em></h1>
-      <p class="fade-up fade-up-2">{{HERO_SUBTEXT}}</p>
-      <div class="hero-actions fade-up fade-up-3">
-        <button class="btn-primary" onclick="showPage('booking')">Schedule Service →</button>
-        <button class="btn-secondary" onclick="document.getElementById('inquirySection').scrollIntoView({behavior:'smooth'})">Ask a Question</button>
+
+  <!-- ═══ GOOGLE REVIEWS STRIP ═══ -->
+  <div id="googleReviewsStrip" style="display:none; background:var(--bg-secondary); border-bottom:1px solid var(--border-light); padding:14px 24px;">
+    <div style="max-width:var(--max-width);margin:0 auto;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        <div>
+          <div style="font-weight:700;font-size:14px;" id="grBusinessName">Google Reviews</div>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <span style="color:#f5a623;font-size:14px;" id="grStars">★★★★★</span>
+            <span style="font-size:13px;font-weight:600;" id="grRating">5.0</span>
+            <span style="font-size:12px;color:var(--text-muted);" id="grCount">(0)</span>
+          </div>
+        </div>
       </div>
+      <div id="grReviewsScroll" style="display:flex;gap:16px;overflow-x:auto;flex:1;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:4px;"></div>
+      <a id="grWriteLink" href="#" target="_blank" rel="noopener" style="flex-shrink:0;font-size:13px;font-weight:600;color:var(--accent);white-space:nowrap;padding:8px 18px;border:1.5px solid var(--accent);border-radius:8px;transition:all .2s;" onmouseover="this.style.background='var(--accent-light)'" onmouseout="this.style.background='transparent'">Write a Review →</a>
     </div>
-    <div class="stats fade-up fade-up-4">
+  </div>
+
+  <!-- ═══ STATS BAR ═══ -->
+  <div style="background:var(--bg-primary);border-bottom:1px solid var(--border-light);">
+    <div class="stats" style="max-width:var(--max-width);margin:0 auto;border-radius:0;box-shadow:none;background:transparent;border:none;">
       <div class="stat"><div class="stat-value" id="statYears">18+</div><div class="stat-label">Years Exp.</div></div>
       <div class="stat"><div class="stat-value" id="statJobs">4,500+</div><div class="stat-label">Jobs Done</div></div>
       <div class="stat"><div class="stat-value" id="statSatisfaction">99%</div><div class="stat-label">Satisfaction</div></div>
       <div class="stat"><div class="stat-value" id="statTeam">12</div><div class="stat-label">Team Size</div></div>
     </div>
-  </section>
+  </div>
 
   <!-- ═══ HOMEPAGE INQUIRY WIDGET ═══ -->
   <div class="inquiry-section" id="inquirySection">
@@ -648,10 +930,27 @@ input, textarea, select { font-family: inherit; }
     </div>
   </div>
 
-  <section class="section section-alt">
+  <section class="section section-alt" id="homeServicesSection">
     <div class="section-inner">
-      <div class="section-header"><h2>{{SECTION_WHAT_WE_DO}}</h2><p>{{SERVICES_SUBTEXT}}</p></div>
-      <div class="services-grid" id="homeServicesGrid"></div>
+      <div class="section-header">
+        <div class="services-eyebrow">{{SERVICES_EYEBROW}}</div>
+        <h2 class="services-big-headline">{{SECTION_WHAT_WE_DO}}</h2>
+        <p>{{SERVICES_SUBTEXT}}</p>
+      </div>
+      <div class="services-img-grid" id="homeServicesGrid"></div>
+    </div>
+  </section>
+
+  <!-- ═══ WHY CHOOSE US ═══ -->
+  <section class="section" id="whyChooseSection">
+    <div class="section-inner">
+      <div class="section-header">
+        <h2>Why Choose Us</h2>
+        <p id="whyChooseSubtitle">{{WHY_CHOOSE_SUBTITLE}}</p>
+      </div>
+      <div class="why-grid" id="whyGrid">
+        <!-- Populated by renderWhyChooseUs() from guarantee data -->
+      </div>
     </div>
   </section>
 
@@ -664,6 +963,24 @@ input, textarea, select { font-family: inherit; }
       </div>
       <div class="gallery-grid" id="galleryGrid"></div>
       <button class="gallery-more-btn hidden" id="galleryMoreBtn">Show More Photos</button>
+    </div>
+  </section>
+
+  <!-- ═══ VIDEO TESTIMONIALS ═══ -->
+  <section class="testimonials-section" id="testimonialsSection">
+    <div class="testimonials-inner">
+      <div class="testimonials-header-center">
+        <h2 class="testimonials-headline">{{TESTIMONIALS_HEADLINE}}</h2>
+        <div class="testimonials-accent-lines">
+          <span>{{TESTIMONIALS_LINE1}}</span>
+          <span>{{TESTIMONIALS_LINE2}}</span>
+          <span>{{TESTIMONIALS_LINE3}}</span>
+        </div>
+        <p class="testimonials-sub">{{TESTIMONIALS_SUB}}</p>
+        <div class="testimonials-video-label">Video Testimonials</div>
+      </div>
+      <div class="testimonials-grid" id="testimonialsGrid"></div>
+      <button class="testimonials-more-btn hidden" id="testimonialsMoreBtn">Show More Testimonials</button>
     </div>
   </section>
 
@@ -969,6 +1286,11 @@ document.getElementById('hamburgerBtn').addEventListener('click', () => {
    ═══════════════════════════════════════ */
 function renderServiceCards(containerId) {
   const active = SERVICES.filter(s => s.Active !== false);
+  // Homepage uses image card style, services page uses icon card style
+  if (containerId === 'homeServicesGrid') {
+    renderServicesImageGrid(active);
+    return;
+  }
   document.getElementById(containerId).innerHTML = active.map(s => `
     <div class="service-card">
       <div class="service-card-icon">${s.Icon || s.icon || '🔧'}</div>
@@ -979,6 +1301,40 @@ function renderServiceCards(containerId) {
     </div>
   `).join('') || '<p style="color:var(--text-muted);text-align:center;padding:24px;">No services available.</p>';
 }
+
+function renderServicesImageGrid(services) {
+  const grid = document.getElementById('homeServicesGrid');
+  if (!grid) return;
+  if (!services.length) { grid.innerHTML = ''; return; }
+  grid.innerHTML = services.map((s, i) => {
+    const name = s.Name || s.name;
+    const desc = s.Description || s.desc || '';
+    const icon = s.Icon || s.icon || '🔧';
+    // Bullets: split description on period/semicolon/newline into max 3 points
+    const rawBullets = s.Bullets || s.bullets || '';
+    let bullets = rawBullets
+      ? rawBullets.split(/[;|\n]/).map(b => b.trim()).filter(Boolean).slice(0, 3)
+      : desc.split(/[.!?]/).map(b => b.trim()).filter(b => b.length > 10).slice(0, 3);
+    if (!bullets.length) bullets = [desc];
+    const imgSrc = 'service' + (i + 1) + '.jpg';
+    return `
+      <div class="svc-img-card">
+        <img class="svc-img-thumb" src="${imgSrc}" alt="${name}"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="svc-img-thumb-placeholder" style="display:none">${icon}</div>
+        <div class="svc-img-body">
+          <h3>${name}</h3>
+          <p>${bullets[0] || desc}</p>
+          <ul class="svc-img-bullets">
+            ${bullets.map(b => `<li>${b}</li>`).join('')}
+          </ul>
+          <button class="svc-img-cta" onclick="showPage('booking')">Learn More →</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
 
 function renderServiceSelectGrid() {
   const active = SERVICES.filter(s => s.Active !== false);
@@ -1072,8 +1428,40 @@ function renderTeam() {
   `).join('') || '';
 }
 
-/* ═══════════════════════════════════════
-   HOMEPAGE INQUIRY WIDGET
+function renderWhyChooseUs() {
+  const a = ABOUT_DATA;
+  const el = document.getElementById('whyGrid');
+  if (!el) return;
+
+  // Default 4 pillars — overridden by guarantee1–4 from GAS if present
+  const defaults = [
+    { icon:'🛡️', title:'Licensed &amp; Insured', desc:'Fully certified and covered for your peace of mind' },
+    { icon:'⭐', title:'5★ Google Rating',     desc:'Trusted by dozens of satisfied clients in {{SERVICE_AREA}}' },
+    { icon:'⏰', title:'Organized &amp; On Time', desc:'Clear communication and a process that keeps your project on schedule' },
+    { icon:'🏆', title:((a.yearsInBusiness || '10+') + ' Years Experience'), desc:'Decade of excellence in ' + ('{{INDUSTRY_TITLE}}' || 'home services') },
+  ];
+
+  const ICONS = ['🛡️','⭐','⏰','🏆','💰','🔒','✅','📋'];
+  const pillars = [];
+  for (let i = 1; i <= 4; i++) {
+    const t = a['guarantee'+i+'Title'];
+    if (t) {
+      pillars.push({ icon: ICONS[i-1], title: t, desc: a['guarantee'+i+'Desc'] || '' });
+    } else {
+      pillars.push(defaults[i-1]);
+    }
+  }
+
+  el.innerHTML = pillars.map(p => `
+    <div class="why-card">
+      <div class="why-icon-wrap">${p.icon}</div>
+      <h4>${p.title}</h4>
+      <p>${p.desc}</p>
+    </div>
+  `).join('');
+}
+
+
    ═══════════════════════════════════════ */
 let inquiryType = 'question';
 
@@ -1641,6 +2029,7 @@ async function loadSiteData() {
   renderInquiryServiceOptions();
   renderReviews();
   renderAbout();
+  renderWhyChooseUs();
 }
 
 /* ═══════════════════════════════════════
@@ -1660,6 +2049,286 @@ async function loadSiteData() {
 
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
+})();
+
+/* ═══════════════════════════════════════
+   GOOGLE REVIEWS — LIVE PULL
+   Requires: {{GOOGLE_PLACE_ID}} and {{GOOGLE_MAPS_API_KEY}} tokens
+   Falls back gracefully if not configured.
+   ═══════════════════════════════════════ */
+(function initGoogleReviews() {
+  const PLACE_ID  = '{{GOOGLE_PLACE_ID}}';
+  const API_KEY   = '{{GOOGLE_MAPS_API_KEY}}';
+  const STRIP     = document.getElementById('googleReviewsStrip');
+  const SCROLL    = document.getElementById('grReviewsScroll');
+
+  // Only run if both tokens are filled in (not still the template placeholder)
+  if (!PLACE_ID || PLACE_ID.includes('{{') || !API_KEY || API_KEY.includes('{{')) return;
+
+  function renderStars(rating) {
+    const full = Math.round(rating);
+    return '★'.repeat(full) + '☆'.repeat(Math.max(0, 5-full));
+  }
+
+  function loadPlaceDetails() {
+    // Use the Places API via a script callback
+    const callbackName = '__grCallback_' + Date.now();
+    window[callbackName] = function(data) {
+      delete window[callbackName];
+      if (data.status !== 'OK') return;
+      const place = data.result;
+      const rating = place.rating || 0;
+      const total  = place.user_ratings_total || 0;
+      const reviews = (place.reviews || []).slice(0, 5);
+
+      document.getElementById('grBusinessName').textContent = place.name || '{{COMPANY_NAME}}';
+      document.getElementById('grRating').textContent = rating.toFixed(1);
+      document.getElementById('grCount').textContent = '(' + total + ' reviews)';
+      document.getElementById('grStars').textContent = renderStars(rating);
+
+      // Link to write a review
+      document.getElementById('grWriteLink').href =
+        'https://search.google.com/local/writereview?placeid=' + PLACE_ID;
+
+      if (reviews.length) {
+        SCROLL.innerHTML = reviews.map(r => `
+          <div style="flex-shrink:0;max-width:280px;background:#fff;border:1px solid var(--border-light);border-radius:10px;padding:12px 16px;cursor:default;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <div style="width:28px;height:28px;border-radius:50%;background:var(--accent-light);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0;">${(r.author_name||'?')[0].toUpperCase()}</div>
+              <div>
+                <div style="font-size:12px;font-weight:600;">${r.author_name || 'Customer'}</div>
+                <div style="color:#f5a623;font-size:11px;">${renderStars(r.rating)}</div>
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${r.text || ''}</p>
+          </div>
+        `).join('');
+        STRIP.style.display = '';
+      }
+    };
+
+    const fields = 'name,rating,user_ratings_total,reviews';
+    const src = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${PLACE_ID}&fields=${fields}&key=${API_KEY}&callback=${callbackName}`;
+
+    // CORS note: direct Places API calls require a server proxy in production.
+    // Here we use the JS SDK approach via a dynamic script tag.
+    const s = document.createElement('script');
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${API_KEY}&libraries=places&callback=${callbackName}_init`;
+    window[callbackName + '_init'] = function() {
+      const service = new google.maps.places.PlacesService(document.createElement('div'));
+      service.getDetails({ placeId: PLACE_ID, fields: ['name','rating','user_ratings_total','reviews'] }, function(place, status) {
+        window[callbackName]({ status, result: place });
+      });
+    };
+    document.head.appendChild(s);
+  }
+
+  // Refresh every 30 minutes for live updates
+  loadPlaceDetails();
+  setInterval(loadPlaceDetails, 30 * 60 * 1000);
+})();
+
+/* ═══════════════════════════════════════
+   HERO LEAD FORM SUBMIT
+   ═══════════════════════════════════════ */
+function submitHeroLead() {
+  const name    = document.getElementById('hlName').value.trim();
+  const phone   = document.getElementById('hlPhone').value.trim();
+  const email   = document.getElementById('hlEmail').value.trim();
+  const zip     = document.getElementById('hlZip').value.trim();
+  const consent = document.getElementById('hlConsent').checked;
+
+  if (!name || !phone || !email || !zip) { showToast('Please fill in all required fields.', 'error'); return; }
+  if (!consent) { showToast('Please consent to receive communications.', 'error'); return; }
+
+  const btn = document.getElementById('btnHeroLead');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Sending...';
+
+  submitToGAS({ type:'hero_lead', name, phone, email, zip })
+    .then(() => {
+      btn.innerHTML = '✓ We\'ll be in touch soon!';
+      btn.style.background = '#27ae60';
+      ['hlName','hlPhone','hlEmail','hlZip'].forEach(id => document.getElementById(id).value = '');
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.innerHTML = 'Get Free Quote';
+      showToast('Something went wrong. Please call us directly.', 'error');
+    });
+}
+
+function submitToGAS(data) {
+  if (!GAS_URL || GAS_URL.includes('{{')) return Promise.resolve();
+  return fetch(GAS_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ action: 'submitLead', ...data })
+  });
+}
+
+/* ═══════════════════════════════════════
+   VIDEO TESTIMONIALS
+   Probes testimonial1.mp4, testimonial2.mp4 …
+   Stops on first 404. Shows 3 initially,
+   "Show More" for the rest.
+   IntersectionObserver: autoplay when 50%
+   visible, pause when scrolled away.
+   Ends: auto-advance to next visible video.
+   ═══════════════════════════════════════ */
+(function initTestimonials() {
+  var INITIAL_VISIBLE = 3;
+  var BADGE_TEXT      = '{{TESTIMONIALS_BADGE}}';
+  if (!BADGE_TEXT || BADGE_TEXT.includes('{{')) BADGE_TEXT = '30+ Testimonials';
+
+  var META_RAW = '{{TESTIMONIALS_META}}';
+  var metaLines = (META_RAW && !META_RAW.includes('{{'))
+    ? META_RAW.split('\n').map(function(l){ return l.split('|'); })
+    : [];
+
+  var loadedSrcs = [];
+  var videoEls   = [];
+  var currentIdx = -1;
+  var ioRef      = null;
+
+  function getMeta(i) {
+    var m = metaLines[i];
+    return {
+      label:    m && m[0] ? m[0].trim() : ('Testimonial #' + (i+1)),
+      location: m && m[1] ? m[1].trim() : '',
+      score:    m && m[2] ? m[2].trim() : '10/10',
+      quote:    m && m[3] ? m[3].trim() : '',
+    };
+  }
+
+  function probeVideos(index, onDone) {
+    var src = 'testimonial' + index + '.mp4';
+    fetch(src, { method: 'HEAD' })
+      .then(function(r) {
+        if (r.ok) { loadedSrcs.push(src); probeVideos(index + 1, onDone); }
+        else onDone();
+      })
+      .catch(function() { onDone(); });
+  }
+
+  function playVideo(idx) {
+    videoEls.forEach(function(v, i) {
+      if (i !== idx) { v.pause(); v.currentTime = 0; }
+    });
+    if (videoEls[idx]) {
+      videoEls[idx].play().catch(function(){});
+      currentIdx = idx;
+    }
+  }
+
+  function isVisible(el) {
+    var r = el.getBoundingClientRect();
+    return r.top < window.innerHeight && r.bottom > 0;
+  }
+
+  function findNextVisible(afterIdx) {
+    for (var i = afterIdx + 1; i < videoEls.length; i++) {
+      var card = videoEls[i].closest('.tst-card');
+      if (card && getComputedStyle(card).display !== 'none' && isVisible(videoEls[i])) return i;
+    }
+    return -1;
+  }
+
+  function buildGrid() {
+    var grid    = document.getElementById('testimonialsGrid');
+    var section = document.getElementById('testimonialsSection');
+    var moreBtn = document.getElementById('testimonialsMoreBtn');
+    if (!grid) return;
+    if (!loadedSrcs.length) {
+      if (section) section.classList.add('tst-empty');
+      return;
+    }
+
+    loadedSrcs.forEach(function(src, i) {
+      var meta = getMeta(i);
+      var card = document.createElement('div');
+      card.className = 'tst-card' + (i >= INITIAL_VISIBLE ? ' tst-overflow' : '');
+      card.dataset.index = i;
+
+      var stars = '★★★★★';
+      card.innerHTML =
+        '<div class="tst-video-wrap" data-idx="' + i + '">' +
+          '<video src="' + src + '" preload="metadata" playsinline muted></video>' +
+          '<div class="tst-play-overlay" id="tst-ov-' + i + '">' +
+            '<div class="tst-play-btn">' +
+              '<svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>' +
+            '</div>' +
+          '</div>' +
+          '<div class="tst-badge">' + BADGE_TEXT + '</div>' +
+        '</div>' +
+        '<div class="tst-body">' +
+          '<div class="tst-stars">' + stars + '</div>' +
+          '<div class="tst-score">' + meta.score + '</div>' +
+          (meta.location ? '<div class="tst-location">' + meta.location + '</div>' : '') +
+          (meta.quote    ? '<p class="tst-quote">&ldquo;' + meta.quote + '&rdquo;</p>' : '') +
+        '</div>';
+
+      grid.appendChild(card);
+
+      var vid     = card.querySelector('video');
+      var overlay = card.querySelector('.tst-play-overlay');
+      var wrap    = card.querySelector('.tst-video-wrap');
+      videoEls.push(vid);
+
+      wrap.addEventListener('click', function() {
+        if (vid.paused) {
+          playVideo(i);
+        } else {
+          vid.pause();
+        }
+      });
+      vid.addEventListener('pause', function() { overlay.classList.remove('hidden'); });
+      vid.addEventListener('play',  function() { overlay.classList.add('hidden'); });
+      vid.addEventListener('ended', function() {
+        overlay.classList.remove('hidden');
+        var next = findNextVisible(i);
+        if (next !== -1) playVideo(next);
+      });
+    });
+
+    if (loadedSrcs.length > INITIAL_VISIBLE && moreBtn) {
+      moreBtn.classList.remove('hidden');
+      moreBtn.textContent = 'Show More (' + (loadedSrcs.length - INITIAL_VISIBLE) + ' more)';
+      moreBtn.addEventListener('click', function() {
+        grid.querySelectorAll('.tst-overflow').forEach(function(el){ el.classList.add('tst-shown'); });
+        moreBtn.classList.add('hidden');
+        setupIO();
+      });
+    }
+
+    setupIO();
+  }
+
+  function setupIO() {
+    if (!('IntersectionObserver' in window)) return;
+    if (ioRef) ioRef.disconnect();
+    ioRef = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var vid = entry.target.querySelector('video');
+        if (!vid) return;
+        if (!entry.isIntersecting && !vid.paused) {
+          vid.pause();
+          if (parseInt(entry.target.dataset.index) === currentIdx) currentIdx = -1;
+        }
+        // Autoplay first video that enters viewport when nothing is currently playing
+        if (entry.isIntersecting && currentIdx === -1) {
+          var idx = parseInt(entry.target.dataset.index);
+          if (!isNaN(idx)) playVideo(idx);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.tst-card:not(.tst-overflow), .tst-card.tst-shown').forEach(function(card) {
+      ioRef.observe(card);
+    });
+  }
+
+  probeVideos(1, buildGrid);
 })();
 
 /* ═══════════════════════════════════════
@@ -1811,6 +2480,7 @@ async function loadSiteData() {
   renderServiceCards('servicesGrid');
   renderInquiryServiceOptions();
   renderTeam();
+  renderWhyChooseUs();
   initInquiry();
   initBooking();
   renderServiceSelectGrid();
